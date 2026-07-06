@@ -1,0 +1,152 @@
+/* ============================================================
+   MIAA Design System — Colors & Typography
+   Mission intermittente d'aide aux autres
+   Source: Figma file "Sans titre.fig" (miaa.fr, 21/04/2026)
+   ============================================================ */
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
+/* ── Base Color Tokens ───────────────────────────────────── */
+:root {
+  /* Brand */
+  --color-primary:        #128BAD;   /* teal – top bar, sidebar, footer, links */
+  --color-primary-light:  #02AED6;   /* lighter teal – hero bg gradient */
+
+  /* Neutrals */
+  --color-black:          #000000;
+  --color-text:           #333333;   /* main body text */
+  --color-text-dark:      #212529;   /* near-black, used sparingly */
+  --color-white:          #FFFFFF;
+  --color-bg-light:       #F8F9FA;   /* page background tint */
+
+  /* Borders & Dividers */
+  --color-border:         #DDDDDD;   /* nav item borders */
+  --color-border-card:    rgba(0,0,0,0.125); /* card/article borders */
+  --color-border-light:   #DEE2E6;
+
+  /* Shadows */
+  --shadow-header:        0 2px 4px 0 rgba(0,0,0,0.075);
+  --shadow-card:          none; /* cards use border only, no shadow */
+
+  /* ── Semantic aliases ─────────────────────────────────── */
+  --color-link:           var(--color-primary);
+  --color-heading:        var(--color-text);
+  --color-body:           var(--color-text);
+  --color-on-primary:     var(--color-white);
+  --color-surface:        var(--color-white);
+  --color-topbar-bg:      var(--color-primary);
+  --color-footer-bg:      var(--color-primary);
+  --color-sidebar-bg:     var(--color-primary);
+  --color-hero-bg:        var(--color-primary);
+}
+
+/* ── Typography Tokens ───────────────────────────────────── */
+:root {
+  /* Font families */
+  --font-sans:            'Raleway', sans-serif;
+  /* NOTE: Font Awesome 5 is used for icons — see ICONOGRAPHY in README */
+
+  /* Font weights */
+  --fw-light:             300;
+  --fw-regular:           400;
+  --fw-bold:              700;
+
+  /* Scale */
+  --fs-hero:              45px;   /* page title in hero */
+  --fs-h2:                32px;   /* article / section headings */
+  --fs-lg:                18px;   /* featured body text */
+  --fs-base:              16px;   /* default body */
+  --fs-sm:                15px;
+  --fs-xs:                13.3px;
+
+  /* Line heights */
+  --lh-hero:              1.1;
+  --lh-heading:           1.1;
+  --lh-body:              1.5;    /* 24px at 16px base */
+}
+
+/* ── Element Styles ──────────────────────────────────────── */
+body {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--color-body);
+  background-color: var(--color-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, .h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-light);
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+  color: var(--color-white);   /* h1 always appears on hero bg */
+  letter-spacing: 0;
+}
+
+h2, .h2 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-h2);
+  line-height: var(--lh-heading);
+  color: var(--color-heading);
+}
+
+h3, .h3 {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-body);
+  color: var(--color-heading);
+}
+
+p, .body {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-regular);
+  font-size: var(--fs-base);
+  line-height: var(--lh-body);
+  color: var(--color-body);
+}
+
+p strong, .bold {
+  font-weight: var(--fw-bold);
+}
+
+em, .italic {
+  font-style: italic;
+}
+
+a, .link {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── Layout constants ────────────────────────────────────── */
+:root {
+  --layout-max-width:     1140px;  /* centered content column */
+  --layout-page-width:    1920px;
+  --layout-gutter:        390px;   /* horizontal padding at full width */
+
+  /* Spacing */
+  --space-xs:   8px;
+  --space-sm:  15px;
+  --space-md:  20px;
+  --space-lg:  30px;
+  --space-xl:  60px;
+  --space-2xl: 100px;
+
+  /* Radii */
+  --radius-card: 4px;
+  --radius-none: 0;
+
+  /* Component heights */
+  --topbar-height: 40px;
+  --header-height: 130px;
+  --hero-height:   258px;
+}

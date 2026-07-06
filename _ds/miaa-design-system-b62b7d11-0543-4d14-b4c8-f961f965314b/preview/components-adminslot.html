@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Components" name="Card Cuisinier / Maraudeur (admin)" subtitle="en-tête + points + bénévoles + CTA ajouter" viewport="320x440" -->
+<html lang="fr"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Raleway',sans-serif;background:#f8f9fa;padding:24px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.spec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.spec small{font-size:11px;color:#888;font-family:monospace}
+.darkbg{background:#eef1f3;padding:24px;border-radius:8px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+</style></head><body><div class="darkbg"><div class="miaa-adminslot">
+    <div class="miaa-adminslot__header"><div><h3 class="miaa-adminslot__role" data-slot="role-name">Cuisiniers</h3><span class="miaa-adminslot__time" data-slot="role-time">8h – 12h</span></div><span class="miaa-adminslot__count" data-slot="count">3/5</span></div>
+    <div class="miaa-adminslot__dots"><span class="miaa-dot miaa-dot--taken"></span><span class="miaa-dot miaa-dot--taken"></span><span class="miaa-dot miaa-dot--pending"></span><span class="miaa-dot"></span><span class="miaa-dot"></span></div>
+    <div class="miaa-adminslot__list"><div class="miaa-volunteer miaa-volunteer--confirmed">
+  <span class="miaa-volunteer__avatar" data-slot="avatar">CM</span>
+  <div class="miaa-volunteer__info"><span class="miaa-volunteer__name" data-slot="name">Claire Martin</span><span class="miaa-volunteer__meta" data-slot="phone">06 11 22 33 44</span></div>
+  <div class="miaa-volunteer__actions"><span class="miaa-volunteer__status" data-slot="status">Confirmé</span><button class="miaa-volunteer__delete" aria-label="Supprimer"><i class="fas fa-trash"></i></button></div>
+</div><div class="miaa-volunteer miaa-volunteer--confirmed">
+  <span class="miaa-volunteer__avatar" data-slot="avatar">TL</span>
+  <div class="miaa-volunteer__info"><span class="miaa-volunteer__name" data-slot="name">Thomas Leroy</span><span class="miaa-volunteer__meta" data-slot="phone">07 55 66 77 88</span></div>
+  <div class="miaa-volunteer__actions"><span class="miaa-volunteer__status" data-slot="status">Confirmé</span><button class="miaa-volunteer__delete" aria-label="Supprimer"><i class="fas fa-trash"></i></button></div>
+</div><div class="miaa-volunteer miaa-volunteer--pending">
+  <span class="miaa-volunteer__avatar" data-slot="avatar">SB</span>
+  <div class="miaa-volunteer__info"><span class="miaa-volunteer__name" data-slot="name">Sophie Bernard</span><span class="miaa-volunteer__meta" data-slot="phone">06 98 76 54 32</span></div>
+  <div class="miaa-volunteer__actions"><span class="miaa-volunteer__status" data-slot="status">En attente</span><button class="miaa-volunteer__delete" aria-label="Supprimer"><i class="fas fa-trash"></i></button></div>
+</div></div>
+    <button class="miaa-add"><i class="fas fa-plus"></i> Ajouter une personne</button>
+  </div></div></body></html>

@@ -1,0 +1,151 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": []
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Raleway))/i]",
+        "message": "Font not provided by the design system. Available: Raleway."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {},
+    "tokens": [
+      "--color-bg-light",
+      "--color-black",
+      "--color-body",
+      "--color-border",
+      "--color-border-card",
+      "--color-border-light",
+      "--color-footer-bg",
+      "--color-heading",
+      "--color-hero-bg",
+      "--color-link",
+      "--color-on-primary",
+      "--color-primary",
+      "--color-primary-light",
+      "--color-sidebar-bg",
+      "--color-surface",
+      "--color-text",
+      "--color-text-dark",
+      "--color-topbar-bg",
+      "--color-white",
+      "--font-sans",
+      "--fs-base",
+      "--fs-h2",
+      "--fs-hero",
+      "--fs-lg",
+      "--fs-sm",
+      "--fs-xs",
+      "--fw-bold",
+      "--fw-light",
+      "--fw-regular",
+      "--header-height",
+      "--hero-height",
+      "--layout-gutter",
+      "--layout-max-width",
+      "--layout-page-width",
+      "--lh-body",
+      "--lh-heading",
+      "--lh-hero",
+      "--radius-card",
+      "--radius-none",
+      "--shadow-card",
+      "--shadow-header",
+      "--space-2xl",
+      "--space-lg",
+      "--space-md",
+      "--space-sm",
+      "--space-xl",
+      "--space-xs",
+      "--topbar-height"
+    ],
+    "tokenKinds": {
+      "--color-primary": "color",
+      "--color-primary-light": "color",
+      "--color-black": "color",
+      "--color-text": "font",
+      "--color-text-dark": "font",
+      "--color-white": "color",
+      "--color-bg-light": "color",
+      "--color-border": "color",
+      "--color-border-card": "color",
+      "--color-border-light": "color",
+      "--shadow-header": "shadow",
+      "--shadow-card": "shadow",
+      "--color-link": "color",
+      "--color-heading": "color",
+      "--color-body": "color",
+      "--color-on-primary": "color",
+      "--color-surface": "color",
+      "--color-topbar-bg": "color",
+      "--color-footer-bg": "color",
+      "--color-sidebar-bg": "color",
+      "--color-hero-bg": "color",
+      "--font-sans": "font",
+      "--fw-light": "other",
+      "--fw-regular": "other",
+      "--fw-bold": "other",
+      "--fs-hero": "spacing",
+      "--fs-h2": "spacing",
+      "--fs-lg": "spacing",
+      "--fs-base": "spacing",
+      "--fs-sm": "spacing",
+      "--fs-xs": "spacing",
+      "--lh-hero": "other",
+      "--lh-heading": "other",
+      "--lh-body": "other",
+      "--layout-max-width": "spacing",
+      "--layout-page-width": "spacing",
+      "--layout-gutter": "spacing",
+      "--space-xs": "spacing",
+      "--space-sm": "spacing",
+      "--space-md": "spacing",
+      "--space-lg": "spacing",
+      "--space-xl": "spacing",
+      "--space-2xl": "spacing",
+      "--radius-card": "radius",
+      "--radius-none": "radius",
+      "--topbar-height": "spacing",
+      "--header-height": "spacing",
+      "--hero-height": "spacing"
+    },
+    "fontFamilies": [
+      "Raleway"
+    ]
+  }
+}

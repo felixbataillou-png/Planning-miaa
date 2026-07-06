@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Components" name="Journée" subtitle="jour passé (gris) · jour J (bleu + liseré) · jour suivant (bleu)" viewport="380x150" -->
+<html lang="fr"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="../colors_and_type.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Raleway',sans-serif;background:#f8f9fa;padding:24px;display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.spec{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.spec small{font-size:11px;color:#888;font-family:monospace}
+.darkbg{background:#eef1f3;padding:24px;border-radius:8px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+</style></head><body><div class="spec"><div class="miaa-day miaa-day--past">
+  <span class="miaa-day__name" data-slot="day-name">Lun</span>
+  <span class="miaa-day__num" data-slot="day-num">20</span>
+  <span class="miaa-day__month" data-slot="day-month">avr</span>
+</div><small>--past</small></div>
+   <div class="spec"><div class="miaa-day miaa-day--today">
+  <span class="miaa-day__name" data-slot="day-name">Mar</span>
+  <span class="miaa-day__num" data-slot="day-num">21</span>
+  <span class="miaa-day__month" data-slot="day-month">avr</span>
+</div><small>--today</small></div>
+   <div class="spec"><div class="miaa-day miaa-day--upcoming">
+  <span class="miaa-day__name" data-slot="day-name">Mer</span>
+  <span class="miaa-day__num" data-slot="day-num">22</span>
+  <span class="miaa-day__month" data-slot="day-month">avr</span>
+</div><small>--upcoming</small></div></body></html>
