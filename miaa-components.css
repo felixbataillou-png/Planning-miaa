@@ -1,0 +1,443 @@
+/* ============================================================
+   MIAA — Bibliothèque de composants
+   Composants extraits des pages « Inscription » et « Planning admin »,
+   rattachés au design system MIAA.
+
+   Convention :
+   - Préfixe « miaa- » sur chaque composant
+   - BEM : .bloc__element  /  .bloc--variant
+   - Les entrées texte modifiables portent un attribut [data-slot]
+   - Les couleurs d'accent passent par des variables CSS héritables
+
+   Dépend de : _ds/<dossier>/colors_and_type.css  (tokens du design system)
+               Raleway (Google Fonts), Font Awesome 5
+   Charger colors_and_type.css AVANT ce fichier pour hériter des tokens DS.
+   ============================================================ */
+
+:root {
+  /* ── Repris du design system MIAA (colors_and_type.css) ──────────
+     Chaque var pointe sur le token DS, avec un repli identique si la
+     feuille du DS n'est pas chargée. */
+  --miaa-teal:        var(--color-primary, #128BAD);
+  --miaa-ink:         var(--color-text, #333333);
+  --miaa-surface:     var(--color-white, #FFFFFF);
+  --miaa-bg-light:    var(--color-bg-light, #F8F9FA);
+  --miaa-border-card: var(--color-border-card, rgba(0,0,0,0.125));
+  --miaa-font:        var(--font-sans, 'Raleway', sans-serif);
+  --miaa-radius:      var(--radius-card, 4px);
+
+  /* ── Extensions hors DS ──────────────────────────────────────────
+     Le DS miaa.fr (site vitrine) ne définit ni teinte foncée du teal,
+     ni couleurs d'état (urgence / statut), ni rayon 6px utilisés par
+     les écrans planning. On les déclare ici, dérivés du teal de marque. */
+  --miaa-teal-dark:   #0f7a99;
+  --miaa-teal-tint:   #e8f5f9;
+
+  /* États / urgence (planning) */
+  --miaa-red:         #e74c3c;
+  --miaa-red-tint:    #fdecea;
+  --miaa-red-ink:     #c0392b;
+  --miaa-orange:      #f39c12;
+  --miaa-orange-tint: #fef3e2;
+  --miaa-orange-ink:  #d68910;
+  --miaa-green:       #27ae60;
+  --miaa-green-tint:  #d6ecdd;
+  --miaa-green-ink:   #0e5e2f;
+
+  /* Neutres complémentaires */
+  --miaa-ink-soft:    #555;
+  --miaa-ink-mute:    #666;
+  --miaa-gray:        #aaa;
+  --miaa-gray-sq:     #ddd;
+  --miaa-line:        #eee;
+
+  --miaa-radius-lg:   6px;
+}
+
+/* =====================================================================
+   1. JOURNÉE  — .miaa-day
+   Partagé entre « Inscription » et « Planning admin ».
+   Variants : --past (jour passé, gris) · --today (jour J, bleu + liseré)
+              --upcoming (jour suivant, bleu — défaut)
+   Slots    : day-name · day-num · day-month
+   ===================================================================== */
+.miaa-day {
+  display: flex;
+  justify-content: center;  /* centre le h2 horizontalement */
+  align-items: center;      /* centre le h2 verticalement */
+  border-radius: var(--miaa-radius-lg);
+  padding: 10px 8px;
+  background: var(--miaa-teal);
+  font-family: var(--miaa-font);
+  min-width: 96px;
+}
+.miaa-day .day-heading {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end; /* ← aligne par le bas */
+  justify-content: center;  /* ← centre horizontalement */
+  gap: 6px;
+  margin: 0;
+  color: #ffffff;   /* ← force le blanc sur le h2 */
+  }
+.miaa-day__name  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.miaa-day__num   { font-size: 24px; font-weight: 700; line-height: 1; }
+.miaa-day__month { font-size: 12px; opacity: 0.85; }
+
+/* Variant — jour suivant (défaut = bleu) */
+.miaa-day--upcoming { background: var(--miaa-teal); }
+
+/* Variant — jour J (bleu + liseré bleu) */
+.miaa-day--today {
+  background: var(--miaa-teal);
+  outline: 3px solid var(--miaa-teal-dark);
+  outline-offset: 2px;
+}
+
+/* Variant — jour passé (gris) */
+.miaa-day--past { background: var(--miaa-gray); }
+
+/* =====================================================================
+   2. INDICATEUR PLACE  — .miaa-spots
+   Ensemble de petits carrés indiquant le nombre de places.
+   - Carré « pris »  -> gris  (.miaa-spots__sq--taken)
+   - Carré « libre » -> coloré (couleur pilotée par variant)
+   Couleur des libres (modifiable) : --blue (défaut) / --orange / --red
+   Carré optionnel de gauche masqué par défaut (4 carrés) ;
+   .miaa-spots--show-first le révèle (5 carrés).
+   Les 5 variants de remplissage sont obtenus en marquant 0→4 carrés --taken.
+   ===================================================================== */
+.miaa-spots {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  /* NB : ne PAS fixer --miaa-spot-color ici, sinon il masque la valeur
+     héritée d'un parent (.miaa-slot). Le fallback est porté par le carré. */
+}
+.miaa-spots--blue   { --miaa-spot-color: var(--miaa-teal);   }
+.miaa-spots--orange { --miaa-spot-color: var(--miaa-orange); }
+.miaa-spots--red    { --miaa-spot-color: var(--miaa-red);    }
+
+.miaa-spots__sq {
+  width: 13px;
+  height: 13px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: var(--miaa-spot-color, var(--miaa-teal)); /* libre par défaut */
+}
+.miaa-spots__sq--taken { background: var(--miaa-gray-sq); } /* place prise = gris */
+
+/* Carré optionnel de gauche : masqué par défaut (-> 4 carrés) */
+.miaa-spots__sq--first { display: none; }
+.miaa-spots--show-first .miaa-spots__sq--first { display: block; }
+
+/* =====================================================================
+   3. CARD CUISINIER / MARAUDEUR  (page Inscription)  — .miaa-slot
+   Variants : --urgent (rouge) · --soon (orange) · --normal (bleu) · --past (gris)
+   Slots    : role-name · role-time · count · permis · cta
+   La couleur d'accent pilote le badge, les carrés libres et le CTA.
+   ===================================================================== */
+.miaa-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--miaa-radius);
+  padding: 10px 10px 8px;
+  background: var(--miaa-surface);
+  font-family: var(--miaa-font);
+  min-height: 130px;
+  width: 200px;
+  /* défaut = normal */
+  --miaa-accent:       var(--miaa-teal);
+  --miaa-accent-tint:  var(--miaa-teal-tint);
+  --miaa-accent-ink:   var(--miaa-teal-dark);
+  --miaa-spot-color:   var(--miaa-accent); /* les carrés libres héritent de l'accent */
+}
+.miaa-slot--normal { --miaa-accent: var(--miaa-teal);   --miaa-accent-tint: var(--miaa-teal-tint);   --miaa-accent-ink: var(--miaa-teal-dark); }
+.miaa-slot--soon   { --miaa-accent: var(--miaa-orange); --miaa-accent-tint: var(--miaa-orange-tint); --miaa-accent-ink: var(--miaa-orange-ink); }
+.miaa-slot--urgent { --miaa-accent: var(--miaa-red);    --miaa-accent-tint: var(--miaa-red-tint);    --miaa-accent-ink: var(--miaa-red-ink); }
+.miaa-slot--past   { opacity: 0.4; pointer-events: none; --miaa-accent: var(--miaa-gray); --miaa-accent-tint: #f0f0f0; --miaa-accent-ink: #999; }
+
+.miaa-slot__header { display: flex; flex-direction: column; gap: 1px; }
+.miaa-slot__role   { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--miaa-ink-soft); margin: 0; line-height: 1.2; }
+.miaa-slot__time   { font-size: 12px; color: var(--miaa-ink-mute); }
+
+/* Badge nombre de places */
+.miaa-slot__badge {
+  font-size: 12px; font-weight: 700; border-radius: 20px;
+  padding: 2px 8px; display: inline-flex; align-items: center; gap: 4px;
+  width: fit-content;
+  background: var(--miaa-accent-tint);
+  color: var(--miaa-accent-ink);
+}
+.miaa-slot__badge i { font-size: 9px; }
+/* Badge « complet » (créneau plein) */
+.miaa-slot__badge--full { background: #f0f0f0; color: #999; }
+
+/* Indicateur permis (maraude uniquement) */
+.miaa-slot__permis {
+  font-size: 12px; color: var(--miaa-ink-soft); font-weight: 600;
+  display: flex; align-items: center; gap: 4px; padding-top: 3px;
+}
+.miaa-slot__permis i { font-size: 9px; color: var(--miaa-ink-soft); }
+
+/* CTA « Je m'inscris » */
+.miaa-slot__cta {
+  width: 100%; padding: 7px 4px; min-height: 45px; margin-top: 2px;
+  font-family: var(--miaa-font); font-size: 12px; font-weight: 700;
+  border: none; border-radius: var(--miaa-radius); cursor: pointer; color: #fff;
+  background: var(--miaa-accent);
+  transition: filter 0.15s, transform 0.1s;
+}
+.miaa-slot__cta:hover { filter: brightness(0.88); transform: translateY(-1px); }
+.miaa-slot__cta--full { background: #ccc; cursor: default; }
+.miaa-slot__cta--full:hover { filter: none; transform: none; }
+
+/* =====================================================================
+   4. CARD « S'INSCRIRE EN CUISINE ET MARAUDE »  — .miaa-double
+   Bouton double inscription en pointillés.
+   Variants : --urgent (rouge) · --soon (orange) · --normal (bleu)
+   ===================================================================== */
+.miaa-double {
+  width: 100%;
+  padding: 10px 8px;
+  min-height: 45px;
+  font-family: var(--miaa-font);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--miaa-radius);
+  cursor: pointer;
+  background: none;
+  border: 1px dashed var(--miaa-accent, var(--miaa-teal));
+  color: var(--miaa-accent, var(--miaa-teal));
+  transition: background 0.15s;
+  --miaa-accent: var(--miaa-teal);
+  --miaa-accent-tint: var(--miaa-teal-tint);
+}
+.miaa-double--normal { --miaa-accent: var(--miaa-teal);   --miaa-accent-tint: var(--miaa-teal-tint); }
+.miaa-double--soon   { --miaa-accent: var(--miaa-orange); --miaa-accent-tint: var(--miaa-orange-tint); }
+.miaa-double--urgent { --miaa-accent: var(--miaa-red);    --miaa-accent-tint: var(--miaa-red-tint); }
+.miaa-double:hover { background: var(--miaa-accent-tint); }
+
+/* =====================================================================
+   5. CHAMP DE FORMULAIRE (popup)  — .miaa-field
+   Un variant par cas d'usage : --name (nom/prénom) · --tel · --email
+   Slots : label · input · error
+   ===================================================================== */
+.miaa-field {
+  display: flex; flex-direction: column; gap: 5px;
+  font-family: var(--miaa-font);
+  width: 100%;
+}
+.miaa-field__label { font-size: 14px; font-weight: 700; color: var(--miaa-ink); }
+.miaa-field__req   { color: var(--miaa-red-ink); }
+.miaa-field__input {
+  border: 1px solid var(--miaa-gray-sq); border-radius: var(--miaa-radius);
+  padding: 10px 14px; font-family: var(--miaa-font); font-size: 15px; color: var(--miaa-ink);
+  outline: none; transition: border-color 0.15s; background: #fff;
+}
+.miaa-field__input:focus { border-color: var(--miaa-teal); }
+.miaa-field__input--error { border-color: var(--miaa-red); }
+.miaa-field__error { font-size: 12px; color: var(--miaa-red-ink); }
+
+/* =====================================================================
+   6. CARD CUISINIER / MARAUDEUR  (page Planning admin)  — .miaa-adminslot
+   Composant distinct de .miaa-slot : carte blanche avec en-tête,
+   pastille de comptage, points, liste de bénévoles et CTA d'ajout.
+   Slots : role-name · role-time · count
+   ===================================================================== */
+.miaa-adminslot {
+  background: var(--miaa-surface);
+  border-radius: var(--miaa-radius-lg);
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  overflow: hidden;
+  font-family: var(--miaa-font);
+  width: 248px;
+  display: flex; flex-direction: column;
+}
+.miaa-adminslot__header {
+  padding: 10px 12px 8px; border-bottom: 1px solid #f0f0f0;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+.miaa-adminslot__role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--miaa-ink-soft); margin: 0; }
+.miaa-adminslot__time { font-size: 10px; color: var(--miaa-ink-mute); }
+.miaa-adminslot__count {
+  font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 8px;
+  white-space: nowrap; flex-shrink: 0;
+  background: var(--miaa-teal-tint); color: var(--miaa-teal-dark);
+}
+.miaa-adminslot__count--warn { background: var(--miaa-orange-tint); color: var(--miaa-orange-ink); }
+.miaa-adminslot__count--full { background: #f0f0f0; color: #999; }
+
+/* Points (places) — version admin : pris=teal, en attente=orange, vide=gris clair */
+.miaa-adminslot__dots { display: flex; gap: 3px; flex-wrap: wrap; padding: 4px 12px 6px; }
+.miaa-dot { width: 10px; height: 10px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.12); background: #fff; }
+.miaa-dot--taken   { background: var(--miaa-teal); border-color: var(--miaa-teal); }
+.miaa-dot--pending { background: var(--miaa-orange); border-color: var(--miaa-orange); }
+
+.miaa-adminslot__list { display: flex; flex-direction: column; }
+
+/* =====================================================================
+   7. CARD INFO BÉNÉVOLE  — .miaa-volunteer
+   Variants : --confirmed (pastille verte) · --pending (pastille orange)
+   Slots : avatar · name · phone · status
+   ===================================================================== */
+.miaa-volunteer {
+  display: flex; align-items: flex-start; gap: 7px;
+  padding: 8px 10px; border-top: 1px solid #f5f5f5;
+  font-family: var(--miaa-font);
+  --miaa-v-accent: var(--miaa-teal);
+}
+.miaa-volunteer--confirmed { --miaa-v-accent: var(--miaa-green); }
+.miaa-volunteer--pending   { --miaa-v-accent: var(--miaa-orange); }
+
+.miaa-volunteer__avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--miaa-teal); color: #fff; font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.miaa-volunteer--pending .miaa-volunteer__avatar { background: var(--miaa-orange); }
+
+.miaa-volunteer__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.miaa-volunteer__name { font-size: 11px; font-weight: 700; color: var(--miaa-ink); line-height: 1.3; }
+.miaa-volunteer__meta { font-size: 10px; color: var(--miaa-ink-mute); line-height: 1.4; }
+
+.miaa-volunteer__actions { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; flex-shrink: 0; }
+
+/* Pastille de statut */
+.miaa-volunteer__status {
+  font-size: 9px; font-weight: 700; border-radius: 10px; padding: 3px 7px;
+  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+}
+.miaa-volunteer--confirmed .miaa-volunteer__status { background: var(--miaa-green-tint); color: var(--miaa-green-ink); }
+.miaa-volunteer--pending   .miaa-volunteer__status { background: #fde9c8; color: #7a4d00; }
+
+.miaa-volunteer__delete {
+  width: 22px; height: 22px; border-radius: var(--miaa-radius); border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 9px; background: var(--miaa-red-tint); color: #a52f23;
+  transition: filter 0.15s;
+}
+.miaa-volunteer__delete:hover { filter: brightness(0.9); }
+
+/* =====================================================================
+   8. CTA « + AJOUTER UNE PERSONNE »  — .miaa-add
+   ===================================================================== */
+.miaa-add {
+  margin: 8px 12px 10px;
+  padding: 7px 10px;
+  background: none;
+  border: 1px dashed var(--miaa-teal);
+  border-radius: var(--miaa-radius);
+  font-family: var(--miaa-font);
+  font-size: 11px; font-weight: 700; color: var(--miaa-teal);
+  cursor: pointer;
+  width: calc(100% - 24px);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: background 0.15s;
+}
+.miaa-add:hover { background: #f0f9fc; }
+.miaa-add:disabled,
+.miaa-add[disabled] { opacity: 0.5; pointer-events: none; }
+
+/* Label au-dessus d'un groupe de toggle (ex : "Permis de conduire") — partagé entre les deux pages */
+.toggle-row-label {
+  font-size: 14px; font-weight: 700; color: var(--miaa-ink);
+  display: block; margin-bottom: 8px;
+}
+
+/* Pastille de statut (point coloré) utilisée dans les encarts d'information bénévole */
+.status-dot { font-size: 8px; }
+.status-dot--confirmed { color: var(--miaa-green); }
+.status-dot--pending   { color: var(--miaa-orange); }
+
+/* =====================================================================
+   EXTENSIONS — pièces manquantes pour la page Planning admin
+   ===================================================================== */
+
+/* Container query sur adminslot (doit être sur le composant racine) */
+.miaa-adminslot {
+  container-type: inline-size;
+  container-name: adminslot;
+}
+
+/* Variante jour passé */
+.miaa-adminslot--past { opacity: 0.5; pointer-events: none; }
+
+/* Wrapper role + time dans l'en-tête */
+.miaa-adminslot__info { display: flex; flex-direction: column; gap: 1px; }
+
+/* Séparateur avant le CTA d'ajout */
+.miaa-adminslot__divider { border: none; border-top: 1px solid #eee; margin: 0; }
+
+/* État vide */
+.miaa-adminslot__empty {
+  padding: 10px 12px; font-size: 11px; color: #888; font-style: italic;
+  border-top: 1px solid #f5f5f5; text-align: center;
+}
+
+/* Bouton identité (avatar + nom + téléphone) à l'intérieur d'une card bénévole */
+.miaa-volunteer__identity-btn {
+  flex: 1; min-width: 0;
+  display: flex; align-items: flex-start; gap: 7px;
+  background: transparent; border: none; padding: 0; margin: 0;
+  font: inherit; color: inherit; text-align: left;
+  cursor: pointer; border-radius: var(--miaa-radius);
+  transition: background 0.15s;
+}
+.miaa-volunteer__identity-btn:hover { background: #fafbfc; }
+.miaa-volunteer__identity-btn:focus-visible { outline: 2px solid var(--miaa-teal); outline-offset: 2px; }
+
+/* Badge permis à l'intérieur de l'info bénévole */
+.miaa-volunteer__permis {
+  font-size: 9px; color: var(--miaa-ink-soft); font-weight: 700;
+  display: flex; align-items: center; gap: 3px; margin-top: 1px;
+}
+.miaa-volunteer__permis i { font-size: 8px; color: var(--miaa-ink-soft); }
+
+/* Requête de conteneur — carte étroite : masquer l'avatar, laisser le nom s'enrouler */
+@container adminslot (max-width: 200px) {
+  .miaa-volunteer__identity-btn > .miaa-volunteer__avatar { display: none; }
+  .miaa-volunteer__name { white-space: normal; overflow-wrap: anywhere; }
+}
+
+/* =====================================================================
+   9. CONSENTEMENT (RGPD)  — .miaa-consent
+   Case à cocher + texte légal, utilisée dans les modales « informations
+   complémentaires » (page Inscription ET page Planning admin).
+   Slots : checkbox · texte (avec astérisque requis en ligne)
+   ===================================================================== */
+.miaa-consent {
+  display: flex; align-items: flex-start; gap: 12px;
+  border: 1px solid var(--miaa-gray-sq); border-radius: var(--miaa-radius);
+  padding: 12px 14px; cursor: pointer; font-family: var(--miaa-font);
+  transition: border-color 0.15s, background 0.15s;
+}
+.miaa-consent:hover { border-color: var(--miaa-teal); background: var(--miaa-teal-tint); }
+
+.miaa-consent__checkbox {
+  width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; cursor: pointer;
+}
+.miaa-consent__text {
+  font-size: 13px; color: var(--miaa-ink); line-height: 1.5;
+}
+
+/* =====================================================================
+   10. ÉTAT « REQUIS »  — .req-star
+   Astérisque rouge utilisé à côté des labels de champs obligatoires,
+   et en ligne dans les textes (ex : à l'intérieur de .miaa-consent__text).
+   ===================================================================== */
+.req-star { color: var(--miaa-red-ink); }
+
+/* =====================================================================
+   11. MESSAGE DE CHARGEMENT  — .loading-message
+   Affiché dans la grille de planning pendant l'attente de Supabase.
+   ===================================================================== */
+.loading-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--miaa-ink-mute);
+  font-size: 14px;
+}

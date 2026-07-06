@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MIAA — Inscription bénévole</title>
+
+<!-- Design system tokens -->
+<link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
+<!-- Component library -->
+<link rel="stylesheet" href="miaa-components.css">
+<!-- Page styles -->
+<link rel="stylesheet" href="inscription.css">
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL  = 'https://uhwldzyevhrmektqzfic.supabase.co'
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVod2xkenlldmhybWVrdHF6ZmljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDU3MjQsImV4cCI6MjA5NjU4MTcyNH0.oEfbsLgp32CSfcyOnPXLxDFz5Ff7bGjq2k6PmciGBrw'
+  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
+</script>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Aller au contenu</a>
+
+<div class="topbar">
+  <a href="https://facebook.com" target="_blank" rel="noopener"
+     aria-label="Page Facebook MIAA (nouvel onglet)">
+    <i class="fab fa-facebook-f" aria-hidden="true"></i>
+  </a>
+</div>
+
+<header class="site-header">
+  <img class="logo" src="assets/logo.png" alt="MIAA">
+  <nav aria-label="Navigation principale">
+    <a href="#">Accueil</a>
+    <a href="#">Association</a>
+    <a href="#">Contact</a>
+    <a href="#" class="active" aria-current="page">Inscription</a>
+    <a href="#">Newsletter</a>
+  </nav>
+</header>
+
+<div class="hero">
+  <div class="hero-text">
+    <h1>Inscription bénévole</h1>
+    <p>Rejoignez-nous sur le terrain — aux fourneaux ou dans la rue.</p>
+  </div>
+</div>
+
+<main class="page-wrap" id="main-content">
+
+  <section class="intro" aria-label="Présentation">
+    <p class="spaced-paragraph">L'expérience est à la portée de tous, et riche de rencontres et de bons moments.
+    L'originalité de MIAA est de profiter du temps libre qui accompagne les beaux métiers de l'intermittence
+    sans engagement régulier ou à long terme. Toute personne désirant participer et susceptible d'offrir un peu
+    de son temps est évidemment la bienvenue, MIAA est ouvert à tous.</p>
+    <p>Repérez un créneau disponible et cliquez sur « Je m'inscris ». Votre demande sera transmise à l'équipe
+    et confirmée par email. Aucune information personnelle n'est affichée sur le site.</p>
+    <p>Si vous le souhaitez, contactez nous à l'adresse suivante:</p>
+    <p><a href="mailto:miaa@miaa.fr">miaa@miaa.fr</a></p>
+  </section>
+
+  <nav class="week-nav" aria-label="Navigation par semaine">
+    <button id="btn-prev" onclick="changeWeek(-1)" disabled aria-label="Semaine précédente">
+      <span class="btn-text">‹ Semaine précédente</span>
+      <span class="btn-chevron" aria-hidden="true">‹</span>
+    </button>
+    <div class="week-label" id="week-label" aria-live="polite" aria-atomic="true">—</div>
+    <button id="btn-next" onclick="changeWeek(1)" aria-label="Semaine suivante">
+      <span class="btn-text">Semaine suivante ›</span>
+      <span class="btn-chevron" aria-hidden="true">›</span>
+    </button>
+  </nav>
+
+  <div class="legend" aria-label="Légende des créneaux">
+    <div class="legend-item">
+      <div class="legend-pip pip-urgent" aria-hidden="true"><i class="fas fa-bolt"></i></div>
+      Urgent — aujourd'hui / demain
+    </div>
+    <div class="legend-item">
+      <div class="legend-pip pip-soon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+      Bientôt — 2 à 3 jours
+    </div>
+    <div class="legend-item">
+      <div class="legend-pip pip-normal" aria-hidden="true"></div>
+      Places disponibles
+    </div>
+    <div class="legend-item">
+      <div class="legend-pip pip-full" aria-hidden="true">
+        <i class="fas fa-check"></i>
+      </div>
+      Complet
+    </div>
+  </div>
+
+  <div class="planning-wrap">
+    <div class="planning-grid" id="planning-grid"></div>
+  </div>
+
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <span>MIAA - 14, rue des Carrières d'Amérique 75019 Paris - © Miaa 2026</span>
+</footer>
+
+<!-- ── Modale principale : S'inscrire ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <!-- Étape 1 : formulaire -->
+    <div id="modal-form-content">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-title">S'inscrire</h3>
+          <div class="mh-meta">
+            <span class="mh-tag" id="modal-tag-date">—</span>
+            <span class="mh-tag" id="modal-tag-role">—</span>
+            <span class="mh-tag" id="modal-tag-time">—</span>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()" aria-label="Fermer la fenêtre">×</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="form-required-legend">
+          <span class="req-star" aria-hidden="true">*</span> Champs requis
+        </p>
+        <div class="form-group">
+          <label for="inp-nom">Nom et prénom <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="text" id="inp-nom" placeholder="Marie Dupont"
+                 autocomplete="name" required aria-required="true"
+                 aria-describedby="err-nom" aria-invalid="false">
+          <div class="error-msg" id="err-nom" role="alert">Veuillez indiquer votre nom.</div>
+        </div>
+        <div class="form-group">
+          <label for="inp-tel">Téléphone <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="tel" id="inp-tel" placeholder="06 12 34 56 78"
+                 autocomplete="tel" required aria-required="true"
+                 aria-describedby="err-tel" aria-invalid="false">
+          <div class="error-msg" id="err-tel" role="alert">Veuillez indiquer votre numéro.</div>
+        </div>
+        <div class="form-group">
+          <label for="inp-email">Email <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="email" id="inp-email" placeholder="marie.dupont@email.com"
+                 autocomplete="email" required aria-required="true"
+                 aria-describedby="err-email" aria-invalid="false">
+          <div class="error-msg" id="err-email" role="alert">Veuillez indiquer un email valide.</div>
+        </div>
+        <div id="permis-group" style="display:none">
+          <span id="permis-label" class="toggle-row-label">
+            Permis de conduire
+          </span>
+          <label class="toggle-row">
+            <span class="tl-main">Je possède le permis et suis disponible pour conduire</span>
+            <span class="toggle-switch">
+              <input type="checkbox" id="inp-permis" aria-labelledby="permis-label">
+              <span class="toggle-track" aria-hidden="true"></span>
+              <span class="toggle-thumb" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+        <div class="modal-info">
+          <strong>Vos informations restent confidentielles.</strong>
+          Elles ne sont transmises qu'aux responsables du planning et n'apparaissent jamais sur le site.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary" onclick="submitForm()">Confirmer mon inscription</button>
+      </div>
+    </div>
+
+    <!-- Étape 3 : succès -->
+    <div id="modal-success-content" style="display:none">
+      <div class="modal-success">
+        <div class="success-icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+        <h3>Demande envoyée !</h3>
+        <p>Votre demande d'inscription a bien été transmise à l'équipe MIAA.</p>
+        <div class="email-note">
+          <strong>Un email de confirmation vous sera envoyé</strong> après validation par un membre
+          de l'association. Pensez à vérifier vos spams.
+        </div>
+        <button class="close-btn" onclick="closeModal()">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Modale informations complémentaires (nouveaux bénévoles) ── -->
+<div class="modal-overlay" id="modal-overlay-extra" onclick="handleOverlayClickExtra(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-extra-title">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-extra-title">Informations complémentaires</h3>
+        <div class="mh-meta">
+          <span class="mh-tag" id="modal-extra-tag-date">—</span>
+          <span class="mh-tag" id="modal-extra-tag-role">—</span>
+          <span class="mh-tag" id="modal-extra-tag-time">—</span>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModalExtra()" aria-label="Fermer la fenêtre">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="modal-info modal-info--accent">
+        <strong>Tu es nouveau dans l'équipe.</strong>
+        Bienvenue et merci pour ton aide. Il ne te reste plus qu'à remplir ces informations pour finaliser ton inscription.
+      </div>
+
+      <p class="form-required-legend">
+        <span class="req-star" aria-hidden="true">*</span> Champs requis
+      </p>
+
+      <div class="form-group">
+        <label for="inp-secu">N° de sécurité sociale <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="inp-secu" placeholder="1 23 45 67 890 123 45"
+               aria-required="true" aria-describedby="err-secu" aria-invalid="false">
+        <div class="error-msg" id="err-secu" role="alert">Veuillez indiquer votre numéro de sécurité sociale.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="inp-profession">Profession</label>
+        <input type="text" id="inp-profession" placeholder="Comédien·ne, technicien·ne…">
+      </div>
+
+      <div class="form-group">
+        <label for="inp-adresse">Adresse postale</label>
+        <input type="text" id="inp-adresse" placeholder="12 rue de Belleville, 75019 Paris">
+      </div>
+
+      <div class="form-group">
+        <label>Personne à prévenir en cas d'urgence <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="inp-urgence-nom" placeholder="Nom et prénom"
+               aria-required="true" aria-describedby="err-urgence" aria-invalid="false"
+               class="field-spaced">
+        <input type="tel" id="inp-urgence-tel" placeholder="Numéro de téléphone"
+               aria-required="true" aria-invalid="false">
+        <div class="error-msg" id="err-urgence" role="alert">Veuillez indiquer une personne à prévenir.</div>
+      </div>
+
+      <label class="miaa-consent">
+        <input type="checkbox" id="inp-rgpd" onchange="handleRgpdChange()" class="miaa-consent__checkbox">
+        <span class="miaa-consent__text">
+          J'autorise MIAA à utiliser mes données personnelles dans le cadre de l'organisation des activités de l'association.
+          <span class="req-star" aria-hidden="true"> *</span>
+        </span>
+      </label>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="backToMainModal()">Annuler</button>
+      <button class="btn-primary" id="btn-confirm-extra" onclick="submitFormExtra()" disabled>
+        Confirmer mon inscription
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Date helpers ──────────────────────────────────────────────────
+const TODAY = (() => { const d = new Date(); d.setHours(0,0,0,0); return d; })();
+
+const DAYS_FR     = ['Lun','Mar','Mer','Jeu','Ven'];
+const MONTHS_FR   = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+const MONTHS_FULL = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const DAYS_FULL   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+
+function getMonday(d) {
+  const date = new Date(d), dow = date.getDay() || 7;
+  date.setDate(date.getDate() - dow + 1); return date;
+}
+function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dayDiff(d) {
+  const a = new Date(dateKey(d)), b = new Date(dateKey(TODAY));
+  return Math.round((a - b) / 86400000);
+}
+function urgency(d) {
+  const diff = dayDiff(d);
+  if (diff < 0)  return 'past';
+  if (diff <= 1) return 'urgent';
+  if (diff <= 3) return 'soon';
+  return 'normal';
+}
+
+// Heure actuelle à Paris (0-23), indépendamment du fuseau horaire de l'appareil
+function getParisHour() {
+  return parseInt(
+    new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' }).format(new Date()),
+    10
+  )
+}
+
+// ── State ─────────────────────────────────────────────────────────
+let currentWeekOffset = 0;
+let pendingDate = null, pendingRole = null, pendingIsDouble = false;
+
+// ── Supabase : enregistrer une inscription ────────────────────────
+async function storeReg(ds, roleId, nom, email, tel, permis, secu='', profession='', adresse='', urgenceNom='', urgenceTel='') {
+  // Vérifie si le bénévole existe déjà
+  const { data: existing } = await db
+    .from('volunteers')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle()
+
+  let volunteerId
+
+  if (existing) {
+    volunteerId = existing.id
+  } else {
+    const { data: newVol } = await db
+      .from('volunteers')
+      .insert({ nom, email, tel, permis, secu, profession, adresse, urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
+      .select('id')
+      .single()
+    volunteerId = newVol.id
+  }
+
+  // Vérifie que le bénévole n'est pas déjà inscrit à ce créneau/rôle
+  const { count: existingReg } = await db
+    .from('registrations')
+    .select('*', { count: 'exact', head: true })
+    .eq('volunteers_id', volunteerId)
+    .eq('date', ds)
+    .eq('role', roleId)
+
+  if (existingReg && existingReg > 0) {
+    throw new Error('Vous êtes déjà inscrit à ce créneau pour cette activité.')
+  }
+
+  const token = crypto.randomUUID()
+
+  const { data: reg, error: regError } = await db
+    .from('registrations')
+    .insert({
+      volunteers_id: volunteerId,
+      date:          ds,
+      role:          roleId,
+      status:        'pending',
+      Confirm_token: token
+    })
+    .select('id')
+    .single()
+
+  console.log('reg:', reg)
+  console.log('regError:', regError)
+
+  try {
+    await fetch(
+      `https://uhwldzyevhrmektqzfic.supabase.co/functions/v1/notify-admin`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON}`
+        },
+        body: JSON.stringify({ registration_id: reg.id })
+      }
+    )
+  } catch(e) {
+    console.log('notify-admin ignoré en local:', e.message)
+  }
+}
+
+// ── Rendering ─────────────────────────────────────────────────────
+function getWeekDays(offset) {
+  const mon = getMonday(addDays(TODAY, offset * 7));
+  return Array.from({ length: 5 }, (_, i) => addDays(mon, i));
+}
+
+async function renderWeek() {
+  const days = getWeekDays(currentWeekOffset)
+  document.getElementById('btn-prev').disabled = currentWeekOffset === 0
+  document.getElementById('btn-next').disabled = currentWeekOffset === 1
+
+  const mon = days[0], fri = days[4]
+  const sameMonth = mon.getMonth() === fri.getMonth()
+  document.getElementById('week-label').innerHTML = sameMonth
+    ? `<span class="week-prefix">Semaine </span><span>${mon.getDate()} au ${fri.getDate()} ${MONTHS_FULL[fri.getMonth()]} ${fri.getFullYear()}</span>`
+    : `<span class="week-prefix">Semaine </span><span>${mon.getDate()} ${MONTHS_FULL[mon.getMonth()]} au ${fri.getDate()} ${MONTHS_FULL[fri.getMonth()]} ${fri.getFullYear()}</span>`
+
+  document.getElementById('planning-grid').innerHTML = `<div class="loading-message">Chargement…</div>`
+
+  const dateKeys = days.map(d => dateKey(d))
+  const { data: allRegs } = await db
+    .from('registrations')
+    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, email, tel, permis )')
+    .in('date', dateKeys)
+
+  function countFilled(ds, roleId) {
+    return (allRegs || []).filter(r => r.date === ds && r.role === roleId).length
+  }
+  function countPermis(ds) {
+    return (allRegs || []).filter(r => r.date === ds && r.role === 'maraudeur' && r.volunteers?.permis).length
+  }
+
+  let html = ''
+  days.forEach((day, i) => {
+    const ds      = dateKey(day)
+    const urg     = urgency(day)
+    const isPast  = urg === 'past'
+    const isToday = dayDiff(day) === 0
+    const dayVariant  = isPast ? 'past' : isToday ? 'today' : 'upcoming'
+    const dayFullName = DAYS_FULL[day.getDay()]
+    const monthFull   = MONTHS_FULL[day.getMonth()]
+
+    // Un créneau passé n'est plus ouvert à l'inscription dès l'heure de coupure,
+    // même le jour J (8h pour la cuisine, 11h pour la maraude — heure de Paris)
+    const parisHour       = isToday ? getParisHour() : null
+    const cuisinierClosed = isPast || (isToday && parisHour >= 8)
+    const maraudeurClosed = isPast || (isToday && parisHour >= 11)
+
+    html += `<div class="day-col">`
+    html += `<div class="miaa-day miaa-day--${dayVariant}">
+      <h2 class="day-heading">
+        <span class="miaa-day__name" aria-hidden="true">${DAYS_FR[i]}</span>
+        <span class="sr-only">${dayFullName}</span>
+        <span class="miaa-day__num">${day.getDate()}</span>
+        <span class="miaa-day__month" aria-hidden="true">${MONTHS_FR[day.getMonth()]}</span>
+        <span class="sr-only">${monthFull}</span>
+      </h2>
+    </div>`
+
+    const filledCuis  = countFilled(ds, 'cuisinier')
+    const filledMar   = countFilled(ds, 'maraudeur')
+    const permisCount = countPermis(ds)
+
+    html += buildSlot('cuisinier', 'Cuisiniers', '8h – 12h', ds, filledCuis, 5, urg, cuisinierClosed, false)
+    html += buildSlotMaraude(ds, filledMar, 4, permisCount, urg, maraudeurClosed)
+
+    if (!isPast) {
+      const rCuis     = 5 - filledCuis
+      const rMar      = 4 - filledMar
+      const canDouble = !cuisinierClosed && !maraudeurClosed && rCuis > 0 && rMar > 0
+      const dateLabel = `${dayFullName} ${day.getDate()} ${MONTHS_FULL[day.getMonth()]}`
+      if (canDouble) {
+        html += `<button
+          class="miaa-double miaa-double--${urg}"
+          onclick="openModal('${ds}','double','Cuisine &amp; Maraude','8h – 12h / 11h – après-midi',true)"
+          aria-label="Je m'inscris en cuisine et maraude, ${dateLabel}"
+        >S'inscrire en cuisine et maraude</button>`
+      } else {
+        html += `<button class="miaa-double" disabled
+          aria-label="Cuisine et maraude indisponible, ${dateLabel}"
+        >Cuisine &amp; maraude — indisponible</button>`
+      }
+    }
+    html += `</div>`
+  })
+
+  document.getElementById('planning-grid').innerHTML = html
+}
+
+function slotVariantClass(isClosed, isFull, urg) {
+  if (isClosed) return 'miaa-slot--past';
+  if (isFull) return 'miaa-slot--full';
+  return `miaa-slot--${urg}`;
+}
+
+function buildBadge(isFull, urg, remaining) {
+  if (isFull) {
+    return `<span class="miaa-slot__badge miaa-slot__badge--full">
+      <i class="fas fa-check" aria-hidden="true"></i> Complet
+    </span>`;
+  }
+  const icon = urg === 'urgent' ? '<i class="fas fa-bolt" aria-hidden="true"></i> '
+             : urg === 'soon'   ? '<i class="fas fa-clock" aria-hidden="true"></i> '
+             : '';
+  const plural = remaining > 1;
+  return `<span class="miaa-slot__badge">${icon}${remaining} place${plural ? 's' : ''}</span>`;
+}
+
+function buildSpots(filled, quota) {
+  let html = `<div class="miaa-spots" aria-hidden="true">`;
+  for (let s = 0; s < quota; s++) {
+    html += `<div class="miaa-spots__sq${s < filled ? ' miaa-spots__sq--taken' : ''}"></div>`;
+  }
+  return html + `</div>`;
+}
+
+function buildSlot(roleId, label, time, ds, filled, quota, urg, isClosed, isMaraude) {
+  const remaining = quota - filled;
+  const isFull    = remaining === 0;
+  const varCls    = slotVariantClass(isClosed, isFull, urg);
+  const d         = new Date(ds + 'T00:00:00');
+  const dateLabel = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`;
+
+  let html = `<div class="miaa-slot ${varCls}">`;
+  html += `<div class="miaa-slot__header">
+    <h3 class="miaa-slot__role">${label}</h3>
+    <span class="miaa-slot__time">${time}</span>
+  </div>`;
+  html += buildSpots(filled, quota);
+  html += buildBadge(isFull, urg, remaining);
+
+  if (!isClosed) {
+    if (isFull) {
+      html += `<button class="miaa-slot__cta miaa-slot__cta--full" disabled
+        aria-label="${label}, ${dateLabel}, ${time} — créneau complet">Complet</button>`;
+    } else {
+      const ariaLabel = `Je m'inscris comme ${label}, ${dateLabel}, ${time} (${remaining} place${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''})`;
+      html += `<button class="miaa-slot__cta"
+        onclick="openModal('${ds}','${roleId}','${label}','${time}',${isMaraude})"
+        aria-label="${ariaLabel}">Je m'inscris</button>`;
+    }
+  }
+  return html + `</div>`;
+}
+
+function buildSlotMaraude(ds, filled, quota, permisCount, urg, isClosed) {
+  const remaining = quota - filled;
+  const isFull    = remaining === 0;
+  const varCls    = slotVariantClass(isClosed, isFull, urg);
+  const time      = "11h – début d'après-midi";
+  const d         = new Date(ds + 'T00:00:00');
+  const dateLabel = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`;
+
+  let html = `<div class="miaa-slot ${varCls}">`;
+  html += `<div class="miaa-slot__header">
+    <h3 class="miaa-slot__role">Maraudeurs</h3>
+    <span class="miaa-slot__time">${time}</span>
+  </div>`;
+  html += buildSpots(filled, quota);
+  html += buildBadge(isFull, urg, remaining);
+  html += `<div class="miaa-slot__permis">
+    <i class="fas fa-car" aria-hidden="true"></i>
+    <span>Permis ${permisCount}/2</span>
+  </div>`;
+
+  if (!isClosed) {
+    if (isFull) {
+      html += `<button class="miaa-slot__cta miaa-slot__cta--full" disabled
+        aria-label="Maraudeurs, ${dateLabel}, ${time} — créneau complet">Complet</button>`;
+    } else {
+      const ariaLabel = `Je m'inscris comme Maraudeur, ${dateLabel}, ${time} (${remaining} place${remaining > 1 ? 's' : ''} restante${remaining > 1 ? 's' : ''})`;
+      html += `<button class="miaa-slot__cta"
+        onclick="openModal('${ds}','maraudeur','Maraudeurs','11h – début après-midi',true)"
+        aria-label="${ariaLabel}">Je m'inscris</button>`;
+    }
+  }
+  return html + `</div>`;
+}
+
+function changeWeek(dir) {
+  currentWeekOffset = Math.max(0, Math.min(1, currentWeekOffset + dir));
+  localStorage.setItem('miaa-week', currentWeekOffset);
+  renderWeek();
+}
+
+// ── Modale principale ─────────────────────────────────────────────
+let lastFocusedTrigger = null;
+
+function openModal(dateStr, roleId, roleLabel, roleTime, isMaraude) {
+  pendingDate     = dateStr;
+  pendingRole     = roleId;
+  pendingIsDouble = roleId === 'double';
+  lastFocusedTrigger = document.activeElement;
+
+  const d = new Date(dateStr + 'T00:00:00');
+  const displayDate = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`;
+
+  document.getElementById('modal-title').textContent = `S'inscrire — ${roleLabel}`;
+  document.getElementById('modal-tag-date').textContent = displayDate;
+  document.getElementById('modal-tag-role').textContent = roleLabel;
+  document.getElementById('modal-tag-time').textContent = roleTime;
+  document.getElementById('permis-group').style.display = isMaraude ? 'block' : 'none';
+
+  ['inp-nom','inp-tel','inp-email'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.classList.remove('error');
+    el.setAttribute('aria-invalid', 'false');
+  });
+  document.getElementById('inp-permis').checked = false;
+  ['err-nom','err-tel','err-email'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  document.getElementById('modal-form-content').style.display   = 'block';
+  document.getElementById('modal-success-content').style.display = 'none';
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('inp-nom').focus(), 120);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  renderWeek();
+  if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') {
+    setTimeout(() => { try { lastFocusedTrigger.focus(); } catch {} }, 50);
+  }
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+async function submitForm() {
+  const nom    = document.getElementById('inp-nom').value.trim()
+  const tel    = document.getElementById('inp-tel').value.trim()
+  const email  = document.getElementById('inp-email').value.trim()
+  const permis = document.getElementById('inp-permis').checked
+
+  // Validation
+  let valid = true, firstInvalid = null
+  const checks = [
+    { ok: nom.length > 0,       errId: 'err-nom',   inputId: 'inp-nom'   },
+    { ok: tel.length > 0,       errId: 'err-tel',   inputId: 'inp-tel'   },
+    { ok: validateEmail(email), errId: 'err-email', inputId: 'inp-email' },
+  ]
+  checks.forEach(({ ok, errId, inputId }) => {
+    const errEl = document.getElementById(errId)
+    const inpEl = document.getElementById(inputId)
+    errEl.style.display = ok ? 'none' : 'block'
+    inpEl.classList[ok ? 'remove' : 'add']('error')
+    inpEl.setAttribute('aria-invalid', ok ? 'false' : 'true')
+    if (!ok) { valid = false; if (!firstInvalid) firstInvalid = inpEl }
+  })
+  if (!valid) { if (firstInvalid) firstInvalid.focus(); return }
+
+  const btnConfirm = document.querySelector('#modal .btn-primary')
+  btnConfirm.disabled = true
+  btnConfirm.textContent = 'Vérification…'
+
+  // Vérifie si le bénévole existe déjà
+  const { data: existing } = await db
+    .from('volunteers')
+    .select('id')
+    .eq('email', email)
+    .maybeSingle()
+
+  if (existing) {
+    // Bénévole connu → inscription directe
+    try {
+      if (pendingIsDouble) {
+        await storeReg(pendingDate, 'cuisinier', nom, email, tel, false)
+        await storeReg(pendingDate, 'maraudeur', nom, email, tel, permis)
+      } else {
+        await storeReg(pendingDate, pendingRole, nom, email, tel, permis)
+      }
+      document.getElementById('modal-form-content').style.display   = 'none'
+      document.getElementById('modal-success-content').style.display = 'block'
+    } catch(err) {
+      console.error(err)
+      btnConfirm.disabled = false
+      btnConfirm.textContent = 'Confirmer mon inscription'
+      if (err.message.includes('déjà inscrit')) {
+        alert('Vous êtes déjà inscrit à ce créneau pour cette activité.')
+      } else {
+        alert('Une erreur est survenue, merci de réessayer.')
+      }
+    }
+    
+  } else {
+    // Nouveau bénévole → ouvre la modale complémentaire
+    btnConfirm.disabled = false
+    btnConfirm.textContent = 'Confirmer mon inscription'
+    openModalExtra()
+  }
+}
+
+// ── Modale informations complémentaires ───────────────────────────
+function openModalExtra() {
+  document.getElementById('modal-extra-tag-date').textContent = document.getElementById('modal-tag-date').textContent
+  document.getElementById('modal-extra-tag-role').textContent = document.getElementById('modal-tag-role').textContent
+  document.getElementById('modal-extra-tag-time').textContent = document.getElementById('modal-tag-time').textContent
+
+  ;['inp-secu','inp-profession','inp-adresse','inp-urgence-nom','inp-urgence-tel'].forEach(id => {
+    document.getElementById(id).value = ''
+  })
+  document.getElementById('inp-rgpd').checked = false
+  document.getElementById('err-secu').style.display    = 'none'
+  document.getElementById('err-urgence').style.display = 'none'
+
+  const btn = document.getElementById('btn-confirm-extra')
+  btn.disabled = true
+
+  document.getElementById('modal-overlay').classList.remove('open')
+  document.getElementById('modal-overlay-extra').classList.add('open')
+}
+
+function closeModalExtra() {
+  document.getElementById('modal-overlay-extra').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function backToMainModal() {
+  document.getElementById('modal-overlay-extra').classList.remove('open')
+  document.getElementById('modal-overlay').classList.add('open')
+}
+
+function handleOverlayClickExtra(e) {
+  if (e.target === document.getElementById('modal-overlay-extra')) closeModalExtra()
+}
+
+function handleRgpdChange() {
+  const checked = document.getElementById('inp-rgpd').checked
+  document.getElementById('btn-confirm-extra').disabled = !checked
+}
+
+async function submitFormExtra() {
+  const secu       = document.getElementById('inp-secu').value.trim()
+  const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
+  const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
+  const profession = document.getElementById('inp-profession').value.trim()
+  const adresse    = document.getElementById('inp-adresse').value.trim()
+  const nom        = document.getElementById('inp-nom').value.trim()
+  const tel        = document.getElementById('inp-tel').value.trim()
+  const email      = document.getElementById('inp-email').value.trim()
+  const permis     = document.getElementById('inp-permis').checked
+
+  // Validation
+  let valid = true
+  if (!secu) {
+    document.getElementById('err-secu').style.display = 'block'
+    document.getElementById('inp-secu').setAttribute('aria-invalid', 'true')
+    valid = false
+  } else {
+    document.getElementById('err-secu').style.display = 'none'
+    document.getElementById('inp-secu').setAttribute('aria-invalid', 'false')
+  }
+  if (!urgenceNom || !urgenceTel) {
+    document.getElementById('err-urgence').style.display = 'block'
+    valid = false
+  } else {
+    document.getElementById('err-urgence').style.display = 'none'
+  }
+  if (!valid) return
+
+  const btn = document.getElementById('btn-confirm-extra')
+  btn.disabled      = true
+  btn.textContent   = 'Envoi en cours…'
+
+  try {
+    if (pendingIsDouble) {
+      await storeReg(pendingDate, 'cuisinier', nom, email, tel, false, secu, profession, adresse, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, 'maraudeur', nom, email, tel, permis, secu, profession, adresse, urgenceNom, urgenceTel)
+    } else {
+      await storeReg(pendingDate, pendingRole, nom, email, tel, permis, secu, profession, adresse, urgenceNom, urgenceTel)
+    }
+
+    closeModalExtra()
+    document.getElementById('modal-form-content').style.display   = 'none'
+    document.getElementById('modal-success-content').style.display = 'block'
+    document.getElementById('modal-overlay').classList.add('open')
+
+  } catch(err) {
+    console.error(err)
+    btn.disabled    = false
+    btn.textContent = 'Confirmer mon inscription'
+    if (err.message.includes('déjà inscrit')) {
+      alert('Vous êtes déjà inscrit à ce créneau pour cette activité.')
+    } else {
+      alert('Une erreur est survenue, merci de réessayer.')
+    }
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+currentWeekOffset = parseInt(localStorage.getItem('miaa-week') || '0');
+if (isNaN(currentWeekOffset) || currentWeekOffset < 0 || currentWeekOffset > 1) {
+  currentWeekOffset = 0;
+}
+renderWeek();
+
+document.addEventListener('keydown', e => {
+  const overlayMain  = document.getElementById('modal-overlay');
+  const overlayExtra = document.getElementById('modal-overlay-extra');
+  const mainOpen  = overlayMain.classList.contains('open');
+  const extraOpen = overlayExtra.classList.contains('open');
+  if (!mainOpen && !extraOpen) return;
+
+  if (e.key === 'Escape') {
+    if (extraOpen) closeModalExtra();
+    else closeModal();
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    const activeOverlay = extraOpen ? overlayExtra : document.getElementById('modal');
+    const focusables = Array.from(activeOverlay.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(el => {
+      if (el.closest('[style*="display:none"], [style*="display: none"]')) return false;
+      return el.offsetParent !== null || el === document.activeElement;
+    });
+    if (!focusables.length) return;
+    const first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault(); last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault(); first.focus();
+    }
+  }
+});
+</script>
+</body>
+</html>

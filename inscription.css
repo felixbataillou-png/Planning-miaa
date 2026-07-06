@@ -1,0 +1,341 @@
+/* ============================================================
+   MIAA — Page d'inscription bénévole
+   Styles spécifiques à la page (chrome, planning, modal).
+   Dépend de (à charger avant) :
+     _ds/.../colors_and_type.css   — tokens du design system
+     miaa-components.css           — composants partagés
+   ============================================================ */
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Accessibilité ── */
+.sr-only {
+  position: absolute !important; width: 1px !important; height: 1px !important;
+  padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+  clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important;
+}
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 9999;
+  background: var(--color-primary, #128BAD); color: #fff;
+  padding: 8px 16px; border-radius: 0 0 4px 4px; font-weight: 700;
+  font-family: var(--font-sans, 'Raleway', sans-serif);
+}
+.skip-link:focus { left: 50%; transform: translateX(-50%); }
+
+/* Focus visible — RGAA 10.7 */
+*:focus-visible {
+  outline: 2px solid var(--color-primary, #128BAD);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.miaa-slot__cta:focus-visible  { outline-offset: -3px; outline-color: #fff; }
+.miaa-double:focus-visible      { outline-color: var(--color-primary, #128BAD); outline-offset: 2px; }
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--color-topbar-bg, #128BAD);
+  height: var(--topbar-height, 40px);
+  display: flex; align-items: center; justify-content: flex-end;
+  padding: 0 max(15px, calc(50% - 600px));
+}
+.topbar a { color: #fff; font-size: 16px; padding: 0 10px; }
+
+/* ── Header ── */
+.site-header {
+  background: var(--color-surface, #fff);
+  box-shadow: var(--shadow-header, 0 2px 4px rgba(0,0,0,.075));
+  height: var(--header-height, 130px);
+  padding: 15px max(15px, calc(50% - 600px));
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.site-header .logo  { height: 99px; width: auto; }
+.site-header nav    { display: flex; gap: 28px; align-items: center; }
+.site-header nav a  {
+  font-size: 13px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333);
+  letter-spacing: 0.07em; text-transform: uppercase;
+  white-space: nowrap; text-decoration: none;
+}
+.site-header nav a.active,
+.site-header nav a:hover { color: var(--color-primary, #128BAD); }
+
+/* ── Hero ── */
+.hero {
+  position: relative; height: 200px;
+  background: url('assets/hero-banner.jpg') center / cover no-repeat;
+  display: flex; align-items: center;
+  padding: 0 max(15px, calc(50% - 600px));
+}
+.hero::after   { content: ''; position: absolute; inset: 0; background: rgba(18,139,173,0.55); }
+.hero-text     { position: relative; z-index: 1; }
+.hero h1       { font-size: 42px; font-weight: var(--fw-light, 300); color: #fff; line-height: 1.1; }
+.hero p        { color: rgba(255,255,255,0.9); font-size: var(--fs-base, 16px); margin-top: 8px; }
+
+/* Espace entre deux paragraphes consécutifs (ex : section intro) */
+.spaced-paragraph { margin-bottom: 12px; }
+.page-wrap { max-width: 1230px; margin: 0 auto; padding: 40px 15px 80px; }
+.intro     { margin-bottom: 36px; }
+.intro p   { font-size: var(--fs-base, 16px); color: #555; line-height: 1.6; }
+
+/* ── Navigation de semaine ── */
+.week-nav { display: flex; align-items: center; margin-bottom: 24px; gap: 8px; }
+.week-nav button {
+  background: none; border: 1px solid var(--color-border, #ddd); padding: 9px 18px;
+  font-family: var(--font-sans, 'Raleway', sans-serif); font-size: 14px;
+  font-weight: var(--fw-bold, 700); color: var(--color-primary, #128BAD);
+  cursor: pointer; border-radius: var(--radius-card, 4px); transition: background 0.15s;
+  white-space: nowrap;
+}
+.week-nav button:hover    { background: #f0f9fc; }
+.week-nav button:disabled { color: #bbb; cursor: default; border-color: #eee; background: none; }
+.week-nav .btn-text       { display: inline; }
+.week-nav .btn-chevron    { display: none; font-size: 20px; line-height: 1; }
+
+.week-label             { flex: 1; text-align: center; font-size: 17px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333); }
+.week-label .week-prefix { display: inline; }
+
+/* ── Légende ── */
+.legend      { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #555; }
+.legend-pip  {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: #fff;
+}
+.pip-urgent { background: var(--miaa-red,    #e74c3c); }
+.pip-soon   { background: var(--miaa-orange, #f39c12); }
+.pip-normal { background: var(--color-primary, #128BAD); }
+.pip-full   { background: #ccc; }
+
+/* ── Grille du planning ── */
+.planning-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+.planning-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 10px;
+  min-width: 620px;
+}
+.day-col { display: flex; flex-direction: column; gap: 8px; }
+
+/* Titre du jour — neutralise les valeurs par défaut du navigateur pour <h2> */
+h2.day-heading {
+  margin: 0; font-size: inherit; font-weight: inherit;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* Les slots dans la grille remplissent leur colonne */
+.planning-grid .miaa-slot { width: 100%; }
+
+/* Créneau complet (fond légèrement grisé) */
+.miaa-slot--full { background: #fafafa; }
+
+/* Neutralise la marge par défaut du <h3> à l'intérieur du composant */
+h3.miaa-slot__role { margin: 0; }
+
+/* Bouton double-inscription désactivé */
+.miaa-double:disabled           { color: #ccc; border-color: #e0e0e0; cursor: default; }
+.miaa-double:disabled:hover     { background: none; }
+
+/* ── Modale d'inscription ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 500;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--color-surface, #fff); border-radius: 8px;
+  width: 480px; max-width: 95vw;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  animation: slideIn 0.2s ease;
+  max-height: 92vh; overflow-y: auto;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(14px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modal-header {
+  background: var(--color-primary, #128BAD); color: #fff;
+  padding: 20px 24px; border-radius: 8px 8px 0 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-header h3 { font-size: 18px; font-weight: var(--fw-bold, 700); line-height: 1.2; }
+
+.mh-meta { display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
+.mh-tag  {
+  font-size: 12px; background: rgba(255,255,255,0.2); border-radius: 20px;
+  padding: 2px 10px; font-weight: 600;
+}
+
+.modal-close {
+  background: none; border: none; color: #fff; font-size: 22px;
+  cursor: pointer; opacity: 0.75; flex-shrink: 0; margin-left: 12px; padding: 0;
+}
+.modal-close:hover { opacity: 1; }
+
+.modal-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Formulaire */
+.form-group        { display: flex; flex-direction: column; gap: 5px; }
+.form-group label  { font-size: 14px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333); }
+.form-group input[type=text],
+.form-group input[type=email],
+.form-group input[type=tel] {
+  border: 1px solid var(--color-border, #ddd); border-radius: var(--radius-card, 4px);
+  padding: 10px 14px; font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 15px; color: var(--color-text, #333); outline: none; transition: border-color 0.15s;
+}
+.form-group input:focus  { border-color: var(--color-primary, #128BAD); }
+.form-group input.error  { border-color: var(--miaa-red, #e74c3c); }
+
+.error-msg             { font-size: 12px; color: var(--miaa-red-ink, #c0392b); display: none; }
+.form-required-legend  { font-size: 12px; color: #666; margin-bottom: 6px; }
+.form-required-legend .req-star { color: var(--miaa-red-ink, #c0392b); font-weight: var(--fw-bold, 700); }
+
+/* Toggle permis */
+.toggle-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border: 1px solid var(--color-border, #ddd);
+  border-radius: var(--radius-card, 4px);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+.toggle-row:hover   { border-color: var(--color-primary, #128BAD); background: #f0f9fc; }
+.toggle-row .tl-main { font-size: 14px; color: var(--color-text, #333); font-weight: 600; }
+
+.toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle-switch input {
+  position: absolute; inset: 0;
+  opacity: 0; margin: 0; padding: 0; width: 100%; height: 100%; cursor: pointer;
+}
+.toggle-switch input:focus-visible + .toggle-track {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary, #128BAD);
+}
+.toggle-track {
+  position: absolute; inset: 0; border-radius: 24px;
+  background: #ddd; transition: background 0.2s; cursor: pointer;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--color-primary, #128BAD); }
+.toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transition: transform 0.2s; pointer-events: none;
+}
+.toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+.modal-info {
+  background: #f0f9fc; border: 1px solid #b8e0ec; border-radius: var(--radius-card, 4px);
+  padding: 11px 14px; font-size: 13px; color: #0f6980; line-height: 1.5;
+}
+/* Variante avec accent de marque (ex : message d'accueil nouveau bénévole) */
+.modal-info--accent { border-color: var(--color-primary, #128BAD); }
+.modal-info--accent strong { color: var(--color-primary, #128BAD); }
+
+/* Espacement entre deux champs empilés dans un même .form-group (ex : nom + tél d'urgence) */
+.field-spaced { margin-bottom: 8px; }
+
+/* Icône à l'intérieur d'une pastille de légende */
+.legend-pip i { font-size: 9px; }
+
+.modal-footer { padding: 0 24px 24px; display: flex; gap: 10px; }
+
+.btn-primary {
+  flex: 1; background: var(--color-primary, #128BAD); color: #fff; border: none;
+  padding: 13px 24px; font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 15px; font-weight: var(--fw-bold, 700); cursor: pointer;
+  border-radius: var(--radius-card, 4px); transition: background 0.15s;
+}
+.btn-primary:hover     { background: #0f7a99; }
+.btn-primary:disabled,
+.btn-primary:disabled:hover {
+  background: var(--color-primary, #128BAD);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: none; color: #666; border: 1px solid var(--color-border, #ddd);
+  padding: 13px 20px; font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 15px; cursor: pointer; border-radius: var(--radius-card, 4px);
+}
+.btn-secondary:hover { background: var(--color-bg-light, #f8f9fa); }
+
+/* ── Écran de confirmation ── */
+.modal-success {
+  padding: 40px 24px; display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 16px;
+}
+.success-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--color-primary, #128BAD);
+  display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff;
+}
+.modal-success h3  { font-size: 22px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333); }
+.modal-success p   { font-size: 15px; color: #555; line-height: 1.6; max-width: 360px; }
+.email-note {
+  background: #f0f9fc; border: 1px solid #b8e0ec; border-radius: var(--radius-card, 4px);
+  padding: 12px 16px; font-size: 14px; color: #0f6980; line-height: 1.5; max-width: 380px;
+}
+.close-btn {
+  background: var(--color-primary, #128BAD); color: #fff; border: none;
+  padding: 12px 32px; font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 15px; font-weight: var(--fw-bold, 700); cursor: pointer;
+  border-radius: var(--radius-card, 4px); margin-top: 4px;
+}
+.close-btn:hover { background: #0f7a99; }
+
+/* ── Pied de page ── */
+.site-footer {
+  background: var(--color-footer-bg, #128BAD);
+  height: var(--topbar-height, 40px);
+  display: flex; align-items: center; justify-content: center;
+}
+.site-footer span { color: #fff; font-size: 14px; }
+
+/* ── Responsive — tablette large (811–980 px) ── */
+@media (max-width: 980px) and (min-width: 811px) {
+  .site-header             { padding: 15px 20px; }
+  .topbar, .hero           { padding-left: 20px; padding-right: 20px; }
+}
+
+/* ── Responsive — mobile (≤ 810 px) ── */
+@media (max-width: 810px) {
+  .site-header             { padding: 15px 20px; }
+  .topbar, .hero           { padding-left: 20px; padding-right: 20px; }
+  .site-header nav         { display: none; }
+
+  /* Jours empilés verticalement */
+  .planning-wrap           { overflow-x: visible; }
+  .planning-grid           { grid-template-columns: 1fr; min-width: 0; gap: 18px; }
+
+  /* Chaque créneau passe en grille 2 colonnes :
+     nom + horaire sur toute la largeur | spots à gauche / badge à droite */
+  .miaa-slot {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 12px; row-gap: 6px;
+    min-height: 0;
+  }
+  .miaa-slot__header  { grid-column: 1 / -1; flex-direction: row; align-items: baseline; gap: 8px; }
+  .miaa-spots         { grid-column: 1; align-self: center; justify-self: start; width: max-content; max-width: 100%; margin: 0; }
+  .miaa-slot__badge   { grid-column: 2; align-self: center; margin: 0; }
+  .miaa-slot__permis  { grid-column: 1 / -1; padding-top: 0; }
+  .miaa-slot__cta     { grid-column: 1 / -1; }
+
+  /* Légende en colonne */
+  .legend             { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* Navigation de semaine compacte */
+  .week-nav           { gap: 6px; }
+  .week-nav button    { padding: 8px 12px; }
+  .week-nav .btn-text    { display: none; }
+  .week-nav .btn-chevron { display: inline; }
+  .week-label .week-prefix { display: none; }
+  .week-label         { font-size: 15px; }
+}
