@@ -466,18 +466,34 @@ async function submitForm() {
 // ── Modale informations complémentaires (nouveau bénévole) ────────
 
 function openModalExtra() {
+  // 1. Copie les tags
   document.getElementById('modal-extra-tag-date').textContent = document.getElementById('modal-tag-date').textContent
   document.getElementById('modal-extra-tag-role').textContent = document.getElementById('modal-tag-role').textContent
   document.getElementById('modal-extra-tag-time').textContent = document.getElementById('modal-tag-time').textContent
 
+  // 2. Vide les champs D'ABORD
   ;['inp-secu', 'inp-profession', 'inp-adresse', 'inp-urgence-nom', 'inp-urgence-tel'].forEach(id => {
     document.getElementById(id).value = ''
   })
-  document.getElementById('inp-rgpd').checked            = false
-  document.getElementById('err-secu').style.display      = 'none'
-  document.getElementById('err-urgence').style.display   = 'none'
-  document.getElementById('btn-confirm-extra').disabled  = true
+  document.getElementById('inp-rgpd').checked           = false
+  document.getElementById('err-secu').style.display     = 'none'
+  document.getElementById('err-urgence').style.display  = 'none'
+  document.getElementById('btn-confirm-extra').disabled = true
 
+  // 3. Ajoute les écouteurs APRÈS avoir vidé
+  const secu       = document.getElementById('inp-secu')
+  const urgenceNom = document.getElementById('inp-urgence-nom')
+  const urgenceTel = document.getElementById('inp-urgence-tel')
+
+  secu.removeEventListener('input', checkExtraFormValid)
+  urgenceNom.removeEventListener('input', checkExtraFormValid)
+  urgenceTel.removeEventListener('input', checkExtraFormValid)
+
+  secu.addEventListener('input', checkExtraFormValid)
+  urgenceNom.addEventListener('input', checkExtraFormValid)
+  urgenceTel.addEventListener('input', checkExtraFormValid)
+
+  // 4. Ouvre la modale
   document.getElementById('modal-overlay').classList.remove('open')
   document.getElementById('modal-overlay-extra').classList.add('open')
 }
@@ -497,9 +513,20 @@ function handleOverlayClickExtra(e) {
 }
 
 /** Active/désactive le bouton de confirmation selon la case RGPD */
-function handleRgpdChange() {
+function checkExtraFormValid() {
+  const secu       = document.getElementById('inp-secu').value.trim()
+  const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
+  const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
+  const rgpd       = document.getElementById('inp-rgpd').checked
+
+  console.log('check:', { secu, urgenceNom, urgenceTel, rgpd })
+
   document.getElementById('btn-confirm-extra').disabled =
-    !document.getElementById('inp-rgpd').checked
+    !(secu && urgenceNom && urgenceTel && rgpd)
+}
+
+function handleRgpdChange() {
+  checkExtraFormValid()
 }
 
 /**
