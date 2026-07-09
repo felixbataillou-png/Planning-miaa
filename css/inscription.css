@@ -118,6 +118,8 @@
   min-width: 620px;
 }
 .day-col { display: flex; flex-direction: column; gap: 8px; }
+.day-col .miaa-slot:nth-child(2) { min-height: 153px; }
+.day-col .miaa-slot:nth-child(3) { min-height: 180px; }
 
 /* Titre du jour — neutralise les valeurs par défaut du navigateur pour <h2> */
 h2.day-heading {
