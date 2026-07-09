@@ -5,40 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Planning Admin</title>
   <link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
-  <link rel="stylesheet" href="miaa-components.css">
-  <link rel="stylesheet" href="planning-admin.css">
+  <link rel="stylesheet" href="css/miaa-components.css">
+  <link rel="stylesheet" href="css/planning-admin.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- Librairie Supabase (doit précéder supabase-config.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL  = 'https://uhwldzyevhrmektqzfic.supabase.co'
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVod2xkenlldmhybWVrdHF6ZmljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEwMDU3MjQsImV4cCI6MjA5NjU4MTcyNH0.oEfbsLgp32CSfcyOnPXLxDFz5Ff7bGjq2k6PmciGBrw'
-  const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
-</script>
+  <!-- Config Supabase partagée -->
+  <script src="js/supabase-config.js"></script>
+  <!-- Utilitaires de date partagés -->
+  <script src="js/date-utils.js"></script>
 </head>
 <body>
 
   <!-- Écran de connexion -->
-<div id="login-screen" class="login-screen">
-  <div class="login-card">
-    <h2 class="login-title">MIAA — Espace Admin</h2>
-    <p class="login-subtitle">Connexion sécurisée par code email</p>
+<div id="login-screen" style="position:fixed;inset:0;background:#f5f6f8;z-index:1000;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:8px;padding:40px;width:400px;max-width:90vw;box-shadow:0 4px 20px rgba(0,0,0,0.1)">
+    <h2 style="margin-bottom:8px;color:#128BAD">MIAA — Espace Admin</h2>
+    <p style="font-size:14px;color:#666;margin-bottom:24px">Connexion sécurisée par code email</p>
 
     <div id="login-step-email">
       <div class="form-group">
         <label for="login-email">Adresse email</label>
-        <input type="email" id="login-email" placeholder="admin@miaa.fr">
+        <input type="email" id="login-email" placeholder="admin@miaa.fr" style="color:#333;caret-color:#333">
       </div>
-      <button class="btn-primary btn-full" onclick="sendLoginCode()">Recevoir un code</button>
-      <p id="login-error" class="login-error"></p>
+      <button class="btn-primary" style="width:100%;margin-top:12px" onclick="sendLoginCode()">Recevoir un code</button>
+      <p id="login-error" style="color:#c0392b;font-size:13px;margin-top:10px;display:none"></p>
     </div>
 
     <div id="login-step-code" style="display:none">
       <div class="form-group">
         <label for="login-code">Code reçu par email</label>
-        <input type="text" id="login-code" placeholder="123456" maxlength="8">
+        <input type="text" id="login-code" placeholder="123456" maxlength="8" style="color:#333;caret-color:#333">
       </div>
-      <button class="btn-primary btn-full" onclick="verifyLoginCode()">Valider</button>
-      <p id="login-error-code" class="login-error"></p>
+      <button class="btn-primary" style="width:100%;margin-top:12px" onclick="verifyLoginCode()">Valider</button>
+      <p id="login-error-code" style="color:#c0392b;font-size:13px;margin-top:10px;display:none"></p>
     </div>
   </div>
 </div>
@@ -56,10 +56,10 @@
   <a href="/" aria-label="Accueil MIAA"><img class="logo" src="assets/logo.png" alt="MIAA"></a>
   <div class="header-right">
     <div class="admin-label">
-      <i class="fas fa-shield-alt" aria-hidden="true"></i>Planning — Vue Admin
+      <i class="fas fa-shield-alt" aria-hidden="true" style="margin-right:5px;font-size:9px"></i>Planning — Vue Admin
     </div>
-    <button onclick="logout()" class="btn-secondary btn-logout">
-      <i class="fas fa-sign-out-alt" aria-hidden="true"></i>Déconnexion
+    <button onclick="logout()" class="btn-secondary" style="font-size:12px;padding:6px 14px">
+      <i class="fas fa-sign-out-alt" aria-hidden="true" style="margin-right:5px"></i>Déconnexion
     </button>
   </div>
 </header>
@@ -110,19 +110,19 @@
     <div class="modal-body">
       <p class="form-required-legend"><span class="req-star" aria-hidden="true">*</span> Champs requis</p>
       <div class="form-group">
-        <label for="add-nom">Nom et prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <label for="add-nom">Nom et prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
         <input type="text" id="add-nom" placeholder="Marie Dupont" autocomplete="off"
                required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
         <div class="error-msg" id="add-err-nom" role="alert">Veuillez indiquer un nom.</div>
       </div>
       <div class="form-group">
-        <label for="add-tel">Téléphone <span class="req-star" aria-hidden="true">*</span></label>
+        <label for="add-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
         <input type="tel" id="add-tel" placeholder="06 12 34 56 78" autocomplete="off"
                required aria-required="true" aria-describedby="add-err-tel" aria-invalid="false">
         <div class="error-msg" id="add-err-tel" role="alert">Veuillez indiquer un numéro.</div>
       </div>
       <div class="form-group">
-        <label for="add-email">Email <span class="req-star" aria-hidden="true">*</span></label>
+        <label for="add-email">Email <span style="color:#c0392b" aria-hidden="true">*</span></label>
         <input type="email" id="add-email" placeholder="marie.dupont@email.com" autocomplete="off"
                required aria-required="true" aria-describedby="add-err-email" aria-invalid="false">
         <div class="error-msg" id="add-err-email" role="alert">Email invalide.</div>
@@ -135,7 +135,7 @@
         </select>
       </div>
       <div id="add-permis-group" style="display:none">
-        <span id="add-permis-label" class="toggle-row-label">Permis de conduire</span>
+        <span id="add-permis-label" style="font-size:14px;font-weight:700;color:#333;display:block;margin-bottom:8px">Permis de conduire</span>
         <label class="toggle-row">
           <span class="tl-main">Possède le permis et disponible pour conduire</span>
           <span class="toggle-switch">
@@ -148,7 +148,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-primary" onclick="submitAdd()">
-        <i class="fas fa-plus" aria-hidden="true"></i>Ajouter
+        <i class="fas fa-plus" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Ajouter
       </button>
     </div>
   </div>
@@ -167,13 +167,13 @@
     <div class="modal-body">
       <div class="person-info-box" id="del-person-info"></div>
       <div class="confirm-warning">
-        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true" style="margin-right:6px"></i>
         <span id="del-warning-text">Cette action est irréversible.</span>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-danger" onclick="confirmDelete()">
-        <i class="fas fa-trash" aria-hidden="true"></i>Supprimer
+        <i class="fas fa-trash" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Supprimer
       </button>
     </div>
   </div>
@@ -192,18 +192,18 @@
     <div class="modal-body">
       <div class="form-group">
         <label for="edit-nom">Nom et prénom</label>
-        <input type="text" id="edit-nom" readonly>
+        <input type="text" id="edit-nom" readonly style="background:#f8f9fa;cursor:default">
       </div>
       <div class="form-group">
         <label for="edit-tel">Téléphone</label>
-        <input type="tel" id="edit-tel" readonly>
+        <input type="tel" id="edit-tel" readonly style="background:#f8f9fa;cursor:default">
       </div>
       <div class="form-group">
         <label for="edit-email">Email</label>
-        <input type="email" id="edit-email" readonly>
+        <input type="email" id="edit-email" readonly style="background:#f8f9fa;cursor:default">
       </div>
       <div id="edit-permis-display" style="display:none">
-        <div class="modal-info modal-info--inline">
+        <div style="background:#f0f9fc;border:1px solid #b8e0ec;border-radius:4px;padding:10px 12px;font-size:12px;color:#0f6980;display:flex;align-items:center;gap:8px">
           <i class="fas fa-car" aria-hidden="true"></i>
           <span>Possède le permis de conduire</span>
         </div>
@@ -217,11 +217,11 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-tertiary btn-auto-width" onclick="deleteFromEdit()">
-        <i class="fas fa-trash" aria-hidden="true"></i>Supprimer
+      <button class="btn-tertiary" onclick="deleteFromEdit()" style="flex:0 0 auto;padding:12px 18px">
+        <i class="fas fa-trash" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Supprimer
       </button>
       <button class="btn-primary" id="edit-save-btn" onclick="saveEdit()" disabled>
-        <i class="fas fa-save" aria-hidden="true"></i>Enregistrer
+        <i class="fas fa-save" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Enregistrer
       </button>
     </div>
   </div>
@@ -239,8 +239,8 @@
     </div>
 
     <div class="modal-body">
-      <div class="modal-info modal-info--accent">
-        <strong>Nouveau bénévole.</strong>
+      <div class="modal-info" style="background:#f0f9fc;border-color:#128BAD">
+        <strong style="color:#128BAD">Nouveau bénévole.</strong>
         Merci de compléter ces informations pour finaliser l'inscription.
       </div>
 
@@ -249,7 +249,7 @@
       </p>
 
       <div class="form-group">
-        <label for="add-extra-secu">N° de sécurité sociale <span class="req-star" aria-hidden="true">*</span></label>
+        <label for="add-extra-secu">N° de sécurité sociale <span style="color:#c0392b" aria-hidden="true">*</span></label>
         <input type="text" id="add-extra-secu" placeholder="1 23 45 67 890 123 45"
                aria-required="true" aria-describedby="add-extra-err-secu" aria-invalid="false">
         <div class="error-msg" id="add-extra-err-secu" role="alert">Veuillez indiquer le numéro de sécurité sociale.</div>
@@ -266,27 +266,29 @@
       </div>
 
       <div class="form-group">
-        <label>Personne à prévenir en cas d'urgence <span class="req-star" aria-hidden="true">*</span></label>
+        <label>Personne à prévenir en cas d'urgence <span style="color:#c0392b" aria-hidden="true">*</span></label>
         <input type="text" id="add-extra-urgence-nom" placeholder="Nom et prénom"
                aria-required="true" aria-describedby="add-extra-err-urgence" aria-invalid="false"
-               class="field-spaced">
+               style="margin-bottom:8px">
         <input type="tel" id="add-extra-urgence-tel" placeholder="Numéro de téléphone"
                aria-required="true" aria-invalid="false">
         <div class="error-msg" id="add-extra-err-urgence" role="alert">Veuillez indiquer une personne à prévenir.</div>
       </div>
 
-      <label class="miaa-consent">
-        <input type="checkbox" id="add-extra-rgpd" onchange="handleRgpdChangeAddExtra()" class="miaa-consent__checkbox">
-        <span class="miaa-consent__text">
+      <label style="border:1px solid #ddd;border-radius:4px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer">
+        <input type="checkbox" id="add-extra-rgpd" onchange="handleRgpdChangeAddExtra()"
+               style="width:18px;height:18px;margin-top:2px;flex-shrink:0;cursor:pointer">
+        <span style="font-size:13px;color:#333;line-height:1.5">
           Le bénévole autorise MIAA à utiliser ses données personnelles dans le cadre de l'organisation des activités de l'association.
-          <span class="req-star" aria-hidden="true"> *</span>
+          <span style="color:#c0392b" aria-hidden="true"> *</span>
         </span>
       </label>
     </div>
 
     <div class="modal-footer">
       <button class="btn-secondary" onclick="backToAddModal()">Annuler</button>
-      <button class="btn-primary" id="btn-confirm-add-extra" onclick="submitAddExtra()" disabled>
+      <button class="btn-primary" id="btn-confirm-add-extra" onclick="submitAddExtra()" disabled
+              style="opacity:0.4;cursor:not-allowed">
         Confirmer
       </button>
     </div>
@@ -299,709 +301,7 @@
   <span id="toast-msg"></span>
 </div>
 
-<script>
-  let loginEmail = ''
-
-async function checkAuth() {
-  const { data: { session } } = await db.auth.getSession()
-  if (session) {
-    document.getElementById('login-screen').style.display = 'none'
-  } else {
-    document.getElementById('login-screen').style.display = 'flex'
-  }
-}
-
-async function sendLoginCode() {
-  loginEmail = document.getElementById('login-email').value.trim()
-  const errEl = document.getElementById('login-error')
-
-  const { error } = await db.auth.signInWithOtp({ email: loginEmail })
-
-  if (error) {
-    errEl.textContent = "Cette adresse n'est pas autorisée."
-    errEl.style.display = 'block'
-    return
-  }
-
-  document.getElementById('login-step-email').style.display = 'none'
-  document.getElementById('login-step-code').style.display  = 'block'
-}
-
-async function verifyLoginCode() {
-  const code = document.getElementById('login-code').value.trim()
-  const errEl = document.getElementById('login-error-code')
-
-  const { error } = await db.auth.verifyOtp({
-    email: loginEmail,
-    token: code,
-    type: 'email'
-  })
-
-  if (error) {
-    errEl.textContent = "Code invalide ou expiré."
-    errEl.style.display = 'block'
-    return
-  }
-
-  document.getElementById('login-screen').style.display = 'none'
-  renderPage()
-}
-async function logout() {
-  await db.auth.signOut()
-  document.getElementById('login-screen').style.display = 'flex'
-  document.getElementById('login-step-email').style.display = 'block'
-  document.getElementById('login-step-code').style.display  = 'none'
-  document.getElementById('login-email').value = ''
-  document.getElementById('login-code').value  = ''
-}
-
-checkAuth()
-// ── Constants ─────────────────────────────────────────────────────
-const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
-const DAYS_FR     = ['Lun','Mar','Mer','Jeu','Ven'];
-const MONTHS_FR   = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
-const MONTHS_FULL = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-const DAYS_FULL   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
-
-const ROLES = [
-  { id: 'cuisinier', label: 'Cuisiniers', quota: 5, time: '8h – 12h',                   isMaraude: false },
-  { id: 'maraudeur', label: 'Maraudeurs', quota: 4, time: '11h – début après-midi', isMaraude: true  },
-];
-
-// ── Helpers ───────────────────────────────────────────────────────
-function getMonday(d) {
-  const date = new Date(d), day = date.getDay() || 7;
-  date.setDate(date.getDate() - day + 1); return date;
-}
-function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r; }
-function localDateKey(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
-}
-function dayDiff(d) {
-  return Math.round((new Date(localDateKey(d)) - new Date(localDateKey(TODAY))) / 86400000);
-}
-function initials(name) {
-  const parts = name.trim().split(' ');
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-}
-
-// ── Supabase helpers ──────────────────────────────────────────────
-async function getSlotRegs(ds, roleId) {
-  const { data } = await db
-    .from('registrations')
-    .select(`
-      id, status, Confirm_token,
-      volunteers ( id, nom, email, tel, permis )
-    `)
-    .eq('date', ds)
-    .eq('role', roleId)
-  return data || []
-}
-
-async function setSlotStatus(regId, newStatus) {
-  await db
-    .from('registrations')
-    .update({ status: newStatus })
-    .eq('id', regId)
-}
-
-async function deleteReg(regId) {
-  await db
-    .from('registrations')
-    .delete()
-    .eq('id', regId)
-}
-
-async function addReg(ds, roleId, nom, email, tel, permis, status, secu='', profession='', adresse='', urgenceNom='', urgenceTel='') {
-  // Vérifie si le bénévole existe déjà
-  const { data: existing } = await db
-    .from('volunteers')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
-
-  let volunteerId
-  if (existing) {
-    volunteerId = existing.id
-  } else {
-    const { data: newVol } = await db
-      .from('volunteers')
-      .insert({ nom, email, tel, permis, secu, profession, adresse, urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
-      .select('id')
-      .single()
-    volunteerId = newVol.id
-  }
-
-  const token = crypto.randomUUID()
-
-  await db
-    .from('registrations')
-    .insert({
-      volunteers_id: volunteerId,
-      date:          ds,
-      role:          roleId,
-      status:        status,
-      Confirm_token: token
-    })
-}
-
-// ── State ─────────────────────────────────────────────────────────
-let currentWeekOffset = parseInt(localStorage.getItem('miaa-admin-week') || '0');
-if (isNaN(currentWeekOffset) || currentWeekOffset < 0 || currentWeekOffset > 4) currentWeekOffset = 0;
-
-let pendingAction = null;
-let addTarget     = null;
-
-// ── Week helpers ──────────────────────────────────────────────────
-function getWeekDays(offset) {
-  const monday = getMonday(addDays(TODAY, offset * 7));
-  return Array.from({ length: 5 }, (_, i) => addDays(monday, i));
-}
-
-async function changeWeek(dir) {
-  currentWeekOffset = Math.max(0, Math.min(4, currentWeekOffset + dir))
-  localStorage.setItem('miaa-admin-week', currentWeekOffset)
-  await renderPage()
-}
-
-// ── Compute stats ─────────────────────────────────────────────────
-function computeWeekStats(days) {
-  let total = 0, confirmed = 0, pending = 0, spots = 0;
-  days.forEach(day => {
-    const ds = localDateKey(day);
-    ROLES.forEach(role => {
-      const regs = getSlotRegs(ds, role.id);
-      total     += regs.length;
-      confirmed += regs.filter(r => r.status === 'confirmed').length;
-      pending   += regs.filter(r => r.status === 'pending').length;
-      spots     += Math.max(0, role.quota - regs.length);
-    });
-  });
-  return { total, confirmed, pending, spots };
-}
-
-// ── Render ────────────────────────────────────────────────────────
-async function renderPage() {
-  const days = getWeekDays(currentWeekOffset)
-
-  document.getElementById('btn-prev').disabled = currentWeekOffset === 0
-  document.getElementById('btn-next').disabled = currentWeekOffset === 4
-
-  const mon = days[0], ven = days[4]
-  const sameMonth = mon.getMonth() === ven.getMonth()
-  document.getElementById('week-label').innerHTML = sameMonth
-    ? `<span class="week-prefix">Semaine </span><span>${mon.getDate()} au ${ven.getDate()} ${MONTHS_FULL[ven.getMonth()]} ${ven.getFullYear()}</span>`
-    : `<span class="week-prefix">Semaine </span><span>${mon.getDate()} ${MONTHS_FULL[mon.getMonth()]} au ${ven.getDate()} ${MONTHS_FULL[ven.getMonth()]} ${ven.getFullYear()}</span>`
-
-  // Chargement
-  document.getElementById('planning-grid').innerHTML = `<div class="loading-message">Chargement…</div>`
-
-  // Récupère toutes les inscriptions de la semaine en une seule requête
-  const dateKeys = days.map(d => localDateKey(d))
-  const { data: allRegs } = await db
-    .from('registrations')
-    .select(`id, date, role, status, Confirm_token, volunteers ( id, nom, email, tel, permis )`)
-    .in('date', dateKeys)
-
-  const regsData = allRegs || []
-
-  // Stats
-  let total = 0, confirmed = 0, pending = 0, spots = 0
-  ROLES.forEach(role => {
-    dateKeys.forEach(ds => {
-      const slotRegs = regsData.filter(r => r.date === ds && r.role === role.id)
-      total     += slotRegs.length
-      confirmed += slotRegs.filter(r => r.status === 'confirmed').length
-      pending   += slotRegs.filter(r => r.status === 'pending').length
-      spots     += Math.max(0, role.quota - slotRegs.length)
-    })
-  })
-
-  document.getElementById('stats-bar').innerHTML = `
-    <div class="stat-card">
-      <div class="stat-icon blue"><i class="fas fa-users" aria-hidden="true"></i></div>
-      <div><div class="stat-label">Total inscrits</div><div class="stat-val">${total}</div></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon green"><i class="fas fa-check" aria-hidden="true"></i></div>
-      <div><div class="stat-label">Confirmés</div><div class="stat-val">${confirmed}</div></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon orange"><i class="fas fa-clock" aria-hidden="true"></i></div>
-      <div><div class="stat-label">En attente</div><div class="stat-val">${pending}</div></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon red"><i class="fas fa-chair" aria-hidden="true"></i></div>
-      <div><div class="stat-label">Places libres</div><div class="stat-val">${spots}</div></div>
-    </div>
-  `
-
-  let html = ''
-  days.forEach((day, i) => {
-    const ds          = localDateKey(day)
-    const diff        = dayDiff(day)
-    const isPast      = diff < 0
-    const isToday     = diff === 0
-    const dayVariant  = isPast ? 'past' : isToday ? 'today' : 'upcoming'
-    const dayFullName = DAYS_FULL[day.getDay()]
-    const monthFull   = MONTHS_FULL[day.getMonth()]
-    const dateLabel   = `${dayFullName} ${day.getDate()} ${monthFull}`
-
-    html += `<div class="day-col">`
-    html += `<div class="miaa-day miaa-day--${dayVariant}">
-      <h2 class="day-heading">
-        <span class="miaa-day__name" aria-hidden="true">${DAYS_FR[i]}</span>
-        <span class="sr-only">${dayFullName}</span>
-        <span class="miaa-day__num">${day.getDate()}</span>
-        <span class="miaa-day__month" aria-hidden="true">${MONTHS_FR[day.getMonth()]}</span>
-        <span class="sr-only">${monthFull}</span>
-      </h2>
-    </div>`
-
-    ROLES.forEach(role => {
-      const regs      = regsData.filter(r => r.date === ds && r.role === role.id)
-      const filled    = regs.length
-      const remaining = role.quota - filled
-      const isFull    = remaining <= 0
-      const countMod  = isFull ? ' miaa-adminslot__count--full' : remaining <= 1 ? ' miaa-adminslot__count--warn' : ''
-      const countTxt  = isFull ? 'Complet' : `${filled}/${role.quota}`
-
-      html += `<div class="miaa-adminslot${isPast ? ' miaa-adminslot--past' : ''}">`
-      html += `<div class="miaa-adminslot__header">
-        <div class="miaa-adminslot__info">
-          <h3 class="miaa-adminslot__role">${escHtml(role.label)}</h3>
-          <span class="miaa-adminslot__time">${escHtml(role.time)}</span>
-        </div>
-        <span class="miaa-adminslot__count${countMod}">${countTxt}</span>
-      </div>`
-
-      html += `<div class="miaa-adminslot__dots" aria-hidden="true">`
-      for (let s = 0; s < role.quota; s++) {
-        if (s < filled) {
-          const dotMod = regs[s].status === 'pending' ? ' miaa-dot--pending' : ' miaa-dot--taken'
-          html += `<div class="miaa-dot${dotMod}"></div>`
-        } else {
-          html += `<div class="miaa-dot"></div>`
-        }
-      }
-      html += `</div>`
-
-      html += `<div class="miaa-adminslot__list">`
-      if (regs.length === 0) {
-        html += `<div class="miaa-adminslot__empty">Aucune inscription</div>`
-      } else {
-        regs.forEach(reg => {
-          const isPending   = reg.status === 'pending'
-          const volMod      = isPending ? ' miaa-volunteer--pending' : ' miaa-volunteer--confirmed'
-          const stTxt       = isPending ? 'En attente' : 'Confirmé'
-          const permisBadge = role.isMaraude && reg.volunteers.permis
-            ? `<span class="miaa-volunteer__permis"><i class="fas fa-car" aria-hidden="true"></i>Permis</span>`
-            : ''
-          const identityLabel = escAttr(`Modifier l'inscription de ${reg.volunteers.nom}, ${role.label.toLowerCase()}, ${dateLabel}, statut ${stTxt.toLowerCase()}`)
-          const deleteLabel   = escAttr(`Supprimer l'inscription de ${reg.volunteers.nom}, ${role.label.toLowerCase()}, ${dateLabel}`)
-
-          html += `<div class="miaa-volunteer${volMod}">
-            <button type="button" class="miaa-volunteer__identity-btn"
-              onclick="openEdit('${ds}','${role.id}','${reg.id}',event)"
-              aria-label="${identityLabel}">
-              <span class="miaa-volunteer__avatar" aria-hidden="true">${initials(reg.volunteers.nom)}</span>
-              <span class="miaa-volunteer__info">
-                <span class="miaa-volunteer__name">${escHtml(reg.volunteers.nom)}</span>
-                <span class="miaa-volunteer__meta">${escHtml(reg.volunteers.tel)}</span>
-                ${permisBadge}
-              </span>
-            </button>
-            <div class="miaa-volunteer__actions">
-              <span class="miaa-volunteer__status">${stTxt}</span>
-              <button type="button" class="miaa-volunteer__delete"
-                aria-label="${deleteLabel}"
-                onclick="openDelete('${ds}','${role.id}','${reg.id}',event)">
-                <i class="fas fa-trash" aria-hidden="true"></i>
-              </button>
-            </div>
-          </div>`
-        })
-      }
-      html += `</div>`
-
-      if (!isPast) {
-        const addLabel = escAttr(`Ajouter une personne au créneau ${role.label.toLowerCase()}, ${dateLabel}, ${role.time}`)
-        if (regs.length > 0) html += `<hr class="miaa-adminslot__divider">`
-        if (!isFull) {
-          html += `<button class="miaa-add"
-            data-date="${ds}"
-            data-role="${role.id}"
-            data-label="${escAttr(role.label)}"
-            data-time="${escAttr(role.time)}"
-            data-maraude="${role.isMaraude}"
-            onclick="handleAdd(this)"
-            aria-label="${addLabel}">
-            <i class="fas fa-plus" aria-hidden="true"></i> Ajouter une personne
-          </button>`
-        } else {
-          html += `<button class="miaa-add" disabled aria-disabled="true">
-            Créneau complet
-          </button>`
-        }
-      }
-
-      html += `</div>`
-    })
-
-    html += `</div>`
-  })
-
-  document.getElementById('planning-grid').innerHTML = html
-}
-
-// ── handleAdd (évite les problèmes d'apostrophe dans onclick) ─────
-function handleAdd(btn) {
-  const { date: ds, role: roleId, label: roleLabel, time: roleTime, maraude } = btn.dataset;
-  openAdd(ds, roleId, roleLabel, roleTime, maraude === 'true');
-}
-
-// ── Modal helpers ─────────────────────────────────────────────────
-function handleOverlayClick(e, id) {
-  if (e.target === document.getElementById(id)) closeModal(id);
-}
-let lastFocusedTrigger = null;
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
-  document.body.style.overflow = '';
-  if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === 'function') {
-    setTimeout(() => { try { lastFocusedTrigger.focus(); } catch(e) {} }, 50);
-  }
-}
-function openModalEl(id) {
-  lastFocusedTrigger = document.activeElement;
-  document.getElementById(id).classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function getFocusable(node) {
-  return Array.from(node.querySelectorAll(
-    'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )).filter(el => {
-    if (el.closest('[style*="display:none"], [style*="display: none"]')) return false;
-    return el.offsetParent !== null || el === document.activeElement;
-  });
-}
-
-// ── Modifier une inscription ──────────────────────────────────────
-let editOriginalStatus = null;
-
-async function openEdit(dateStr, roleId, regId, event) {
-  if (event) event.stopPropagation();
-  const regs = await getSlotRegs(dateStr, roleId);
-  const reg  = regs.find(r => String(r.id) === String(regId));
-  if (!reg) return;
-  pendingAction      = { type: 'edit', dateStr, roleId, regId };
-  editOriginalStatus = reg.status;
-
-  const role = ROLES.find(r => r.id === roleId);
-document.getElementById('edit-modal-sub').textContent  = `${role.label} · ${role.time}`;
-document.getElementById('edit-nom').value              = reg.volunteers.nom;
-document.getElementById('edit-tel').value              = reg.volunteers.tel;
-document.getElementById('edit-email').value            = reg.volunteers.email;
-document.getElementById('edit-status').value           = reg.status;
-document.getElementById('edit-permis-display').style.display = role.isMaraude && reg.volunteers.permis ? 'block' : 'none';
-
-  const saveBtn     = document.getElementById('edit-save-btn');
-  const statusGroup = document.getElementById('edit-status-group');
-  if (reg.status === 'pending') {
-    saveBtn.innerHTML = '<i class="fas fa-check"></i>Confirmer';
-    saveBtn.disabled  = false;
-    statusGroup.style.display = 'none';
-  } else {
-    saveBtn.innerHTML = '<i class="fas fa-save"></i>Enregistrer';
-    saveBtn.disabled  = true;
-    statusGroup.style.display = 'block';
-  }
-
-  document.getElementById('edit-status').addEventListener('change', checkEditChanges);
-  openModalEl('modal-edit');
-}
-
-function checkEditChanges() {
-  const newStatus = document.getElementById('edit-status').value;
-  const saveBtn   = document.getElementById('edit-save-btn');
-  saveBtn.disabled = editOriginalStatus !== 'pending' && newStatus === editOriginalStatus;
-}
-
-async function saveEdit() {
-  const { dateStr, roleId, regId } = pendingAction
-  const regs = await getSlotRegs(dateStr, roleId)
-  const reg  = regs.find(r => String(r.id) === String(regId))
-  if (!reg) return
-
-  const newStatus = editOriginalStatus === 'pending'
-    ? 'confirmed'
-    : document.getElementById('edit-status').value
-
-  await setSlotStatus(regId, newStatus)
-  document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
-  closeModal('modal-edit')
-  await renderPage()
-  showToast('green', editOriginalStatus === 'pending' ? `${reg.volunteers.nom} confirmé(e).` : 'Informations mises à jour.')
-}
-
-function deleteFromEdit() {
-  document.getElementById('edit-status').removeEventListener('change', checkEditChanges);
-  closeModal('modal-edit');
-  const { dateStr, roleId, regId } = pendingAction;
-  openDelete(dateStr, roleId, regId);
-}
-
-// ── Ajouter une personne ──────────────────────────────────────────
-let addIsMaraude = false;
-function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
-  addTarget    = { dateStr, roleId };
-  addIsMaraude = isMaraude;
-  document.getElementById('add-modal-sub').textContent = `${roleLabel} · ${roleTime}`;
-  document.getElementById('add-permis-group').style.display = isMaraude ? 'block' : 'none';
-  ['add-nom','add-tel','add-email'].forEach(id => {
-    const el = document.getElementById(id);
-    el.value = ''; el.classList.remove('error'); el.setAttribute('aria-invalid', 'false');
-  });
-  document.getElementById('add-permis').checked  = false;
-  document.getElementById('add-status').value    = 'confirmed';
-  ['add-err-nom','add-err-tel','add-err-email'].forEach(id => { document.getElementById(id).style.display = 'none'; });
-  openModalEl('modal-add');
-  setTimeout(() => document.getElementById('add-nom').focus(), 120);
-}
-
-async function submitAdd() {
-  const nom    = document.getElementById('add-nom').value.trim()
-  const tel    = document.getElementById('add-tel').value.trim()
-  const email  = document.getElementById('add-email').value.trim()
-  const status = document.getElementById('add-status').value
-  const permis = document.getElementById('add-permis').checked
-
-  let valid = true, firstInvalid = null
-  const checks = [
-    { ok: nom.length > 0,                            errId: 'add-err-nom',   inputId: 'add-nom'   },
-    { ok: tel.length > 0,                            errId: 'add-err-tel',   inputId: 'add-tel'   },
-    { ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), errId: 'add-err-email', inputId: 'add-email' },
-  ]
-  checks.forEach(c => {
-    const errEl = document.getElementById(c.errId)
-    const inpEl = document.getElementById(c.inputId)
-    errEl.style.display = c.ok ? 'none' : 'block'
-    inpEl.classList[c.ok ? 'remove' : 'add']('error')
-    inpEl.setAttribute('aria-invalid', c.ok ? 'false' : 'true')
-    if (!c.ok) { valid = false; if (!firstInvalid) firstInvalid = inpEl }
-  })
-  if (!valid) { if (firstInvalid) firstInvalid.focus(); return }
-
-  // Vérifie si le bénévole existe déjà
-  const { data: existing } = await db
-    .from('volunteers')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
-
-  if (existing) {
-    // Bénévole connu → inscription directe
-    try {
-      await addReg(addTarget.dateStr, addTarget.roleId, nom, email, tel, permis, status)
-      closeModal('modal-add')
-      await renderPage()
-      showToast('green', `${nom} ajouté(e) au créneau.`)
-    } catch (err) {
-      console.error(err)
-      showToast('red', 'Une erreur est survenue, merci de réessayer.')
-    }
-  } else {
-    // Nouveau bénévole → ferme la modale add et ouvre la modale extra (comme sur inscription.html)
-    closeModal('modal-add')
-    openAddExtra(nom, email, tel, permis, status)
-  }
-}
-
-let addExtraData = null;
-
-function openAddExtra(nom, email, tel, permis, status) {
-  addExtraData = { nom, email, tel, permis, status }
-  
-  document.getElementById('add-extra-tag-date').textContent = document.getElementById('add-modal-sub').textContent;
-  
-  ;['add-extra-secu','add-extra-profession','add-extra-adresse','add-extra-urgence-nom','add-extra-urgence-tel'].forEach(id => {
-    document.getElementById(id).value = ''
-  })
-  document.getElementById('add-extra-rgpd').checked = false
-  document.getElementById('add-extra-err-secu').style.display    = 'none'
-  document.getElementById('add-extra-err-urgence').style.display = 'none'
-  
-  const btn = document.getElementById('btn-confirm-add-extra')
-  btn.disabled = true
-  
-  openModalEl('modal-add-extra')
-}
-
-function closeAddExtra() {
-  document.getElementById('modal-add-extra').classList.remove('open')
-  document.body.style.overflow = ''
-}
-
-function backToAddModal() {
-  document.getElementById('modal-add-extra').classList.remove('open')
-  openModalEl('modal-add')
-}
-
-function handleRgpdChangeAddExtra() {
-  const checked = document.getElementById('add-extra-rgpd').checked
-  document.getElementById('btn-confirm-add-extra').disabled = !checked
-}
-
-async function submitAddExtra() {
-  const secu       = document.getElementById('add-extra-secu').value.trim()
-  const urgenceNom = document.getElementById('add-extra-urgence-nom').value.trim()
-  const urgenceTel = document.getElementById('add-extra-urgence-tel').value.trim()
-  const profession = document.getElementById('add-extra-profession').value.trim()
-  const adresse    = document.getElementById('add-extra-adresse').value.trim()
-
-  let valid = true
-  if (!secu) {
-    document.getElementById('add-extra-err-secu').style.display = 'block'
-    valid = false
-  } else {
-    document.getElementById('add-extra-err-secu').style.display = 'none'
-  }
-  if (!urgenceNom || !urgenceTel) {
-    document.getElementById('add-extra-err-urgence').style.display = 'block'
-    valid = false
-  } else {
-    document.getElementById('add-extra-err-urgence').style.display = 'none'
-  }
-  if (!valid) return
-
-  const btn = document.getElementById('btn-confirm-add-extra')
-  btn.disabled      = true
-  btn.textContent   = 'Ajout en cours…'
-
-  try {
-    await addReg(addTarget.dateStr, addTarget.roleId, addExtraData.nom, addExtraData.email, addExtraData.tel, addExtraData.permis, addExtraData.status, secu, profession, adresse, urgenceNom, urgenceTel)
-    closeAddExtra()
-    await renderPage()
-    showToast('green', `${addExtraData.nom} ajouté(e) au créneau.`)
-  } catch(err) {
-    console.error(err)
-    btn.disabled    = false
-    btn.textContent = 'Confirmer'
-    showToast('red', 'Une erreur est survenue, merci de réessayer.')
-  }
-}
-
-function handleOverlayClickAddExtra(e) {
-  if (e.target === document.getElementById('modal-add-extra')) closeAddExtra()
-}
-
-
-// ── Supprimer ─────────────────────────────────────────────────────
-async function openDelete(dateStr, roleId, regId, event) {
-  if (event) event.stopPropagation();
-  const regs = await getSlotRegs(dateStr, roleId);
-  const reg  = regs.find(r => String(r.id) === String(regId));
-  if (!reg) return;
-  pendingAction = { type: 'delete', dateStr, roleId, regId };
-
-  const role = ROLES.find(r => r.id === roleId);
-  document.getElementById('del-modal-sub').textContent    = `${role.label} · ${role.time}`;
-  document.getElementById('del-person-info').innerHTML    = personInfoHTML(reg, role.isMaraude);
-  document.getElementById('del-warning-text').textContent = reg.status === 'pending'
-    ? "Cette personne sera supprimée et notifiée que sa demande n’a pas été retenue."
-    : "Cette action est irréversible. La personne sera notifiée par email de l’annulation.";
-
-  openModalEl('modal-delete');
-}
-
-async function confirmDelete() {
-  const { dateStr, roleId, regId } = pendingAction
-
-  // Récupère les infos du bénévole avant suppression
-  const regs = await getSlotRegs(dateStr, roleId)
-  const reg  = regs.find(r => String(r.id) === String(regId))
-
-  await deleteReg(regId)
-  closeModal('modal-delete')
-  await renderPage()
-  showToast('red', 'Inscription supprimée.')
-
-  // Ouvre un brouillon email pour prévenir le bénévole
-  if (reg) {
-    const role = ROLES.find(r => r.id === roleId)
-    const d    = new Date(dateStr + 'T00:00:00')
-    const dateFr = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-
-    const wasPending = reg.status === 'pending'
-    const subject = wasPending
-      ? `MIAA — À propos de ta demande d'inscription`
-      : `MIAA — Annulation de ton créneau`
-
-    const body = wasPending
-      ? `Bonjour ${reg.volunteers.nom},\n\n` // à compléter par l'admin
-      : `Bonjour ${reg.volunteers.nom},\n\nTon créneau du ${dateFr} (${role.label}) a été annulé.\n\n` // à compléter par l'admin
-
-    const mailtoURL = `mailto:${reg.volunteers.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.open(mailtoURL, '_blank')
-  }
-}
-
-function personInfoHTML(reg, isMaraude) {
-  const statusMod = reg.status === 'confirmed' ? 'status-dot--confirmed' : 'status-dot--pending'
-  return `
-    <div class="pib-row"><i class="fas fa-user" aria-hidden="true"></i><strong>${escHtml(reg.volunteers.nom)}</strong></div>
-    <div class="pib-row"><i class="fas fa-phone" aria-hidden="true"></i>${escHtml(reg.volunteers.tel)}</div>
-    <div class="pib-row"><i class="fas fa-envelope" aria-hidden="true"></i>${escHtml(reg.volunteers.email)}</div>
-    ${isMaraude && reg.volunteers.permis ? '<div class="pib-row"><i class="fas fa-car" aria-hidden="true"></i>Possède le permis</div>' : ''}
-    <div class="pib-row"><i class="fas fa-circle status-dot ${statusMod}" aria-hidden="true"></i>${reg.status==='confirmed' ? 'Confirmé' : 'En attente de validation'}</div>
-  `;
-}
-
-// ── Toast ─────────────────────────────────────────────────────────
-let toastTimer = null;
-function showToast(type, msg) {
-  const el    = document.getElementById('toast');
-  const msgEl = document.getElementById('toast-msg');
-  msgEl.textContent = '';
-  el.className = `toast toast-${type}`;
-  requestAnimationFrame(() => { msgEl.textContent = msg; el.classList.add('show'); });
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 3000);
-}
-
-// ── Init ──────────────────────────────────────────────────────────
-document.addEventListener('keydown', e => {
-  const openId = ['modal-add','modal-delete','modal-edit'].find(id =>
-    document.getElementById(id).classList.contains('open')
-  );
-  if (!openId) return;
-
-  if (e.key === 'Escape') { closeModal(openId); return; }
-
-  if (e.key === 'Tab') {
-    const modal      = document.getElementById(openId).querySelector('.modal');
-    const focusables = getFocusable(modal);
-    if (focusables.length === 0) return;
-    const first = focusables[0], last = focusables[focusables.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault(); last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault(); first.focus();
-    }
-  }
-});
-
-renderPage();
-</script>
+<!-- Logique de la page planning admin -->
+<script src="js/planning-admin.js"></script>
 </body>
 </html>

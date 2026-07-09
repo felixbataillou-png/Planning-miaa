@@ -82,7 +82,7 @@ h3.miaa-adminslot__role { margin: 0; }
 /* ── Hero ─────────────────────────────────────────────────────── */
 .hero {
   position: relative; height: 160px;
-  background: url('assets/hero-banner.jpg') center/cover no-repeat;
+  background: url('../assets/hero-banner.jpg') center/cover no-repeat;
   display: flex; align-items: center;
   padding: 0 max(15px, calc(50% - 600px));
 }
