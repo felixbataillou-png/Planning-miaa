@@ -48,7 +48,7 @@ async function storeReg(ds, roleId, nom, email, tel, permis,
                         secu = '', profession = '', adresse = '',
                         urgenceNom = '', urgenceTel = '') {
   // 1. Recherche ou création du bénévole
-  const { data: existing } = await db
+const { data: existing } = await db
     .from('volunteers')
     .select('id')
     .eq('email', email)
@@ -59,13 +59,14 @@ async function storeReg(ds, roleId, nom, email, tel, permis,
   if (existing) {
     volunteerId = existing.id
   } else {
-    const { data: newVol } = await db
-      .from('volunteers')
-      .insert({ nom, email, tel, permis, secu, profession, adresse,
-                urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
-      .select('id')
-      .single()
-    volunteerId = newVol.id
+    const { data: newVol, error: volError } = await db
+    .from('volunteers')
+    .insert({ nom, email, tel, permis, secu, profession, adresse,
+              urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
+    .select('id')
+    .single()
+    
+    if (newVol) volunteerId = newVol.id
   }
 
   // 2. Vérification anti-doublon sur ce créneau
@@ -94,9 +95,6 @@ async function storeReg(ds, roleId, nom, email, tel, permis,
     })
     .select('id')
     .single()
-
-  console.log('reg:', reg)
-  console.log('regError:', regError)
 
   // 4. Notification email aux admins (ignorée silencieusement en local à cause du CORS)
   try {
