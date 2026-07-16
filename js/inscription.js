@@ -437,6 +437,7 @@ async function submitForm() {
     .eq('email', email)
     .maybeSingle()
 
+
   if (existing) {
     try {
       if (pendingIsDouble) {
