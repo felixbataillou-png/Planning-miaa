@@ -149,18 +149,16 @@
           <div class="error-msg" id="err-email" role="alert">Veuillez indiquer un email valide.</div>
         </div>
         <div id="permis-group" style="display:none">
-          <span id="permis-label" style="font-size:14px;font-weight:700;color:#333;display:block;margin-bottom:8px">
-            Permis de conduire
-          </span>
-          <label class="toggle-row">
+          <label for="inp-permis" class="toggle-row">
             <span class="tl-main">Je possède le permis et suis disponible pour conduire</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="inp-permis" aria-labelledby="permis-label">
-              <span class="toggle-track" aria-hidden="true"></span>
-              <span class="toggle-thumb" aria-hidden="true"></span>
+            <span class="toggle-switch" aria-hidden="true">
+              <span class="toggle-track"></span>
+              <span class="toggle-thumb"></span>
             </span>
           </label>
+          <input type="checkbox" id="inp-permis" class="sr-only">
         </div>
+
         <div class="modal-info">
           <strong>Vos informations restent confidentielles.</strong>
           Elles ne sont transmises qu'aux responsables du planning et n'apparaissent jamais sur le site.
@@ -242,12 +240,12 @@
         <div class="error-msg" id="err-urgence" role="alert">Veuillez indiquer une personne à prévenir.</div>
       </div>
 
-      <label style="border:1px solid #ddd;border-radius:4px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer">
-        <input type="checkbox" id="inp-rgpd" onchange="handleRgpdChange()"
-               style="width:18px;height:18px;margin-top:2px;flex-shrink:0;cursor:pointer">
-        <span style="font-size:13px;color:#333;line-height:1.5">
-          J'autorise MIAA à utiliser mes données personnelles dans le cadre de l'organisation des activités de l'association.
-          <span style="color:#c0392b" aria-hidden="true"> *</span>
+      <label class="miaa-consent">
+        <input type="checkbox" id="inp-rgpd" onchange="handleRgpdChange()" 
+         class="miaa-consent__checkbox">
+        <span class="miaa-consent__text">
+          J'autorise MIAA à utiliser mes données personnelles...
+          <span class="req-star" aria-hidden="true"> *</span>
         </span>
       </label>
     </div>

@@ -82,7 +82,7 @@
   }
 .miaa-day__name  { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
 .miaa-day__num   { font-size: 24px; font-weight: 700; line-height: 1; }
-.miaa-day__month { font-size: 12px; opacity: 0.85; }
+.miaa-day__month { font-size: 12px; font-weight: 700; opacity: 0.85; }
 
 /* Variant — jour suivant (défaut = bleu) */
 .miaa-day--upcoming { background: var(--miaa-teal); }
