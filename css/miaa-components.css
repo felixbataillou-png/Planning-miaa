@@ -261,7 +261,7 @@
   display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
 }
 .miaa-adminslot__role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--miaa-ink-soft); margin: 0; }
-.miaa-adminslot__time { font-size: 10px; color: var(--miaa-ink-mute); }
+.miaa-adminslot__time { font-size: 12px; color: var(--miaa-ink-soft); }
 .miaa-adminslot__count {
   font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 8px;
   white-space: nowrap; flex-shrink: 0;
@@ -294,7 +294,7 @@
 
 .miaa-volunteer__avatar {
   width: 26px; height: 26px; border-radius: 50%;
-  background: var(--miaa-teal); color: #fff; font-size: 10px; font-weight: 700;
+  background: var(--miaa-teal); color: #fff; font-size: 12px; font-weight: 700;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .miaa-volunteer--pending .miaa-volunteer__avatar { background: var(--miaa-orange); }
