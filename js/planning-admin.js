@@ -76,6 +76,8 @@ async function sendLoginCode() {
 
   const { error } = await db.auth.signInWithOtp({ email: loginEmail })
 
+  console.log('erreur OTP:', error)
+
   if (error) {
     errEl.textContent    = "Cette adresse n'est pas autorisée."
     errEl.style.display  = 'block'
