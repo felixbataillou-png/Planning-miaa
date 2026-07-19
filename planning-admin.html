@@ -26,19 +26,14 @@
     <div id="login-step-email">
       <div class="form-group">
         <label for="login-email">Adresse email</label>
-        <input type="email" id="login-email" placeholder="admin@miaa.fr" style="color:#333;caret-color:#333">
+        <input type="email" id="login-email" placeholder="admin@miaa.fr">
       </div>
-      <button class="btn-primary" style="width:100%;margin-top:12px" onclick="sendLoginCode()">Recevoir un code</button>
-      <p id="login-error" style="color:#c0392b;font-size:13px;margin-top:10px;display:none"></p>
-    </div>
-
-    <div id="login-step-code" style="display:none">
       <div class="form-group">
-        <label for="login-code">Code reçu par email</label>
-        <input type="text" id="login-code" placeholder="123456" maxlength="8" style="color:#333;caret-color:#333">
+        <label for="login-password">Mot de passe</label>
+        <input type="password" id="login-password" placeholder="••••••••">
       </div>
-      <button class="btn-primary" style="width:100%;margin-top:12px" onclick="verifyLoginCode()">Valider</button>
-      <p id="login-error-code" style="color:#c0392b;font-size:13px;margin-top:10px;display:none"></p>
+      <button class="btn-primary btn-full" onclick="sendLoginCode()">Se connecter</button>
+      <p id="login-error" class="login-error"></p>
     </div>
   </div>
 </div>

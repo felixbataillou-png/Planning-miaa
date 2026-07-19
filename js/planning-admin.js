@@ -66,43 +66,23 @@ async function checkAuth() {
 }
 
 /**
- * Envoie un code OTP à l'adresse email saisie.
+ * Authentification par mot de passe
+ * Adresse et mot de passe sur SupaBase
  * Supabase refusera automatiquement les adresses non autorisées
  * (signup désactivé dans Authentication → Settings).
  */
 async function sendLoginCode() {
-  loginEmail = document.getElementById('login-email').value.trim()
-  const errEl = document.getElementById('login-error')
+  loginEmail    = document.getElementById('login-email').value.trim()
+  const password = document.getElementById('login-password').value.trim()
+  const errEl   = document.getElementById('login-error')
 
-  const { error } = await db.auth.signInWithOtp({ email: loginEmail })
-
-  console.log('erreur OTP:', error)
-
-  if (error) {
-    errEl.textContent    = "Cette adresse n'est pas autorisée."
-    errEl.style.display  = 'block'
-    return
-  }
-
-  document.getElementById('login-step-email').style.display = 'none'
-  document.getElementById('login-step-code').style.display  = 'block'
-}
-
-/**
- * Vérifie le code OTP saisi et ouvre la session si correct.
- */
-async function verifyLoginCode() {
-  const code  = document.getElementById('login-code').value.trim()
-  const errEl = document.getElementById('login-error-code')
-
-  const { error } = await db.auth.verifyOtp({
-    email: loginEmail,
-    token: code,
-    type:  'email'
+  const { error } = await db.auth.signInWithPassword({
+    email:    loginEmail,
+    password: password
   })
 
   if (error) {
-    errEl.textContent   = 'Code invalide ou expiré.'
+    errEl.textContent   = "Identifiants incorrects."
     errEl.style.display = 'block'
     return
   }
