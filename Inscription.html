@@ -128,11 +128,18 @@
           <span class="req-star" aria-hidden="true">*</span> Champs requis
         </p>
         <div class="form-group">
-          <label for="inp-nom">Nom et prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
-          <input type="text" id="inp-nom" placeholder="Marie Dupont"
+          <label for="inp-nom">Nom <span style="color:#c0392b" aria-hidden="true">*</span></label>
+          <input type="text" id="inp-nom" placeholder="Dupont"
                  autocomplete="name" required aria-required="true"
                  aria-describedby="err-nom" aria-invalid="false">
           <div class="error-msg" id="err-nom" role="alert">Veuillez indiquer votre nom.</div>
+        </div>
+        <div class="form-group">
+          <label for="inp-prenom">Prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
+          <input type="text" id="inp-prenom" placeholder="Marie"
+                 autocomplete="name" required aria-required="true"
+                 aria-describedby="err-nom" aria-invalid="false">
+          <div class="error-msg" id="err-prenom" role="alert">Veuillez indiquer votre prénom.</div>
         </div>
         <div class="form-group">
           <label for="inp-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
@@ -227,7 +234,18 @@
 
       <div class="form-group">
         <label for="inp-adresse">Adresse postale</label>
-        <input type="text" id="inp-adresse" placeholder="12 rue de Belleville, 75019 Paris">
+        <input type="text" id="inp-adresse" placeholder="12 rue de Belleville">
+
+         <div class="adresse-row">
+          <div class="adresse-col adresse-col--cp">
+            <label for="inp-codepostal">Code postal</label>
+            <input type="text" id="inp-codepostal" placeholder="75019">
+          </div>
+          <div class="adresse-col adresse-col--ville">
+            <label for="inp-ville">Ville</label>
+            <input type="text" id="inp-ville" placeholder="Paris">
+          </div>
+        </div>
       </div>
 
       <div class="form-group">

@@ -34,6 +34,7 @@ let lastFocusedTrigger = null
  * @param {string} ds         - Date au format YYYY-MM-DD
  * @param {string} roleId     - 'cuisinier' | 'maraudeur'
  * @param {string} nom
+ * @param {string} prenom
  * @param {string} email
  * @param {string} tel
  * @param {boolean} permis
@@ -44,9 +45,9 @@ let lastFocusedTrigger = null
  * @param {string} [urgenceTel]
  * @throws {Error} Si le bénévole est déjà inscrit à ce créneau
  */
-async function storeReg(ds, roleId, nom, email, tel, permis,
-                        secu = '', profession = '', adresse = '',
-                        urgenceNom = '', urgenceTel = '') {
+async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
+                        secu = '', profession = '', adresse = '', codepostal = '',
+                        ville = '', urgenceNom = '', urgenceTel = '') {
   // 1. Recherche ou création du bénévole
 const { data: existing } = await db
     .from('volunteers')
@@ -61,10 +62,11 @@ const { data: existing } = await db
   } else {
     const { data: newVol, error: volError } = await db
     .from('volunteers')
-    .insert({ nom, email, tel, permis, secu, profession, adresse,
+    .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
               urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
     .select('id')
     .single()
+
     
     if (newVol) volunteerId = newVol.id
   }
@@ -363,7 +365,7 @@ function openModal(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   document.getElementById('modal-tag-time').textContent    = roleTime
   document.getElementById('permis-group').style.display    = isMaraude ? 'block' : 'none'
 
-  ;['inp-nom', 'inp-tel', 'inp-email'].forEach(id => {
+  ;['inp-nom', 'inp-prenom', 'inp-tel', 'inp-email'].forEach(id => {
     const el = document.getElementById(id)
     el.value = ''
     el.classList.remove('error')
@@ -473,7 +475,7 @@ function openModalExtra() {
   document.getElementById('modal-extra-tag-time').textContent = document.getElementById('modal-tag-time').textContent
 
   // 2. Vide les champs D'ABORD
-  ;['inp-secu', 'inp-profession', 'inp-adresse', 'inp-urgence-nom', 'inp-urgence-tel'].forEach(id => {
+  ;['inp-secu', 'inp-profession', 'inp-adresse', 'inp-codepostal', 'inp-ville', 'inp-urgence-nom', 'inp-urgence-tel'].forEach(id => {
     document.getElementById(id).value = ''
   })
   document.getElementById('inp-rgpd').checked           = false
@@ -539,8 +541,11 @@ async function submitFormExtra() {
   const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
   const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
   const profession = document.getElementById('inp-profession').value.trim()
-  const adresse    = document.getElementById('inp-adresse').value.trim()
+  const adresse     = document.getElementById('inp-adresse').value.trim()
+  const codepostal  = document.getElementById('inp-codepostal').value.trim()
+  const ville       = document.getElementById('inp-ville').value.trim()
   const nom        = document.getElementById('inp-nom').value.trim()
+  const prenom = document.getElementById('inp-prenom').value.trim()
   const tel        = document.getElementById('inp-tel').value.trim()
   const email      = document.getElementById('inp-email').value.trim()
   const permis     = document.getElementById('inp-permis').checked
@@ -568,10 +573,10 @@ async function submitFormExtra() {
 
   try {
     if (pendingIsDouble) {
-      await storeReg(pendingDate, 'cuisinier', nom, email, tel, false, secu, profession, adresse, urgenceNom, urgenceTel)
-      await storeReg(pendingDate, 'maraudeur', nom, email, tel, permis, secu, profession, adresse, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, 'cuisinier', nom, prenom, email, tel, false, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, 'maraudeur', nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
     } else {
-      await storeReg(pendingDate, pendingRole, nom, email, tel, permis, secu, profession, adresse, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, pendingRole, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
     }
 
     closeModalExtra()

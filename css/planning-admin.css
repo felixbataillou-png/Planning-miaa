@@ -192,6 +192,7 @@ h3.miaa-adminslot__role { margin: 0; }
 .form-group input[type=text],
 .form-group input[type=email],
 .form-group input[type=tel],
+.form-group input[type=password],
 .form-group select {
   border: 1px solid #ddd; border-radius: var(--radius-card, 4px); padding: 10px 14px;
   font-family: var(--font-sans, 'Raleway', sans-serif); font-size: 14px;

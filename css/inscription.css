@@ -198,6 +198,10 @@ h3.miaa-slot__role { margin: 0; }
 .error-msg             { font-size: 12px; color: var(--miaa-red-ink, #c0392b); display: none; }
 .form-required-legend  { font-size: 12px; color: #666; margin-bottom: 6px; }
 .form-required-legend .req-star { color: var(--miaa-red-ink, #c0392b); font-weight: var(--fw-bold, 700); }
+.adresse-row { display: flex; gap: 12px; }
+.adresse-col {display: flex; flex-direction: column; gap: 5px; }
+.adresse-col--cp    { flex: 0 0 60px; }
+.adresse-col--ville { flex: 1; }
 
 /* Toggle permis */
 .toggle-row {
@@ -316,6 +320,11 @@ h3.miaa-slot__role { margin: 0; }
   .site-header             { padding: 15px 20px; }
   .topbar, .hero           { padding-left: 20px; padding-right: 20px; }
   .site-header nav         { display: none; }
+  
+  
+  /* Adresse postale modale complement empilé verticalement */
+  .adresse-row {flex-direction: column; column-gap: 5px;}
+  .adresse-col--cp { flex: 0 0 auto; }
 
   /* Jours empilés verticalement */
   .planning-wrap           { overflow-x: visible; }

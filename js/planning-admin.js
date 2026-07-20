@@ -248,12 +248,13 @@ async function renderPage() {
 
   // Requête Supabase unique
   const dateKeys = days.map(d => dateKey(d))
-  const { data: allRegs } = await db
+  const { data: allRegs, error: regsError } = await db
     .from('registrations')
-    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, email, tel, permis )')
+    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )')
     .in('date', dateKeys)
 
   const regsData = allRegs || []
+  
 
   // Calcul des statistiques de la semaine
   let total = 0, confirmed = 0, pending = 0, spots = 0
