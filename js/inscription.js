@@ -358,6 +358,9 @@ function openModal(dateStr, roleId, roleLabel, roleTime, isMaraude) {
 
   const d = new Date(dateStr + 'T00:00:00')
   const displayDate = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`
+  const btnConfirm = document.querySelector('#modal .btn-primary')
+  btnConfirm.disabled    = false
+  btnConfirm.textContent = 'Confirmer mon inscription'
 
   document.getElementById('modal-title').textContent       = `S'inscrire — ${roleLabel}`
   document.getElementById('modal-tag-date').textContent    = displayDate

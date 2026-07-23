@@ -523,6 +523,10 @@ function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   addTarget    = { dateStr, roleId }
   addIsMaraude = isMaraude
 
+  const btnAdd = document.querySelector('#modal-add .btn-primary')
+  btnAdd.disabled    = false
+  btnAdd.innerHTML   = '<i class="fas fa-plus" aria-hidden="true"></i>Ajouter'
+
   document.getElementById('add-modal-sub').textContent          = `${roleLabel} · ${roleTime}`
   document.getElementById('add-permis-group').style.display     = isMaraude ? 'block' : 'none'
   ;['add-nom', 'add-prenom', 'add-tel', 'add-email'].forEach(id => {
