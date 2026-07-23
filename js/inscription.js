@@ -47,7 +47,7 @@ let lastFocusedTrigger = null
  */
 async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
                         secu = '', profession = '', adresse = '', codepostal = '',
-                        ville = '', urgenceNom = '', urgenceTel = '') {
+                        ville = '', urgenceContact = '') {
   // 1. Recherche ou création du bénévole
 const { data: existing } = await db
     .from('volunteers')

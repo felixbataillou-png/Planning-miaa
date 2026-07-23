@@ -112,7 +112,7 @@ async function logout() {
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
-    .select('id, status, Confirm_token, volunteers ( id, nom, email, tel, permis )')
+    .select('id, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )')
     .eq('date', ds)
     .eq('role', roleId)
   return data || []
@@ -207,10 +207,12 @@ function escAttr(s) {
 }
 
 /** Génère les initiales d'un nom complet (prénom + nom). */
-function initials(name) {
-  const parts = name.trim().split(' ')
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-  return name.slice(0, 2).toUpperCase()
+function initials(nom, prenom) {
+  const n = (nom || '').trim()
+  const p = (prenom || '').trim()
+  if (n && p) return (p[0] + n[0]).toUpperCase()
+  if (n) return n.slice(0, 2).toUpperCase()
+  return '?'
 }
 
 // ── Navigation de semaine ─────────────────────────────────────────
@@ -352,15 +354,15 @@ async function renderPage() {
             ? `<span class="miaa-volunteer__permis"><i class="fas fa-car" aria-hidden="true"></i>Permis</span>`
             : ''
           const identityLabel = escAttr(`Modifier l'inscription de ${reg.volunteers.nom}, ${role.label.toLowerCase()}, ${dateLabel}, statut ${stTxt.toLowerCase()}`)
-          const deleteLabel   = escAttr(`Supprimer l'inscription de ${reg.volunteers.nom}, ${role.label.toLowerCase()}, ${dateLabel}`)
+          const deleteLabel   = escAttr(`Supprimer l'inscription de ${reg.volunteers.nom, reg.volunteers.prenom}, ${role.label.toLowerCase()}, ${dateLabel}`)
 
           html += `<div class="miaa-volunteer${volMod}">
             <button type="button" class="miaa-volunteer__identity-btn"
               onclick="openEdit('${ds}','${role.id}','${reg.id}',event)"
               aria-label="${identityLabel}">
-              <span class="miaa-volunteer__avatar" aria-hidden="true">${initials(reg.volunteers.nom)}</span>
+              <span class="miaa-volunteer__avatar" aria-hidden="true">${initials(reg.volunteers.nom, reg.volunteers.prenom)}</span>
               <span class="miaa-volunteer__info">
-                <span class="miaa-volunteer__name">${escHtml(reg.volunteers.nom)}</span>
+                <span class="miaa-volunteer__name">${escHtml(`${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim())}</span>
                 <span class="miaa-volunteer__meta">${escHtml(reg.volunteers.tel)}</span>
                 ${permisBadge}
               </span>
@@ -458,11 +460,13 @@ async function openEdit(dateStr, roleId, regId, event) {
 
   const role = ROLES.find(r => r.id === roleId)
   document.getElementById('edit-modal-sub').textContent         = `${role.label} · ${role.time}`
-  document.getElementById('edit-nom').value                     = reg.volunteers.nom
-  document.getElementById('edit-tel').value                     = reg.volunteers.tel
-  document.getElementById('edit-email').value                   = reg.volunteers.email
+  document.getElementById('edit-nom').textContent   = reg.volunteers.nom || '—'
+  document.getElementById('edit-prenom').textContent = reg.volunteers.prenom || '—'
+  document.getElementById('edit-tel').textContent   = reg.volunteers.tel || '—'
+  document.getElementById('edit-email').textContent = reg.volunteers.email || '—'
   document.getElementById('edit-status').value                  = reg.status
-  document.getElementById('edit-permis-display').style.display  = role.isMaraude && reg.volunteers.permis ? 'block' : 'none'
+  document.getElementById('edit-permis-display').style.display = 
+  role.isMaraude && reg.volunteers.permis ? 'flex' : 'none'
 
   const saveBtn     = document.getElementById('edit-save-btn')
   const statusGroup = document.getElementById('edit-status-group')
@@ -521,7 +525,7 @@ function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
 
   document.getElementById('add-modal-sub').textContent          = `${roleLabel} · ${roleTime}`
   document.getElementById('add-permis-group').style.display     = isMaraude ? 'block' : 'none'
-  ;['add-nom', 'add-tel', 'add-email'].forEach(id => {
+  ;['add-nom', 'add-prenom', 'add-tel', 'add-email'].forEach(id => {
     const el = document.getElementById(id)
     el.value = ''; el.classList.remove('error'); el.setAttribute('aria-invalid', 'false')
   })
@@ -537,6 +541,7 @@ function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
 
 async function submitAdd() {
   const nom    = document.getElementById('add-nom').value.trim()
+  const prenom = document.getElementById('add-prenom').value.trim()
   const tel    = document.getElementById('add-tel').value.trim()
   const email  = document.getElementById('add-email').value.trim()
   const status = document.getElementById('add-status').value
@@ -567,7 +572,7 @@ async function submitAdd() {
 
   if (existing) {
     try {
-      await addReg(addTarget.dateStr, addTarget.roleId, nom, email, tel, permis, status)
+      await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status)
       closeModal('modal-add')
       await renderPage()
       showToast('green', `${nom} ajouté(e) au créneau.`)
@@ -578,14 +583,14 @@ async function submitAdd() {
   } else {
     // Nouveau bénévole → modale complémentaire
     closeModal('modal-add')
-    openAddExtra(nom, email, tel, permis, status)
+    openAddExtra(nom, prenom, email, tel, permis, status)
   }
 }
 
 // ── Modale : Informations complémentaires (ajout admin) ──────────
 
-function openAddExtra(nom, email, tel, permis, status) {
-  addExtraData = { nom, email, tel, permis, status }
+function openAddExtra(nom, prenom, email, tel, permis, status) {
+  addExtraData = { nom, prenom, email, tel, permis, status }
 
   document.getElementById('add-extra-tag-date').textContent = document.getElementById('add-modal-sub').textContent
 
@@ -721,7 +726,7 @@ async function confirmDelete() {
 function personInfoHTML(reg, isMaraude) {
   const statusMod = reg.status === 'confirmed' ? 'status-dot--confirmed' : 'status-dot--pending'
   return `
-    <div class="pib-row"><i class="fas fa-user" aria-hidden="true"></i><strong>${escHtml(reg.volunteers.nom)}</strong></div>
+    <div class="pib-row"><i class="fas fa-user" aria-hidden="true"></i><strong>${escHtml(`${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim())}</strong></div>
     <div class="pib-row"><i class="fas fa-phone" aria-hidden="true"></i>${escHtml(reg.volunteers.tel)}</div>
     <div class="pib-row"><i class="fas fa-envelope" aria-hidden="true"></i>${escHtml(reg.volunteers.email)}</div>
     ${isMaraude && reg.volunteers.permis ? '<div class="pib-row"><i class="fas fa-car" aria-hidden="true"></i>Possède le permis</div>' : ''}

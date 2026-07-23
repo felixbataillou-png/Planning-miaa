@@ -105,10 +105,16 @@
     <div class="modal-body">
       <p class="form-required-legend"><span class="req-star" aria-hidden="true">*</span> Champs requis</p>
       <div class="form-group">
-        <label for="add-nom">Nom et prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
-        <input type="text" id="add-nom" placeholder="Marie Dupont" autocomplete="off"
-               required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
+        <label for="add-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-nom" placeholder="Dupont" autocomplete="off"
+         required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
         <div class="error-msg" id="add-err-nom" role="alert">Veuillez indiquer un nom.</div>
+      </div>
+      <div class="form-group">
+        <label for="add-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-prenom" placeholder="Marie" autocomplete="off"
+         required aria-required="true" aria-describedby="add-err-prenom" aria-invalid="false">
+        <div class="error-msg" id="add-err-prenom" role="alert">Veuillez indiquer un prénom.</div>
       </div>
       <div class="form-group">
         <label for="add-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
@@ -185,24 +191,34 @@
       <button class="modal-close" onclick="closeModal('modal-edit')" aria-label="Fermer la fenêtre">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-group">
-        <label for="edit-nom">Nom et prénom</label>
-        <input type="text" id="edit-nom" readonly style="background:#f8f9fa;cursor:default">
-      </div>
-      <div class="form-group">
-        <label for="edit-tel">Téléphone</label>
-        <input type="tel" id="edit-tel" readonly style="background:#f8f9fa;cursor:default">
-      </div>
-      <div class="form-group">
-        <label for="edit-email">Email</label>
-        <input type="email" id="edit-email" readonly style="background:#f8f9fa;cursor:default">
-      </div>
-      <div id="edit-permis-display" style="display:none">
-        <div style="background:#f0f9fc;border:1px solid #b8e0ec;border-radius:4px;padding:10px 12px;font-size:12px;color:#0f6980;display:flex;align-items:center;gap:8px">
-          <i class="fas fa-car" aria-hidden="true"></i>
-          <span>Possède le permis de conduire</span>
+
+      <!-- Bloc infos bénévole en lecture seule -->
+      <div class="volunteer-info-block">
+        <div class="vib-row">
+          <span class="vib-label">Nom</span>
+          <span class="vib-value" id="edit-nom">—</span>
+        </div>
+        <div class="vib-row">
+          <span class="vib-label">Prénom</span>
+          <span class="vib-value" id="edit-prenom">—</span>
+        </div>
+        <div class="vib-row">
+          <span class="vib-label">Téléphone</span>
+          <span class="vib-value" id="edit-tel">—</span>
+        </div>
+        <div class="vib-row">
+          <span class="vib-label">Email</span>
+          <span class="vib-value" id="edit-email">—</span>
+        </div>
+        <div class="vib-row" id="edit-permis-display" style="display:none">
+          <span class="vib-label">Permis</span>
+          <span class="vib-value vib-value--permis">
+            <i class="fas fa-car" aria-hidden="true"></i> Oui
+          </span>
         </div>
       </div>
+
+      <!-- Statut modifiable -->
       <div class="form-group" id="edit-status-group">
         <label for="edit-status">Statut de l'inscription</label>
         <select id="edit-status">
@@ -210,13 +226,14 @@
           <option value="pending">En attente de validation</option>
         </select>
       </div>
+
     </div>
     <div class="modal-footer">
-      <button class="btn-tertiary" onclick="deleteFromEdit()" style="flex:0 0 auto;padding:12px 18px">
-        <i class="fas fa-trash" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Supprimer
+      <button class="btn-tertiary btn-auto-width" onclick="deleteFromEdit()">
+        <i class="fas fa-trash" aria-hidden="true"></i>Supprimer
       </button>
       <button class="btn-primary" id="edit-save-btn" onclick="saveEdit()" disabled>
-        <i class="fas fa-save" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Enregistrer
+        <i class="fas fa-save" aria-hidden="true"></i>Enregistrer
       </button>
     </div>
   </div>
