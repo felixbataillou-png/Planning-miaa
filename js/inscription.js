@@ -63,7 +63,7 @@ const { data: existing } = await db
     const { data: newVol, error: volError } = await db
     .from('volunteers')
     .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
-              urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
+              urgence_contact: urgenceContact, rgpd: true })
     .select('id')
     .single()
 
@@ -540,6 +540,7 @@ async function submitFormExtra() {
   const secu       = document.getElementById('inp-secu').value.trim()
   const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
   const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
+  const urgenceContact = `${urgenceNom} / ${urgenceTel}`.trim()
   const profession = document.getElementById('inp-profession').value.trim()
   const adresse     = document.getElementById('inp-adresse').value.trim()
   const codepostal  = document.getElementById('inp-codepostal').value.trim()
@@ -573,10 +574,10 @@ async function submitFormExtra() {
 
   try {
     if (pendingIsDouble) {
-      await storeReg(pendingDate, 'cuisinier', nom, prenom, email, tel, false, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
-      await storeReg(pendingDate, 'maraudeur', nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, 'cuisinier', nom, prenom, email, tel, false, secu, profession, adresse, codepostal, ville, urgenceContact)
+      await storeReg(pendingDate, 'maraudeur', nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceContact)
     } else {
-      await storeReg(pendingDate, pendingRole, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceNom, urgenceTel)
+      await storeReg(pendingDate, pendingRole, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgenceContact)
     }
 
     closeModalExtra()
@@ -586,6 +587,8 @@ async function submitFormExtra() {
 
   } catch (err) {
     console.error(err)
+    console.error('Erreur complète:', err)
+    console.error('Message:', err.message)
     btn.disabled    = false
     btn.textContent = 'Confirmer mon inscription'
     alert(err.message.includes('déjà inscrit')

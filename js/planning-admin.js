@@ -155,12 +155,11 @@ async function deleteReg(regId) {
  * @param {string}  [secu]
  * @param {string}  [profession]
  * @param {string}  [adresse]
- * @param {string}  [urgenceNom]
- * @param {string}  [urgenceTel]
+ * @param {string}  [urgenceContact]
  */
 async function addReg(ds, roleId, nom, email, tel, permis, status,
                       secu = '', profession = '', adresse = '',
-                      urgenceNom = '', urgenceTel = '') {
+                      urgenceContact = '') {
   const { data: existing } = await db
     .from('volunteers')
     .select('id')
@@ -174,7 +173,7 @@ async function addReg(ds, roleId, nom, email, tel, permis, status,
     const { data: newVol } = await db
       .from('volunteers')
       .insert({ nom, email, tel, permis, secu, profession, adresse,
-                urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
+                urgence_contact: urgenceContact, rgpd: true })
       .select('id')
       .single()
     volunteerId = newVol.id
@@ -625,6 +624,7 @@ async function submitAddExtra() {
   const secu       = document.getElementById('add-extra-secu').value.trim()
   const urgenceNom = document.getElementById('add-extra-urgence-nom').value.trim()
   const urgenceTel = document.getElementById('add-extra-urgence-tel').value.trim()
+  const urgenceContact = `${urgenceNom} / ${urgenceTel}`.trim()
   const profession = document.getElementById('add-extra-profession').value.trim()
   const adresse    = document.getElementById('add-extra-adresse').value.trim()
 
