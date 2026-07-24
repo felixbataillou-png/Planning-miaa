@@ -7,6 +7,8 @@
 
 <!-- Design system tokens -->
 <link rel="stylesheet" href="css/colors_and_type.css">
+<!-- Styles communs du site (header, footer, hero) -->
+<link rel="stylesheet" href="css/miaa-site.css">
 <!-- Component library -->
 <link rel="stylesheet" href="css/miaa-components.css">
 <!-- Page styles -->
@@ -24,23 +26,9 @@
 
 <a href="#main-content" class="skip-link">Aller au contenu</a>
 
-<div class="topbar">
-  <a href="https://facebook.com" target="_blank" rel="noopener"
-     aria-label="Page Facebook MIAA (nouvel onglet)">
-    <i class="fab fa-facebook-f" aria-hidden="true"></i>
-  </a>
-</div>
 
-<header class="site-header">
-  <img class="logo" src="assets/logo.png" alt="MIAA">
-  <nav aria-label="Navigation principale">
-    <a href="#">Accueil</a>
-    <a href="#">Association</a>
-    <a href="#">Contact</a>
-    <a href="#" class="active" aria-current="page">Inscription</a>
-    <a href="#">Newsletter</a>
-  </nav>
-</header>
+<miaa-header page="inscription"></miaa-header>
+
 
 <div class="hero">
   <div class="hero-text">
@@ -278,6 +266,7 @@
 </div>
 
 <!-- Logique de la page inscription -->
+<script src="js/miaa-site.js"></script>
 <script src="js/inscription.js"></script>
 </body>
 </html>

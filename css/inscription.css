@@ -33,45 +33,6 @@
 .miaa-slot__cta:focus-visible  { outline-offset: -3px; outline-color: #fff; }
 .miaa-double:focus-visible      { outline-color: var(--color-primary, #128BAD); outline-offset: 2px; }
 
-/* ── Topbar ── */
-.topbar {
-  background: var(--color-topbar-bg, #128BAD);
-  height: var(--topbar-height, 40px);
-  display: flex; align-items: center; justify-content: flex-end;
-  padding: 0 max(15px, calc(50% - 600px));
-}
-.topbar a { color: #fff; font-size: 16px; padding: 0 10px; }
-
-/* ── Header ── */
-.site-header {
-  background: var(--color-surface, #fff);
-  box-shadow: var(--shadow-header, 0 2px 4px rgba(0,0,0,.075));
-  height: var(--header-height, 130px);
-  padding: 15px max(15px, calc(50% - 600px));
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
-}
-.site-header .logo  { height: 99px; width: auto; }
-.site-header nav    { display: flex; gap: 28px; align-items: center; }
-.site-header nav a  {
-  font-size: 13px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333);
-  letter-spacing: 0.07em; text-transform: uppercase;
-  white-space: nowrap; text-decoration: none;
-}
-.site-header nav a.active,
-.site-header nav a:hover { color: var(--color-primary, #128BAD); }
-
-/* ── Hero ── */
-.hero {
-  position: relative; height: 200px;
-  background: url('../assets/hero-banner.jpg') center / cover no-repeat;
-  display: flex; align-items: center;
-  padding: 0 max(15px, calc(50% - 600px));
-}
-.hero::after   { content: ''; position: absolute; inset: 0; background: rgba(18,139,173,0.55); }
-.hero-text     { position: relative; z-index: 1; }
-.hero h1       { font-size: 42px; font-weight: var(--fw-light, 300); color: #fff; line-height: 1.1; }
-.hero p        { color: rgba(255,255,255,0.9); font-size: var(--fs-base, 16px); margin-top: 8px; }
 
 /* Espace entre deux paragraphes consécutifs (ex : section intro) */
 .spaced-paragraph { margin-bottom: 12px; }

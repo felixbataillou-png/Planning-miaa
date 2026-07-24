@@ -167,7 +167,7 @@ h1, h2, h3, h4 {
   color: #fff; border-radius: 8px; padding: 24px;
   text-align: center; font-size: 14px; line-height: 1.6;
 }
-.donation-box p { margin-bottom: 10px; }
+.donation-box p { margin-bottom: 10px; color: #fff;}
 .donation-box a {
   display: inline-block; background: #fff;
   color: var(--color-primary, #128BAD);
@@ -242,10 +242,20 @@ h1, h2, h3, h4 {
   background: #f7f9fc; border: 1px solid #e0e8f0;
   border-radius: 6px; padding: 16px 20px; font-size: 14px; line-height: 1.5;
   transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .partner-item:hover { border-color: var(--color-primary, #128BAD); background: #f0f9fc; }
 .partner-item a { color: var(--color-text, #222); }
 .partner-item strong { color: var(--color-primary, #128BAD); }
+.partner-logo {
+  height: 60px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
 
 /* ── Formulaire de contact ─────────────────────────────────────── */
 .contact-form { max-width: 560px; }
