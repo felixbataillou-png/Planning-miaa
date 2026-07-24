@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Contactez l'association MIAA">
+  <title>MIAA — Contact</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="css/miaa-site.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&display=swap">
+</head>
+<body>
+<miaa-header page="contact"></miaa-header>
+<div class="hero"><div class="hero-text"><h1>Contact</h1></div></div>
+<main class="page-wrap" id="main-content">
+  <div class="layout-with-sidebar">
+    <miaa-sidebar></miaa-sidebar>
+    <div class="main-content article-content">
+      <h2>Nous contacter</h2>
+      <p>Pour toute question ou demande, envoyez-nous un message :</p>
+      <form class="contact-form" action="mailto:miaa@miaa.fr" method="post" enctype="text/plain">
+        <div class="form-group">
+          <label for="c-nom">Votre nom <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="text" id="c-nom" name="nom" required aria-required="true" placeholder="Marie Dupont">
+        </div>
+        <div class="form-group">
+          <label for="c-email">Votre adresse e-mail <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="email" id="c-email" name="email" required aria-required="true" placeholder="marie@exemple.fr">
+        </div>
+        <div class="form-group">
+          <label for="c-sujet">Sujet <span class="req-star" aria-hidden="true">*</span></label>
+          <input type="text" id="c-sujet" name="sujet" required aria-required="true">
+        </div>
+        <div class="form-group">
+          <label for="c-message">Message <span class="req-star" aria-hidden="true">*</span></label>
+          <textarea id="c-message" name="message" rows="5" required aria-required="true"></textarea>
+        </div>
+        <button type="submit" class="btn-contact">Envoyer</button>
+      </form>
+      <p style="margin-top:24px;font-size:14px;color:#666">
+        Vous pouvez aussi nous écrire directement à <a href="mailto:miaa@miaa.fr">miaa@miaa.fr</a>
+      </p>
+    </div>
+  </div>
+</main>
+<miaa-footer></miaa-footer>
+<script src="js/miaa-site.js"></script>
+</body>
+</html>

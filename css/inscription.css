@@ -2,7 +2,7 @@
    MIAA — Page d'inscription bénévole
    Styles spécifiques à la page (chrome, planning, modal).
    Dépend de (à charger avant) :
-     _ds/.../colors_and_type.css   — tokens du design system
+     css/colors_and_type.css       — tokens du design system
      miaa-components.css           — composants partagés
    ============================================================ */
 
