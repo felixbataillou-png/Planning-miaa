@@ -98,20 +98,15 @@ const { data: existing } = await db
     .select('id')
     .single()
 
-  // 4. Notification email aux admins (ignorée silencieusement en local à cause du CORS)
+  // 4. Notification email aux admins via Netlify Function (évite les problèmes CORS)
   try {
-    await fetch(`${SUPABASE_URL}/functions/v1/notify-admin`, {
+    await fetch('/.netlify/functions/notify', {
       method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ registration_id: reg.id })
     })
   } catch (e) {
-    // En local (localhost), le CORS bloque cet appel.
-    // En production (miaa.fr), il fonctionnera normalement.
-    console.log('notify-admin ignoré en local:', e.message)
+    console.log('notify-admin ignoré:', e.message)
   }
 }
 
