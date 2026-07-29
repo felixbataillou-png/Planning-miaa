@@ -99,6 +99,14 @@ const { data: existing } = await db
     .single()
 
   // 4. Notification email aux admins via Netlify Function (évite les problèmes CORS)
+  console.log('Appel notify avec reg.id:', reg.id)
+  const notifyRes = await fetch('/.netlify/functions/notify', {
+   method: 'POST',
+   headers: { 'Content-Type': 'application/json' },
+   body: JSON.stringify({ registration_id: reg.id })
+  })
+  console.log('Réponse notify:', notifyRes.status)
+  
   try {
     await fetch('/.netlify/functions/notify', {
       method: 'POST',
