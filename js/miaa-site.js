@@ -356,4 +356,7 @@
     inject()
   }
 
+  // Netlify Identity — force l'URL native pour l'authentification CMS
+  window.netlifyIdentityUrl = "https://verdant-phoenix-e415b1.netlify.app";
+
 })()
