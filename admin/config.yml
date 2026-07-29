@@ -2,11 +2,8 @@
 # Documentation : https://decapcms.org/docs/configuration-options/
 
 backend:
-  name: github
-  repo: felixbataillou-png/Planning-miaa  # ← ton dépôt GitHub
-  branch: main
-  base_url: https://sveltia-cms-auth.pages.dev  # service d'auth gratuit
-  auth_client_id: Ov23lihG7ZyS1n6xmBR2
+    name: git-gateway
+    branch: main
 
 # Dossier où les images uploadées sont stockées
 media_folder: assets/uploads
