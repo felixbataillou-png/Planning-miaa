@@ -4,7 +4,7 @@
       "titre": "MIAA en vidéo — Reportage 2023",
       "type": "Vidéo",
       "description": "Découvrez MIAA à travers ce reportage vidéo.",
-      "video": "assets/videos/2312-MIAA-FT.mp4",
+      "video": "assets/uploads/2312-miaa-ft.mp4",
       "image": "",
       "lien": "",
       "date": "2023-12-01"
@@ -13,7 +13,7 @@
       "titre": "MIAA en vidéo — Présentation",
       "type": "Vidéo",
       "description": "Présentation de l'association MIAA.",
-      "video": "assets/videos/MIAA-720-h264.mp4",
+      "video": "assets/uploads/miaa-presentation-2.m4v",
       "image": "",
       "lien": "",
       "date": "2022-01-01"
@@ -23,7 +23,7 @@
       "type": "Article",
       "description": "MIAA a été présenté sur France 2 en 2020.",
       "video": "",
-      "image": "",
+      "image": "assets/uploads/miaa_france_2.png",
       "lien": "",
       "date": "2020-01-01"
     },
@@ -32,7 +32,7 @@
       "type": "Article",
       "description": "MIAA a participé à La Chaîne du Cœur.",
       "video": "",
-      "image": "",
+      "image": "assets/uploads/la_chaine_du_coeur.png",
       "lien": "",
       "date": "2021-01-01"
     }
