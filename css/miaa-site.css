@@ -307,9 +307,6 @@ h1, h2, h3, h4 {
   .layout-with-sidebar { grid-template-columns: 1fr; }
   .sidebar { order: 2; }
   .main-content { order: 1; }
-}
-
-@media (max-width: 810px) {
   .site-header { padding: 15px 20px; height: auto; min-height: 70px; }
   .topbar, .hero { padding-left: 20px; padding-right: 20px; }
   .site-nav { display: none; }
