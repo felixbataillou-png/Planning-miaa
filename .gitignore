@@ -1,5 +1,5 @@
 .env
-
+js/supabase-config.js
 1-acceuil
 2-asso
 3-contact
