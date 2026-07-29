@@ -1,0 +1,96 @@
+# Configuration Sveltia CMS — Site MIAA
+# Documentation : https://decapcms.org/docs/configuration-options/
+
+backend:
+  name: github
+  repo: felixbataillou-png/Planning-miaa  # ← ton dépôt GitHub
+  branch: main
+  base_url: https://sveltia-cms-auth.pages.dev  # service d'auth gratuit
+
+# Dossier où les images uploadées sont stockées
+media_folder: assets/uploads
+public_folder: assets/uploads
+
+# Locale française
+locale: fr
+
+# ── Collections éditables ────────────────────────────────────────
+
+collections:
+
+  # ── Page Accueil — articles d'actualité ─────────────────────────
+  - name: actualites
+    label: "Actualités (page d'accueil)"
+    label_singular: "Actualité"
+    folder: _content/actualites
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    fields:
+      - { label: "Titre", name: titre, widget: string }
+      - { label: "Contenu", name: contenu, widget: markdown }
+      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
+      - { label: "Visible", name: visible, widget: boolean, default: true }
+
+  # ── Équipe ──────────────────────────────────────────────────────
+  - name: equipe
+    label: "Équipe"
+    label_singular: "Membre"
+    folder: _content/equipe
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    fields:
+      - { label: "Nom complet", name: nom, widget: string }
+      - { label: "Rôle / Fonction", name: role, widget: string }
+      - { label: "Type", name: type, widget: select, options: ["Bureau", "Conseil d'Administration", "Membre d'honneur"] }
+      - { label: "Ordre d'affichage", name: ordre, widget: number, default: 99 }
+
+  # ── Partenaires ─────────────────────────────────────────────────
+  - name: partenaires
+    label: "Partenaires"
+    label_singular: "Partenaire"
+    folder: _content/partenaires
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    fields:
+      - { label: "Nom", name: nom, widget: string }
+      - { label: "Site web", name: url, widget: string, required: false }
+      - { label: "Description", name: description, widget: string, required: false }
+      - { label: "Logo", name: logo, widget: image, required: false, media_folder: assets/partenaires }
+
+  # ── Newsletters ─────────────────────────────────────────────────
+  - name: newsletters
+    label: "Newsletters"
+    label_singular: "Newsletter"
+    folder: _content/newsletters
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    fields:
+      - { label: "Titre", name: titre, widget: string }
+      - { label: "Lien", name: url, widget: string }
+      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
+
+  # ── Presse et Médias ────────────────────────────────────────────
+  - name: presse
+    label: "Presse et Médias"
+    label_singular: "Article / Vidéo"
+    folder: _content/presse
+    create: true
+    slug: "{{slug}}"
+    extension: json
+    format: json
+    fields:
+      - { label: "Titre", name: titre, widget: string }
+      - { label: "Type", name: type, widget: select, options: ["Vidéo", "Article", "Photo"] }
+      - { label: "Description", name: description, widget: text, required: false }
+      - { label: "Fichier vidéo", name: video, widget: file, required: false, media_folder: assets/videos }
+      - { label: "Image", name: image, widget: image, required: false }
+      - { label: "Lien externe", name: lien, widget: string, required: false }
+      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
