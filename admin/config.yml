@@ -4,6 +4,7 @@
 backend:
     name: git-gateway
     branch: main
+    site_url: https://verdant-phoenix-e415b1.netlify.app
 
 # Dossier où les images uploadées sont stockées
 media_folder: assets/uploads
