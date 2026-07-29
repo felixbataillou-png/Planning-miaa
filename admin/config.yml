@@ -1,39 +1,36 @@
-# Configuration Netifly CMS — Site MIAA
-# Documentation : https://decapcms.org/docs/configuration-options/
+# Configuration Decap CMS — Site MIAA
 
 backend:
-    name: git-gateway
-    branch: main
+  name: git-gateway
+  branch: main
 
 site_url: https://miaa.fr
-
-# Dossier où les images uploadées sont stockées
 media_folder: assets/uploads
 public_folder: assets/uploads
-
-# Locale française
 locale: fr
-
-# ── Collections éditables ────────────────────────────────────────
 
 collections:
 
-  # ── Page Accueil — articles d'actualité ─────────────────────────
+  # Actualités (page d'accueil)
   - name: actualites
     label: "Actualités (page d'accueil)"
-    label_singular: "Actualité"
-    folder: _content/actualites
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    fields:
-      - { label: "Titre", name: titre, widget: string }
-      - { label: "Contenu", name: contenu, widget: markdown }
-      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
-      - { label: "Visible", name: visible, widget: boolean, default: true }
+    files:
+      - name: actualites
+        label: "Liste des actualités"
+        file: _content/actualites.json
+        fields:
+          - label: "Articles"
+            name: articles
+            widget: list
+            label_singular: "Article"
+            summary: "{{fields.titre}}"
+            fields:
+              - { label: "Titre", name: titre, widget: string }
+              - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+              - { label: "Visible sur le site", name: visible, widget: boolean, default: true }
+              - { label: "Contenu", name: contenu, widget: markdown }
 
-  # ── Équipe ──────────────────────────────────────────────────────
+  # Équipe
   - name: equipe
     label: "Équipe"
     files:
@@ -41,62 +38,73 @@ collections:
         label: "Membres de l'équipe"
         file: _content/equipe.json
         fields:
-        - label: "Bureau"
-          name: bureau
-          widget: list
-          fields:
-            - { label: "Nom", name: nom, widget: string }
-            - { label: "Rôle", name: role, widget: string }
-        - label: "Conseil d'Administration"
-          name: ca
-          widget: list
-          fields:
-            - { label: "Nom", name: nom, widget: string }
-        - { label: "Message hommage", name: hommage, widget: text }
-  
-  # ── Partenaires ─────────────────────────────────────────────────
+          - label: "Bureau"
+            name: bureau
+            widget: list
+            summary: "{{fields.nom}}"
+            fields:
+              - { label: "Nom", name: nom, widget: string }
+              - { label: "Rôle", name: role, widget: string }
+          - label: "Conseil d'Administration"
+            name: ca
+            widget: list
+            summary: "{{fields.nom}}"
+            fields:
+              - { label: "Nom", name: nom, widget: string }
+          - { label: "Message hommage", name: hommage, widget: text }
+
+  # Partenaires
   - name: partenaires
     label: "Partenaires"
-    label_singular: "Partenaire"
-    folder: _content/partenaires
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    fields:
-      - { label: "Nom", name: nom, widget: string }
-      - { label: "Site web", name: url, widget: string, required: false }
-      - { label: "Description", name: description, widget: string, required: false }
-      - { label: "Logo", name: logo, widget: image, required: false, media_folder: assets/partenaires }
+    files:
+      - name: partenaires
+        label: "Liste des partenaires"
+        file: _content/partenaires.json
+        fields:
+          - label: "Partenaires"
+            name: partenaires
+            widget: list
+            summary: "{{fields.nom}}"
+            fields:
+              - { label: "Nom", name: nom, widget: string }
+              - { label: "Site web", name: url, widget: string, required: false }
+              - { label: "Description", name: description, widget: string, required: false }
+              - { label: "Logo", name: logo, widget: image, required: false }
 
-  # ── Newsletters ─────────────────────────────────────────────────
+  # Newsletters
   - name: newsletters
     label: "Newsletters"
-    label_singular: "Newsletter"
-    folder: _content/newsletters
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    fields:
-      - { label: "Titre", name: titre, widget: string }
-      - { label: "Lien", name: url, widget: string }
-      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
+    files:
+      - name: newsletters
+        label: "Liste des newsletters"
+        file: _content/newsletters.json
+        fields:
+          - label: "Newsletters"
+            name: newsletters
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { label: "Titre", name: titre, widget: string }
+              - { label: "Lien", name: url, widget: string }
+              - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
 
-  # ── Presse et Médias ────────────────────────────────────────────
+  # Presse et Médias
   - name: presse
     label: "Presse et Médias"
-    label_singular: "Article / Vidéo"
-    folder: _content/presse
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    fields:
-      - { label: "Titre", name: titre, widget: string }
-      - { label: "Type", name: type, widget: select, options: ["Vidéo", "Article", "Photo"] }
-      - { label: "Description", name: description, widget: text, required: false }
-      - { label: "Fichier vidéo", name: video, widget: file, required: false, media_folder: assets/videos }
-      - { label: "Image", name: image, widget: image, required: false }
-      - { label: "Lien externe", name: lien, widget: string, required: false }
-      - { label: "Date", name: date, widget: datetime, date_format: "DD/MM/YYYY", time_format: false }
+    files:
+      - name: presse
+        label: "Articles et vidéos"
+        file: _content/presse.json
+        fields:
+          - label: "Contenus"
+            name: contenus
+            widget: list
+            summary: "{{fields.titre}}"
+            fields:
+              - { label: "Titre", name: titre, widget: string }
+              - { label: "Type", name: type, widget: select, options: ["Vidéo", "Article", "Photo"] }
+              - { label: "Description", name: description, widget: text, required: false }
+              - { label: "Fichier vidéo", name: video, widget: file, required: false }
+              - { label: "Image", name: image, widget: image, required: false }
+              - { label: "Lien externe", name: lien, widget: string, required: false }
+              - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }

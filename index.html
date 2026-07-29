@@ -34,24 +34,14 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-// Liste des fichiers d'actualités — ajouter ici les nouveaux fichiers
-const ACTUALITES = [
-  '_content/actualites/braderie-31-mai-2026.json',
-  '_content/actualites/miaa-en-deficit.json',
-  '_content/actualites/meals-4-monologues-2026.json'
-]
+// Charge toutes les actualités depuis un seul fichier JSON
+// Les non-devs gèrent ce fichier via le CMS — aucune modification du HTML nécessaire
+fetch('_content/actualites.json')
+  .then(r => r.json())
+  .then(data => {
+    const container = document.getElementById('actualites-content')
 
-async function chargerActualites() {
-  const container = document.getElementById('actualites-content')
-
-  try {
-    // Charge tous les fichiers en parallèle
-    const resultats = await Promise.all(
-      ACTUALITES.map(url => fetch(url).then(r => r.json()))
-    )
-
-    // Filtre les articles visibles et trie par date (plus récent en premier)
-    const articles = resultats
+    const articles = (data.articles || [])
       .filter(a => a.visible !== false)
       .sort((a, b) => new Date(b.date) - new Date(a.date))
 
@@ -60,7 +50,6 @@ async function chargerActualites() {
       return
     }
 
-    // Construit le HTML
     let html = ''
     articles.forEach((article, index) => {
       if (index > 0) html += '<hr class="article-separator">'
@@ -69,13 +58,11 @@ async function chargerActualites() {
     })
 
     container.innerHTML = html
-
-  } catch (e) {
-    container.innerHTML = '<p>Impossible de charger les actualités. Merci de réessayer.</p>'
-  }
-}
-
-chargerActualites()
+  })
+  .catch(() => {
+    document.getElementById('actualites-content').innerHTML =
+      '<p>Impossible de charger les actualités. Merci de réessayer.</p>'
+  })
 </script>
 
 <!-- Netlify Identity -->
