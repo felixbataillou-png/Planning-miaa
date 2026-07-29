@@ -1,2 +1,5 @@
 [functions]
   directory = "netlify/functions"
+
+[build]
+  environment = { SECRETS_SCAN_OMIT_PATHS = "js/supabase-config.js" }
