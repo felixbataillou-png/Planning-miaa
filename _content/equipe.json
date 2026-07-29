@@ -1,0 +1,31 @@
+{
+  "bureau": [
+    { "nom": "Pascale SCHULER", "role": "Présidente" },
+    { "nom": "Héloïse TOUR", "role": "Vice-Présidente" },
+    { "nom": "Jordane CHOUZENOUX", "role": "Secrétaire" },
+    { "nom": "Sandrine DE MONTE", "role": "Secrétaire Adjointe" },
+    { "nom": "Pascal SAUZET", "role": "Trésorier" },
+    { "nom": "Juliette DESMARESCAUX", "role": "Trésorière Adjointe" },
+    { "nom": "Dominique BOUILLERET & Adeline DARRAUX", "role": "Fondateur et Fondatrice du MIAA & Membres d'Honneur" }
+  ],
+  "ca": [
+    { "nom": "Mimouna AZOUZI" },
+    { "nom": "Malika BENBACHIR" },
+    { "nom": "Joséphine BERRY" },
+    { "nom": "Basile DEROURE" },
+    { "nom": "Serge DUPUY" },
+    { "nom": "Patrick FALCONIERI" },
+    { "nom": "Eric HERSON-MACAREL" },
+    { "nom": "Massamba KHOUMA" },
+    { "nom": "Muranyi KOVACS" },
+    { "nom": "Hubert LAURIOT PREVOST" },
+    { "nom": "Lucie LLOPIS" },
+    { "nom": "Nathalie MANN" },
+    { "nom": "Madame Miniature" },
+    { "nom": "Nicolas RAPPO" },
+    { "nom": "Isabelle RIBIS" },
+    { "nom": "Béatrice SICOURI" },
+    { "nom": "Sophie SIMONIN" }
+  ],
+  "hommage": "Pensées pour notre chère Rachida BOUMEDIENNE qui fera toujours partie du MIAA."
+}

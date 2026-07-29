@@ -36,18 +36,24 @@ collections:
   # ── Équipe ──────────────────────────────────────────────────────
   - name: equipe
     label: "Équipe"
-    label_singular: "Membre"
-    folder: _content/equipe
-    create: true
-    slug: "{{slug}}"
-    extension: json
-    format: json
-    fields:
-      - { label: "Nom complet", name: nom, widget: string }
-      - { label: "Rôle / Fonction", name: role, widget: string }
-      - { label: "Type", name: type, widget: select, options: ["Bureau", "Conseil d'Administration", "Membre d'honneur"] }
-      - { label: "Ordre d'affichage", name: ordre, widget: number, default: 99 }
-
+    files:
+      - name: equipe
+        label: "Membres de l'équipe"
+        file: _content/equipe.json
+        fields:
+        - label: "Bureau"
+          name: bureau
+          widget: list
+          fields:
+            - { label: "Nom", name: nom, widget: string }
+            - { label: "Rôle", name: role, widget: string }
+        - label: "Conseil d'Administration"
+          name: ca
+          widget: list
+          fields:
+            - { label: "Nom", name: nom, widget: string }
+        - { label: "Message hommage", name: hommage, widget: text }
+  
   # ── Partenaires ─────────────────────────────────────────────────
   - name: partenaires
     label: "Partenaires"
