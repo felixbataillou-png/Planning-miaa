@@ -5,43 +5,134 @@
   <meta name="description" content="MIAA dans les médias - vidéos et articles de presse">
   <title>MIAA — Presse et Médias</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
   <link rel="stylesheet" href="css/miaa-site.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&display=swap">
+  <style>
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+      margin-top: 24px;
+    }
+    .media-card {
+      background: #f7f9fc;
+      border: 1px solid #e0e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .media-card__video,
+    .media-card__image {
+      width: 100%;
+      display: block;
+      background: #000;
+      max-height: 200px;
+      object-fit: cover;
+    }
+    .media-card__video { max-height: 200px; }
+    .media-card__body { padding: 16px; }
+    .media-card__type {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-primary, #128BAD);
+      margin-bottom: 6px;
+    }
+    .media-card__titre {
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 8px;
+    }
+    .media-card__desc {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .media-card__lien {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-primary, #128BAD);
+    }
+    .media-card--video .media-card__body { border-top: 3px solid var(--color-primary, #128BAD); }
+    .media-card--article .media-card__body { border-top: 3px solid #f39c12; }
+    .media-card--photo .media-card__body { border-top: 3px solid #27ae60; }
+  </style>
 </head>
 <body>
 <miaa-header page="association"></miaa-header>
-<div class="hero"><h1>Presse et Médias</h1></div>
+<div class="hero"><div class="hero-text"><h1>Presse et Médias</h1></div></div>
 <main class="page-wrap" id="main-content">
   <div class="layout-with-sidebar">
     <miaa-sidebar></miaa-sidebar>
     <div class="main-content article-content">
-      <h2>MIAA en vidéo</h2>
-      <p>Découvrez MIAA à travers ces reportages vidéo :</p>
-      <div class="video-wrapper">
-        <video controls preload="metadata" poster="assets/hero-banner.jpg">
-          <source src="assets/videos/2312-MIAA-FT.mp4" type="video/mp4">
-          Votre navigateur ne supporte pas la lecture de vidéos.
-        </video>
+      <p>Retrouvez ici les apparitions de MIAA dans les médias.</p>
+      <div class="media-grid" id="media-grid">
+        <p>Chargement...</p>
       </div>
-      <div class="video-wrapper" style="margin-top:24px">
-        <video controls preload="metadata">
-          <source src="assets/videos/MIAA-720-h264.mp4" type="video/mp4">
-          Votre navigateur ne supporte pas la lecture de vidéos.
-        </video>
-      </div>
-      <h2>France 2 — 2020</h2>
-      <p>MIAA a été présenté sur France 2 en 2020.</p>
-      <h2>La Chaîne du Cœur</h2>
-      <p>MIAA a participé à La Chaîne du Cœur.</p>
-      <p style="margin-top:24px;font-size:14px;color:#666">
-        Pour toute demande presse, contactez-nous à <a href="mailto:miaa@miaa.fr">miaa@miaa.fr</a>
+      <p style="margin-top:32px;font-size:14px;color:#666">
+        Pour toute demande presse, contactez-nous à
+        <a href="mailto:miaa@miaa.fr">miaa@miaa.fr</a>
       </p>
     </div>
   </div>
 </main>
 <miaa-footer></miaa-footer>
 <script src="js/miaa-site.js"></script>
+<script>
+fetch('_content/presse.json')
+  .then(r => r.json())
+  .then(data => {
+    const grid = document.getElementById('media-grid')
+    const contenus = (data.contenus || [])
+      .sort((a, b) => new Date(b.date) - new Date(a.date))
+
+    if (contenus.length === 0) {
+      grid.innerHTML = '<p>Aucun contenu pour le moment.</p>'
+      return
+    }
+
+    grid.innerHTML = contenus.map(item => {
+      const typeClass = item.type === 'Vidéo' ? 'video'
+                      : item.type === 'Photo' ? 'photo' : 'article'
+
+      let media = ''
+      if (item.video) {
+        media = `<video class="media-card__video" controls preload="metadata">
+          <source src="${item.video}" type="video/mp4">
+        </video>`
+      } else if (item.image) {
+        media = `<img class="media-card__image" src="${item.image}" alt="${item.titre}">`
+      }
+
+      let lien = ''
+      if (item.lien) {
+        lien = `<a href="${item.lien}" target="_blank" rel="noopener" class="media-card__lien">
+          <i class="fas fa-external-link-alt" aria-hidden="true"></i> Voir le contenu
+        </a>`
+      }
+
+      return `<div class="media-card media-card--${typeClass}">
+        ${media}
+        <div class="media-card__body">
+          <div class="media-card__type">${item.type}</div>
+          <div class="media-card__titre">${item.titre}</div>
+          ${item.description ? `<div class="media-card__desc">${item.description}</div>` : ''}
+          ${lien}
+        </div>
+      </div>`
+    }).join('')
+  })
+  .catch(() => {
+    document.getElementById('media-grid').innerHTML =
+      '<p>Impossible de charger les médias. Merci de réessayer.</p>'
+  })
+</script>
 </body>
 </html>
