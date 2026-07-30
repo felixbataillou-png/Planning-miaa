@@ -98,23 +98,15 @@ const { data: existing } = await db
     .select('id')
     .single()
 
-  // 4. Notification email aux admins via Netlify Function (évite les problèmes CORS)
-  console.log('Appel notify avec reg.id:', reg.id)
+  // 4. Notification email aux admins
   const notifyRes = await fetch('/.netlify/functions/notify', {
    method: 'POST',
    headers: { 'Content-Type': 'application/json' },
    body: JSON.stringify({ registration_id: reg.id })
   })
-  console.log('Réponse notify:', notifyRes.status)
-  
-  try {
-    await fetch('/.netlify/functions/notify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registration_id: reg.id })
-    })
-  } catch (e) {
-    console.log('notify-admin ignoré:', e.message)
+
+  if (!notifyRes.ok) {
+   throw new Error('NOTIFY_FAILED')
   }
 }
 
@@ -460,9 +452,13 @@ async function submitForm() {
       console.error(err)
       btnConfirm.disabled    = false
       btnConfirm.textContent = 'Confirmer mon inscription'
-      alert(err.message.includes('déjà inscrit')
-        ? 'Vous êtes déjà inscrit à ce créneau pour cette activité.'
-        : 'Une erreur est survenue, merci de réessayer.')
+      if (err.message === 'NOTIFY_FAILED') {
+       alert('Votre inscription a bien été enregistrée, mais nous avons rencontré un problème technique pour vous confirmer par email. Merci de nous contacter directement à miaa@miaa.fr')
+      } else {
+        alert(err.message.includes('déjà inscrit')
+          ? 'Vous êtes déjà inscrit à ce créneau pour cette activité.'
+          : 'Une erreur est survenue, merci de réessayer.')
+      }
     }
   } else {
     // Nouveau bénévole → modale complémentaire
