@@ -34,6 +34,8 @@ exports.handler = async (event) => {
       }
     )
 
+    console.log('SERVICE_ROLE défini:', !!process.env.SUPABASE_SERVICE_ROLE)
+
     const data = await res.text()
     console.log('Réponse Supabase:', res.status, data)
 
