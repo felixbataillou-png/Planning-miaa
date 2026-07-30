@@ -115,42 +115,54 @@
         <p class="form-required-legend">
           <span class="req-star" aria-hidden="true">*</span> Champs requis
         </p>
-        <div class="form-group">
-          <label for="inp-nom">Nom <span style="color:#c0392b" aria-hidden="true">*</span></label>
-          <input type="text" id="inp-nom" placeholder="Dupont"
-                 autocomplete="name" required aria-required="true"
-                 aria-describedby="err-nom" aria-invalid="false">
-          <div class="error-msg" id="err-nom" role="alert">Veuillez indiquer votre nom.</div>
-        </div>
-        <div class="form-group">
-          <label for="inp-prenom">Prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
-          <input type="text" id="inp-prenom" placeholder="Marie"
-                 autocomplete="name" required aria-required="true"
-                 aria-describedby="err-nom" aria-invalid="false">
-          <div class="error-msg" id="err-prenom" role="alert">Veuillez indiquer votre prénom.</div>
-        </div>
-        <div class="form-group">
-          <label for="inp-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
-          <input type="tel" id="inp-tel" placeholder="06 12 34 56 78"
-                 autocomplete="tel" required aria-required="true"
-                 aria-describedby="err-tel" aria-invalid="false">
-          <div class="error-msg" id="err-tel" role="alert">Veuillez indiquer votre numéro.</div>
-        </div>
+
+       <!-- Email en premier — déclenche l'autocomplétion -->
         <div class="form-group">
           <label for="inp-email">Email <span style="color:#c0392b" aria-hidden="true">*</span></label>
           <input type="email" id="inp-email" placeholder="marie.dupont@email.com"
-                 autocomplete="email" required aria-required="true"
-                 aria-describedby="err-email" aria-invalid="false">
+             autocomplete="email" required aria-required="true"
+             aria-describedby="err-email" aria-invalid="false">
+          <span id="email-loading" style="display:none;position:absolute;right:10px;top:50%;
+            transform:translateY(-50%);font-size:12px;color:#888">
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+          </span>
           <div class="error-msg" id="err-email" role="alert">Veuillez indiquer un email valide.</div>
         </div>
+
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="inp-nom">Nom <span style="color:#c0392b" aria-hidden="true">*</span></label>
+          <input type="text" id="inp-nom" placeholder="Dupont" autocomplete="family-name" required aria-required="true" aria-describedby="err-nom" aria-invalid="false">
+          <div class="error-msg" id="err-nom" role="alert">Veuillez indiquer votre nom.</div>
+        </div>
+
+        <!-- Prénom -->
+        <div class="form-group">
+          <label for="inp-prenom">Prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
+          <input type="text" id="inp-prenom" placeholder="Marie"
+           autocomplete="given-name" required aria-required="true"
+           aria-describedby="err-prenom" aria-invalid="false">
+          <div class="error-msg" id="err-prenom" role="alert">Veuillez indiquer votre prénom.</div>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="form-group">
+          <label for="inp-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
+          <input type="tel" id="inp-tel" placeholder="06 12 34 56 78"
+           autocomplete="tel" required aria-required="true"
+           aria-describedby="err-tel" aria-invalid="false">
+          <div class="error-msg" id="err-tel" role="alert">Veuillez indiquer votre numéro.</div>
+        </div>
+
+        <!-- Permis -->
         <div id="permis-group" style="display:none">
           <label for="inp-permis" class="toggle-row">
             <span class="tl-main">Je possède le permis et suis disponible pour conduire</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="inp-permis">
+            <span class="toggle-switch" aria-hidden="true">
               <span class="toggle-track"></span>
               <span class="toggle-thumb"></span>
             </span>
+            <input type="checkbox" id="inp-permis" class="sr-only">
           </label>
         </div>
 

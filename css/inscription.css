@@ -33,6 +33,21 @@
 .miaa-slot__cta:focus-visible  { outline-offset: -3px; outline-color: #fff; }
 .miaa-double:focus-visible      { outline-color: var(--color-primary, #128BAD); outline-offset: 2px; }
 
+/* Si le planning est masqué depuis le CMS */
+.planning-masque {
+  text-align: center;
+  padding: 60px 20px;
+  color: #555;
+  font-size: 16px;
+  line-height: 1.6;
+}
+.planning-masque i {
+  font-size: 48px;
+  color: var(--color-primary, #128BAD);
+  margin-bottom: 20px;
+  display: block;
+}
+
 
 /* Espace entre deux paragraphes consécutifs (ex : section intro) */
 .spaced-paragraph { margin-bottom: 12px; }
@@ -142,6 +157,12 @@ h3.miaa-slot__role { margin: 0; }
 .modal-close:hover { opacity: 1; }
 
 .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+
+.autocompleted {
+  background: #f0f9fc;
+  border-color: var(--color-primary, #128BAD);
+  color: #333;
+}
 
 /* Formulaire */
 .form-group        { display: flex; flex-direction: column; gap: 5px; }

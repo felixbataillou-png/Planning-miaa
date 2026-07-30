@@ -378,7 +378,48 @@ function openModal(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   document.getElementById('modal-success-content').style.display = 'none'
   document.getElementById('modal-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
-  setTimeout(() => document.getElementById('inp-nom').focus(), 120)
+  initEmailAutocomplete()
+  setTimeout(() => document.getElementById('inp-email').focus(), 120)
+}
+
+// ── Autocomplétion email ─────────────────────────────────────────
+// Quand le bénévole quitte le champ email, on cherche dans Supabase
+// Si trouvé → on pré-remplit nom, prénom, tel automatiquement
+let autocompleteTimer = null
+
+function initEmailAutocomplete() {
+  const emailInput = document.getElementById('inp-email')
+  if (!emailInput) return
+
+  emailInput.addEventListener('blur', async () => {
+    const email = emailInput.value.trim()
+    if (!validateEmail(email)) return
+
+    // Affiche le spinner
+    document.getElementById('email-loading').style.display = 'inline'
+
+    const { data: vol } = await db
+      .from('volunteers')
+      .select('nom, prenom, tel, permis')
+      .eq('email', email)
+      .maybeSingle()
+
+    // Cache le spinner
+    document.getElementById('email-loading').style.display = 'none'
+
+    if (vol) {
+      // Bénévole existant — remplit les champs automatiquement
+      document.getElementById('inp-nom').value    = vol.nom    || ''
+      document.getElementById('inp-prenom').value = vol.prenom || ''
+      document.getElementById('inp-tel').value    = vol.tel    || ''
+      document.getElementById('inp-permis').checked = vol.permis || false
+
+      // Marque les champs comme remplis visuellement
+      ;['inp-nom', 'inp-prenom', 'inp-tel'].forEach(id => {
+        document.getElementById(id).classList.add('autocompleted')
+      })
+    }
+  })
 }
 
 function closeModal() {
