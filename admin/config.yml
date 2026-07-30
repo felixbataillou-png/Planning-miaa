@@ -119,4 +119,4 @@ collections:
         file: _content/planning-config.json
         fields:
           - { label: "Masquer le planning", name: masquer, widget: boolean, default: false }
-          - { label: "Message affiché à la place du planning", name: message, widget: text, hint: "Affiché uniquement quand le planning est masqué" }
+          - { label: "Message affiché à la place du planning", name: message, widget: markdown, hint: "Affiché uniquement quand le planning est masqué" }
