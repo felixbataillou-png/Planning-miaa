@@ -22,8 +22,7 @@ exports.handler = async (event) => {
     const targetUrl = `${supabaseUrl}/functions/v1/Notify_admin`
     console.log('URL appelée:', targetUrl)
 
-    const res = await fetch(
-      `${supabaseUrl}/functions/v1/notify-admin`,
+    const res = await fetch(targetUrl, 
       {
         method: 'POST',
         headers: {
