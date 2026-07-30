@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     console.log('SUPABASE_URL défini:', !!supabaseUrl)
     console.log('SUPABASE_ANON défini:', !!supabaseAnon)
 
-    const targetUrl = `${supabaseUrl}/functions/v1/notify-admin`
+    const targetUrl = `${supabaseUrl}/functions/v1/Notify_admin`
     console.log('URL appelée:', targetUrl)
 
     const res = await fetch(
