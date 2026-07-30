@@ -108,3 +108,15 @@ collections:
               - { label: "Image", name: image, widget: image, required: false }
               - { label: "Lien externe", name: lien, widget: string, required: false }
               - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+
+
+  # Configuration du planning
+  - name: planning-config
+    label: "Configuration du planning"
+    files:
+      - name: planning-config
+        label: "Affichage du planning bénévole"
+        file: _content/planning-config.json
+        fields:
+          - { label: "Masquer le planning", name: masquer, widget: boolean, default: false }
+          - { label: "Message affiché à la place du planning", name: message, widget: text, hint: "Affiché uniquement quand le planning est masqué" }
