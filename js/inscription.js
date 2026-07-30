@@ -118,6 +118,26 @@ const { data: existing } = await db
  * puis construit le HTML de chaque colonne jour par jour.
  */
 async function renderWeek() {
+  // Vérifie si le planning est masqué depuis le CMS
+  try {
+    const configRes = await fetch('_content/planning-config.json')
+    const config = await configRes.json()
+    console.log('config masquer:', config.masquer, typeof config.masquer)
+    if (config.masquer) {
+      document.getElementById('planning-grid').innerHTML =
+        `<div class="planning-masque">
+          <i class="fas fa-pause-circle" aria-hidden="true"></i>
+          <p>${config.message}</p>
+        </div>`
+      document.getElementById('btn-prev').style.display = 'none'
+      document.getElementById('btn-next').style.display = 'none'
+      document.querySelector('.week-nav').style.display = 'none'
+      return
+    }
+  } catch (e) {
+    // Si le fichier n'existe pas, on affiche le planning normalement
+  }
+
   const days = getWeekDays(currentWeekOffset)
 
   // Navigation semaine
