@@ -28,7 +28,7 @@ exports.handler = async (event) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnon}`
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE}`
         },
         body: JSON.stringify({ registration_id })
       }
