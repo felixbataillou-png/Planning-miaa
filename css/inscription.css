@@ -37,9 +37,8 @@
 .planning-masque {
   text-align: center;
   padding: 60px 20px;
-  color: #555;
-  font-size: 16px;
-  line-height: 1.6;
+  max-width: 700px;
+  margin: 0 auto;
 }
 .planning-masque i {
   font-size: 48px;
@@ -47,6 +46,13 @@
   margin-bottom: 20px;
   display: block;
 }
+.planning-masque__message {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #333;
+}
+.planning-masque__message p { margin-bottom: 12px; }
+.planning-masque__message strong { color: var(--color-primary, #128BAD); }
 
 
 /* Espace entre deux paragraphes consécutifs (ex : section intro) */

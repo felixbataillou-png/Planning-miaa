@@ -122,7 +122,6 @@ async function renderWeek() {
   try {
     const configRes = await fetch('_content/planning-config.json')
     const config = await configRes.json()
-    console.log('config masquer:', config.masquer, typeof config.masquer)
     if (config.masquer) {
       document.getElementById('planning-grid').innerHTML =
         `<div class="planning-masque">
