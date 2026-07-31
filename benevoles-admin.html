@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MIAA — Bénévoles</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="css/miaa-components.css">
+  <link rel="stylesheet" href="css/planning-admin.css">
+  <link rel="stylesheet" href="css/admin-site.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+</head>
+<body>
+
+<!-- Header admin injecté par admin-site.js -->
+<admin-header></admin-header>
+
+<section class="hero" aria-label="En-tête bénévoles admin">
+  <div class="hero-text">
+    <h1>Gestion des bénévoles</h1>
+    <p>Liste complète des bénévoles enregistrés dans la base de données.</p>
+  </div>
+</section>
+
+<main class="page-wrap" id="main-content">
+
+  <!-- Barre d'outils -->
+  <div class="benevoles-toolbar">
+    <div class="benevoles-search">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input type="text" id="search-input"
+             placeholder="Rechercher par nom, email, téléphone…"
+             aria-label="Rechercher un bénévole"
+             oninput="handleSearch()">
+    </div>
+    <span class="benevoles-count" id="benevoles-count">Chargement…</span>
+    <button class="btn-primary" onclick="openAddModal()"
+            style="white-space:nowrap">
+      <i class="fas fa-plus" aria-hidden="true"></i> Ajouter un bénévole
+    </button>
+  </div>
+
+  <!-- Tableau -->
+  <div class="table-wrap">
+    <table class="benevoles-table" aria-label="Liste des bénévoles">
+      <thead>
+        <tr>
+          <th>Commentaire</th>
+          <th>Nom</th>
+          <th>Prénom</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Permis</th>
+          <th>Profession</th>
+          <th>Adresse</th>
+          <th>CP</th>
+          <th>Ville</th>
+          <th>Urgence</th>
+          <th aria-label="Actions"></th>
+        </tr>
+      </thead>
+      <tbody id="benevoles-tbody">
+        <tr><td colspan="12" class="table-loading">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Chargement…
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination" aria-label="Pagination"></div>
+
+</main>
+
+<!-- ── Modale : Modifier / Ajouter un bénévole ───────────── -->
+<div class="modal-overlay" id="modal-benevole" role="dialog"
+     aria-modal="true" aria-labelledby="modal-bvl-title"
+     onclick="handleModalOverlayClick(event, 'modal-benevole')">
+  <div class="modal modal-benevole">
+    <div class="modal-header">
+      <h3 id="modal-bvl-title">Modifier le bénévole</h3>
+      <button class="modal-close" onclick="closeModal('modal-benevole')"
+              aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group form-group-full">
+        <label for="bvl-commentaire">Commentaire</label>
+        <textarea id="bvl-commentaire" rows="2" placeholder="Notes internes…"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="bvl-nom" placeholder="Dupont" required>
+        <div class="error-msg" id="err-bvl-nom" role="alert">Champ requis.</div>
+      </div>
+      <div class="form-group">
+        <label for="bvl-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="bvl-prenom" placeholder="Marie" required>
+        <div class="error-msg" id="err-bvl-prenom" role="alert">Champ requis.</div>
+      </div>
+      <div class="form-group">
+        <label for="bvl-email">Email</label>
+        <input type="email" id="bvl-email" placeholder="marie@exemple.fr">
+      </div>
+      <div class="form-group">
+        <label for="bvl-tel">Téléphone</label>
+        <input type="tel" id="bvl-tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="form-group">
+        <label for="bvl-profession">Profession</label>
+        <input type="text" id="bvl-profession" placeholder="Comédien·ne…">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="bvl-adresse">Adresse</label>
+        <input type="text" id="bvl-adresse" placeholder="12 rue de Belleville">
+      </div>
+      <div class="form-group">
+        <label for="bvl-codepostal">Code postal</label>
+        <input type="text" id="bvl-codepostal" placeholder="75019">
+      </div>
+      <div class="form-group">
+        <label for="bvl-ville">Ville</label>
+        <input type="text" id="bvl-ville" placeholder="Paris">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="bvl-urgence">Personne à contacter en urgence</label>
+        <input type="text" id="bvl-urgence" placeholder="Marie Dupont / 06 12 34 56 78">
+      </div>
+      <!-- Permis -->
+      <div class="form-group form-group-full">
+        <span class="toggle-row-label">Permis de conduire</span>
+        <label class="toggle-row" for="bvl-permis">
+          <span class="tl-main">Possède le permis et disponible pour conduire</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="bvl-permis">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-benevole')">Annuler</button>
+      <button class="btn-primary" id="btn-save-bvl" onclick="saveBenévole()">
+        <i class="fas fa-save" aria-hidden="true"></i> Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modale : Confirmation suppression ─────────────────── -->
+<div class="modal-overlay" id="modal-confirm-delete" role="dialog"
+     aria-modal="true" aria-labelledby="modal-del-title"
+     onclick="handleModalOverlayClick(event, 'modal-confirm-delete')">
+  <div class="modal modal-confirm">
+    <div class="modal-header">
+      <h3 id="modal-del-title">Supprimer le bénévole</h3>
+      <button class="modal-close" onclick="closeModal('modal-confirm-delete')"
+              aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="confirm-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
+      <p>Vous êtes sur le point de supprimer définitivement</p>
+      <p class="confirm-name" id="confirm-del-name">—</p>
+      <p style="font-size:13px;color:#888;margin-top:8px">
+        Cette action supprimera aussi toutes les inscriptions associées. Elle est irréversible.
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-confirm-delete')">Annuler</button>
+      <button class="btn-tertiary" onclick="confirmDelete()">
+        <i class="fas fa-trash" aria-hidden="true"></i> Supprimer définitivement
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast" aria-live="polite" aria-atomic="true">
+  <span id="toast-msg"></span>
+</div>
+
+<!-- Scripts -->
+<script src="js/admin-site.js"></script>
+<script src="js/benevoles-admin.js"></script>
+</body>
+</html>

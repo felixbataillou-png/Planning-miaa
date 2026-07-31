@@ -1,0 +1,168 @@
+/**
+ * admin-site.js
+ * Composants communs à toutes les pages de l'espace admin MIAA.
+ *
+ * Gère :
+ *   - L'écran de connexion (auth Supabase partagée entre toutes les pages admin)
+ *   - Le header admin avec navigation entre les pages
+ *   - La déconnexion
+ *
+ * Usage : charger ce fichier AVANT le JS spécifique à chaque page admin.
+ * La page appelante doit définir :
+ *   - window.ADMIN_PAGE = 'planning' | 'benevoles' (pour le lien actif dans la nav)
+ *   - window.onAdminReady = async function() { ... } (appelée une fois connecté)
+ *
+ * Dépendances :
+ *   - @supabase/supabase-js v2 (CDN)
+ *   - js/supabase-config.js → db
+ */
+
+;(function () {
+
+  // ── Navigation admin ─────────────────────────────────────────────
+  const ADMIN_NAV = [
+    { key: 'planning',   label: 'Planning',   href: 'planning-admin.html', icon: 'fa-calendar-alt' },
+    { key: 'benevoles',  label: 'Bénévoles',  href: 'benevoles-admin.html', icon: 'fa-users' },
+  ]
+
+  // ── Construction du HTML du header admin ─────────────────────────
+  function buildAdminHeader (activePage) {
+    const navItems = ADMIN_NAV.map(item => {
+      const isActive = item.key === activePage
+      return `<a href="${item.href}" class="${isActive ? 'active' : ''}"
+                 ${isActive ? 'aria-current="page"' : ''}
+                 aria-label="${item.label}">
+        <i class="fas ${item.icon}" aria-hidden="true"></i>
+        ${item.label}
+      </a>`
+    }).join('')
+
+    return `
+      <div class="topbar">
+        <div class="topbar-admin-badge">
+          <i class="fas fa-lock" aria-hidden="true"></i> Espace Administration
+        </div>
+        <a href="https://www.facebook.com/pages/Association-MIAA/377808022330859"
+           target="_blank" rel="noopener"
+           aria-label="Page Facebook MIAA (nouvel onglet)">
+          <i class="fab fa-facebook-f" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <header class="site-header">
+        <a href="planning-admin.html" aria-label="Espace admin MIAA">
+          <img class="logo" src="assets/logo.png" alt="MIAA">
+        </a>
+        <nav class="admin-nav" aria-label="Navigation administration">
+          ${navItems}
+        </nav>
+        <div class="header-right">
+          <div class="admin-label">
+            <i class="fas fa-shield-alt" aria-hidden="true"></i> Admin
+          </div>
+          <button onclick="AdminSite.logout()" class="btn-secondary"
+                  style="font-size:12px;padding:6px 14px">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Déconnexion
+          </button>
+        </div>
+      </header>`
+  }
+
+  // ── Écran de connexion ────────────────────────────────────────────
+  function buildLoginScreen () {
+    return `
+      <div id="login-screen" class="login-screen">
+        <div class="login-card">
+          <h2 class="login-title">MIAA — Espace Admin</h2>
+          <p class="login-subtitle">Connexion sécurisée</p>
+          <div id="login-step-email">
+            <div class="form-group">
+              <label for="login-email">Adresse email</label>
+              <input type="email" id="login-email" placeholder="admin@miaa.fr">
+            </div>
+            <div class="form-group">
+              <label for="login-password">Mot de passe</label>
+              <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            <button class="btn-primary btn-full" onclick="AdminSite.login()">
+              Se connecter
+            </button>
+            <p id="login-error" class="login-error"></p>
+          </div>
+        </div>
+      </div>`
+  }
+
+  // ── Injection du header ───────────────────────────────────────────
+  function inject () {
+    const activePage = window.ADMIN_PAGE || 'planning'
+
+    // Écran de connexion
+    const loginEl = document.getElementById('login-screen')
+    if (!loginEl) {
+      const wrapper = document.createElement('div')
+      wrapper.innerHTML = buildLoginScreen()
+      document.body.insertBefore(wrapper.firstElementChild, document.body.firstChild)
+    }
+
+    // Header admin
+    const headerEl = document.querySelector('admin-header')
+    if (headerEl) {
+      const wrapper = document.createElement('div')
+      wrapper.innerHTML = buildAdminHeader(activePage)
+      headerEl.replaceWith(...wrapper.childNodes)
+    }
+  }
+
+  // ── Authentification ──────────────────────────────────────────────
+  window.AdminSite = {
+
+    async checkAuth () {
+      inject()
+      const { data: { session } } = await db.auth.getSession()
+      const loginScreen = document.getElementById('login-screen')
+      if (session) {
+        if (loginScreen) loginScreen.style.display = 'none'
+        if (typeof window.onAdminReady === 'function') {
+          await window.onAdminReady()
+        }
+      } else {
+        if (loginScreen) loginScreen.style.display = 'flex'
+      }
+    },
+
+    async login () {
+      const email    = document.getElementById('login-email').value.trim()
+      const password = document.getElementById('login-password').value.trim()
+      const errEl    = document.getElementById('login-error')
+
+      const { error } = await db.auth.signInWithPassword({ email, password })
+
+      if (error) {
+        errEl.textContent   = 'Identifiants incorrects.'
+        errEl.style.display = 'block'
+        return
+      }
+
+      const loginScreen = document.getElementById('login-screen')
+      if (loginScreen) loginScreen.style.display = 'none'
+
+      if (typeof window.onAdminReady === 'function') {
+        await window.onAdminReady()
+      }
+    },
+
+    async logout () {
+      await db.auth.signOut()
+      window.location.href = 'planning-admin.html'
+    }
+  }
+
+  // Lance l'init après chargement du DOM
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => AdminSite.checkAuth())
+  } else {
+    AdminSite.checkAuth()
+  }
+
+})()

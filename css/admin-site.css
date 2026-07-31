@@ -1,0 +1,278 @@
+/* ============================================================
+   admin-site.css
+   Styles communs à toutes les pages de l'espace admin MIAA.
+   Complète planning-admin.css pour les éléments partagés.
+   ============================================================ */
+
+/* ── Navigation admin ─────────────────────────────────────── */
+.admin-nav {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.admin-nav a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #333;
+  text-decoration: none;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.admin-nav a:hover {
+  background: #f0f9fc;
+  color: var(--color-primary, #128BAD);
+}
+
+.admin-nav a.active {
+  background: var(--color-primary, #128BAD);
+  color: #fff;
+  border-color: var(--color-primary, #128BAD);
+}
+
+.admin-nav a i { font-size: 11px; }
+
+/* ── Table bénévoles ──────────────────────────────────────── */
+.benevoles-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.benevoles-search {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.benevoles-search input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: var(--miaa-font, 'Raleway', sans-serif);
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.benevoles-search input:focus { border-color: var(--color-primary, #128BAD); }
+
+.benevoles-search i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 13px;
+}
+
+.benevoles-count {
+  font-size: 13px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* ── Tableau ──────────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e0e8f0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+
+.benevoles-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 900px;
+}
+
+.benevoles-table th {
+  background: #f7f9fc;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #555;
+  border-bottom: 2px solid #e0e8f0;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.benevoles-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  vertical-align: middle;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.benevoles-table tr:last-child td { border-bottom: none; }
+.benevoles-table tr:hover td { background: #f7f9fc; }
+
+/* Colonne permis */
+.permis-oui { color: #27ae60; font-size: 15px; }
+.permis-non { color: #ddd; font-size: 15px; }
+
+/* Colonne actions */
+.td-actions {
+  width: 40px;
+  text-align: center;
+  position: relative;
+}
+
+.btn-actions {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #999;
+  border-radius: 4px;
+  font-size: 16px;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-actions:hover { background: #f0f0f0; color: #333; }
+
+/* Menu contextuel 3 points */
+.actions-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #e0e8f0;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  z-index: 100;
+  min-width: 140px;
+  padding: 4px 0;
+  display: none;
+}
+.actions-menu.open { display: block; }
+
+.actions-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--miaa-font, 'Raleway', sans-serif);
+  color: #333;
+  text-align: left;
+  transition: background 0.12s;
+}
+.actions-menu button:hover { background: #f7f9fc; }
+.actions-menu button.danger { color: #e74c3c; }
+.actions-menu button.danger:hover { background: #fdf0ef; }
+.actions-menu button i { width: 14px; text-align: center; font-size: 12px; }
+
+/* Séparateur dans le menu */
+.actions-menu hr {
+  border: none;
+  border-top: 1px solid #f0f0f0;
+  margin: 4px 0;
+}
+
+/* ── Pagination ───────────────────────────────────────────── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 7px 14px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: var(--miaa-font, 'Raleway', sans-serif);
+  cursor: pointer;
+  color: #333;
+  transition: background 0.12s, border-color 0.12s;
+}
+.pagination button:hover { background: #f0f9fc; border-color: var(--color-primary, #128BAD); }
+.pagination button.active {
+  background: var(--color-primary, #128BAD);
+  border-color: var(--color-primary, #128BAD);
+  color: #fff;
+}
+.pagination button:disabled { opacity: 0.4; cursor: default; }
+
+.pagination-info {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ── Modale bénévole ──────────────────────────────────────── */
+.modal-benevole .modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-benevole .form-group-full {
+  grid-column: 1 / -1;
+}
+
+/* ── Modale confirmation suppression ─────────────────────── */
+.modal-confirm .modal-body {
+  text-align: center;
+  padding: 24px;
+}
+.modal-confirm .confirm-icon {
+  font-size: 48px;
+  color: #e74c3c;
+  margin-bottom: 16px;
+}
+.modal-confirm p {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 8px;
+}
+.modal-confirm .confirm-name {
+  font-weight: 700;
+  color: var(--color-primary, #128BAD);
+}
+
+/* ── État vide / chargement ───────────────────────────────── */
+.table-empty {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+.table-loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+.table-loading i { margin-right: 8px; }
