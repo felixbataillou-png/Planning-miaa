@@ -9,7 +9,7 @@
    - Les entrées texte modifiables portent un attribut [data-slot]
    - Les couleurs d'accent passent par des variables CSS héritables
 
-   Dépend de : _ds/<dossier>/colors_and_type.css  (tokens du design system)
+   Dépend de : css/colors_and_type.css  (tokens du design system)
                Raleway (Google Fonts), Font Awesome 5
    Charger colors_and_type.css AVANT ce fichier pour hériter des tokens DS.
    ============================================================ */
