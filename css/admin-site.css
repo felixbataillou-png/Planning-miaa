@@ -123,6 +123,7 @@
 /* ── Tableau ──────────────────────────────────────────────── */
 .table-wrap {
   overflow-x: auto;
+  overflow-y: visible;
   border-radius: 8px;
   border: 1px solid #e0e8f0;
   background: #fff;
@@ -165,6 +166,7 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  border-right: 1px solid #e0e8f0;
 }
 
 .benevoles-table td {
@@ -182,6 +184,7 @@
 .benevoles-table tr:last-child td { border-bottom: none; }
 .benevoles-table tr:hover td { background: #f7f9fc; }
 .benevoles-table td:last-child { border-right: none; }
+.benevoles-table th:last-child { border-right: none; }
 
 /* Colonne permis */
 .permis-oui { color: #27ae60; font-size: 15px; }
