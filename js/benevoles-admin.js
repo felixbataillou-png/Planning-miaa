@@ -31,7 +31,7 @@ async function loadBenevoles () {
 
   const { data, error } = await db
     .from('volunteers')
-    .select('id, commentairess, nom, prenom, email, tel, permis, profession, adresse, codepostal, ville, urgence_contact')
+    .select('id, commentaires, nom, prenom, email, tel, permis, profession, adresse, codepostal, ville, urgence_contact')
     .order('nom', { ascending: true })
 
   if (error) {
@@ -56,7 +56,7 @@ function handleSearch () {
       filteredList = allBenevoles
     } else {
       filteredList = allBenevoles.filter(b =>
-        [b.nom, b.prenom, b.email, b.tel, b.profession, b.ville, b.commentairess, b.urgence_contact]
+        [b.nom, b.prenom, b.email, b.tel, b.profession, b.ville, b.commentaires, b.urgence_contact]
           .some(v => v && String(v).toLowerCase().includes(q))
       )
     }
@@ -85,7 +85,7 @@ function renderTable () {
 
   tbody.innerHTML = page.map(b => `
     <tr>
-      <td title="${esc(b.commentairess)}">${esc(truncate(b.commentairess, 30))}</td>
+      <td title="${esc(b.commentaires)}">${esc(truncate(b.commentaires, 30))}</td>
       <td><strong>${esc(b.nom)}</strong></td>
       <td>${esc(b.prenom)}</td>
       <td>${esc(b.email)}</td>
@@ -205,7 +205,7 @@ function openEditModal (id) {
 
   editingId = id
   document.getElementById('modal-bvl-title').textContent = `Modifier — ${b.prenom || ''} ${b.nom || ''}`
-  document.getElementById('bvl-commentairess').value  = b.commentairess    || ''
+  document.getElementById('bvl-commentaires').value  = b.commentaires    || ''
   document.getElementById('bvl-nom').value          = b.nom            || ''
   document.getElementById('bvl-prenom').value       = b.prenom         || ''
   document.getElementById('bvl-email').value        = b.email          || ''
@@ -224,7 +224,7 @@ function openEditModal (id) {
 }
 
 function resetBvlForm () {
-  ;['bvl-commentairess','bvl-nom','bvl-prenom','bvl-email','bvl-tel',
+  ;['bvl-commentaires','bvl-nom','bvl-prenom','bvl-email','bvl-tel',
     'bvl-profession','bvl-adresse','bvl-codepostal','bvl-ville','bvl-urgence'].forEach(id => {
     const el = document.getElementById(id)
     if (el) el.value = ''
@@ -259,7 +259,7 @@ async function saveBenévole () {
   btn.textContent = 'Enregistrement…'
 
   const payload = {
-    commentairess:     document.getElementById('bvl-commentairess').value.trim(),
+    commentaires:     document.getElementById('bvl-commentaires').value.trim(),
     nom,
     prenom,
     email:           document.getElementById('bvl-email').value.trim(),
