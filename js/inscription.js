@@ -123,14 +123,16 @@ async function renderWeek() {
     const configRes = await fetch('_content/planning-config.json')
     const config = await configRes.json()
     if (config.masquer) {
-      document.getElementById('planning-grid').innerHTML =
-      `<div class="planning-masque">
-      <i class="fas fa-pause-circle" aria-hidden="true"></i>
-      <div class="planning-masque__message">${marked.parse(config.message)}</div>
-    </div>`
-      document.getElementById('btn-prev').style.display = 'none'
-      document.getElementById('btn-next').style.display = 'none'
+      // Cache la navigation de semaine
       document.querySelector('.week-nav').style.display = 'none'
+  
+      // Remplace le planning-wrap entier par le message
+      const planningWrap = document.querySelector('.planning-wrap')
+      planningWrap.innerHTML = `
+        <div class="planning-masque">
+          <i class="fas fa-pause-circle" aria-hidden="true"></i>
+          <div class="planning-masque__message">${marked.parse(config.message)}</div>
+        </div>`
       return
     }
   } catch (e) {
