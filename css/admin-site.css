@@ -40,6 +40,18 @@
 
 .admin-nav a i { font-size: 11px; }
 
+.burger       { display: none; }
+.mobile-menu  { display: none; }
+.mobile-menu.open { display: flex; }
+
+
+/* Burger mobile */
+.burger {
+  display: none; background: none; border: none;
+  cursor: pointer; padding: 8px;
+  color: var(--color-text, #222); font-size: 22px;
+}
+
 /* ── Table bénévoles ──────────────────────────────────────── */
 .benevoles-toolbar {
   display: flex;
