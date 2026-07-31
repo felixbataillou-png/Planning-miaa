@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Bénévoles</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
   <link rel="stylesheet" href="css/miaa-components.css">
   <link rel="stylesheet" href="css/planning-admin.css">
   <link rel="stylesheet" href="css/admin-site.css">
@@ -15,7 +15,6 @@
 </head>
 <body>
 
-<!-- Header admin injecté par admin-site.js -->
 <admin-header></admin-header>
 
 <section class="hero" aria-label="En-tête bénévoles admin">
@@ -27,7 +26,6 @@
 
 <main class="page-wrap" id="main-content">
 
-  <!-- Barre d'outils -->
   <div class="benevoles-toolbar">
     <div class="benevoles-search">
       <i class="fas fa-search" aria-hidden="true"></i>
@@ -36,7 +34,7 @@
              aria-label="Rechercher un bénévole"
              oninput="handleSearch()">
     </div>
-    <span class="benevoles-count" id="benevoles-count">Chargement…</span>
+    <span class="benevoles-count" id="benevoles-count" aria-live="polite" aria-atomic="true">Chargement…</span>
     <button class="btn-primary" onclick="openAddModal()"
             style="white-space:nowrap;max-width:200px"
             aria-label="Ajouter un nouveau bénévole">
@@ -44,23 +42,26 @@
     </button>
   </div>
 
-  <!-- Tableau -->
-  <div class="table-wrap">
-    <table class="benevoles-table" aria-label="Liste des bénévoles">
+  <div class="table-wrap" role="region" aria-label="Liste des bénévoles" tabindex="0">
+    <table class="benevoles-table">
+      <colgroup>
+        <col><col><col><col><col><col>
+        <col><col><col><col><col><col>
+      </colgroup>
       <thead>
         <tr>
-          <th>commentaires</th>
-          <th>Nom</th>
-          <th>Prénom</th>
-          <th>Email</th>
-          <th>Téléphone</th>
-          <th>Permis</th>
-          <th>Profession</th>
-          <th>Adresse</th>
-          <th>CP</th>
-          <th>Ville</th>
-          <th>Urgence</th>
-          <th aria-label="Actions"></th>
+          <th scope="col">Commentaire</th>
+          <th scope="col">Nom</th>
+          <th scope="col">Prénom</th>
+          <th scope="col">Email</th>
+          <th scope="col">Téléphone</th>
+          <th scope="col">Permis</th>
+          <th scope="col">Profession</th>
+          <th scope="col">Adresse</th>
+          <th scope="col">CP</th>
+          <th scope="col">Ville</th>
+          <th scope="col">Urgence</th>
+          <th scope="col"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody id="benevoles-tbody">
@@ -71,43 +72,48 @@
     </table>
   </div>
 
-  <!-- Pagination -->
-  <div class="pagination" id="pagination" aria-label="Pagination"></div>
+  <div class="pagination" id="pagination" aria-label="Pagination de la liste des bénévoles"></div>
 
 </main>
 
-<!-- ── Modale : Modifier / Ajouter un bénévole ───────────── -->
+<!-- ── Modale : Modifier / Ajouter ───────────────────────── -->
 <div class="modal-overlay" id="modal-benevole" role="dialog"
      aria-modal="true" aria-labelledby="modal-bvl-title"
      onclick="handleModalOverlayClick(event, 'modal-benevole')">
   <div class="modal modal-benevole">
     <div class="modal-header">
       <h3 id="modal-bvl-title">Modifier le bénévole</h3>
-      <button class="modal-close" onclick="closeModal('modal-benevole')"
-              aria-label="Fermer">×</button>
+      <button class="modal-close" onclick="closeBvlModal('modal-benevole')"
+              aria-label="Fermer la fenêtre">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-group form-group-full">
-        <label for="bvl-commentaires">commentaires</label>
-        <textarea id="bvl-commentaires" rows="2" placeholder="Notes internes…"></textarea>
-      </div>
       <div class="form-group">
         <label for="bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="bvl-nom" placeholder="Dupont" required>
+        <input type="text" id="bvl-nom" placeholder="Dupont"
+               required aria-required="true" aria-describedby="err-bvl-nom">
         <div class="error-msg" id="err-bvl-nom" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
         <label for="bvl-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="bvl-prenom" placeholder="Marie" required>
+        <input type="text" id="bvl-prenom" placeholder="Marie"
+               required aria-required="true" aria-describedby="err-bvl-prenom">
         <div class="error-msg" id="err-bvl-prenom" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
-        <label for="bvl-email">Email</label>
-        <input type="email" id="bvl-email" placeholder="marie@exemple.fr">
+        <label for="bvl-email">Email <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="email" id="bvl-email" placeholder="marie@exemple.fr"
+               required aria-required="true" aria-describedby="err-bvl-email">
+        <div class="error-msg" id="err-bvl-email" role="alert">Email invalide.</div>
       </div>
       <div class="form-group">
         <label for="bvl-tel">Téléphone</label>
         <input type="tel" id="bvl-tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="form-group">
+        <label for="bvl-secu">N° Sécu <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="bvl-secu" placeholder="1 23 45 678 901 23"
+               required aria-required="true" aria-describedby="err-bvl-secu">
+        <div class="error-msg" id="err-bvl-secu" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
         <label for="bvl-profession">Profession</label>
@@ -129,21 +135,35 @@
         <label for="bvl-urgence">Personne à contacter en urgence</label>
         <input type="text" id="bvl-urgence" placeholder="Marie Dupont / 06 12 34 56 78">
       </div>
+      <div class="form-group form-group-full">
+        <label for="bvl-commentaires">Commentaires</label>
+        <textarea id="bvl-commentaires" rows="2" placeholder="Notes internes…"></textarea>
+      </div>
       <!-- Permis -->
       <div class="form-group form-group-full">
-        <span class="toggle-row-label">Permis de conduire</span>
         <label class="toggle-row" for="bvl-permis">
           <span class="tl-main">Possède le permis et disponible pour conduire</span>
-          <span class="toggle-switch">
-            <input type="checkbox" id="bvl-permis">
-            <span class="toggle-track" aria-hidden="true"></span>
-            <span class="toggle-thumb" aria-hidden="true"></span>
+          <span class="toggle-switch" aria-hidden="true">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
           </span>
+          <input type="checkbox" id="bvl-permis">
+        </label>
+      </div>
+      <!-- RGPD -->
+      <div class="form-group form-group-full">
+        <label class="toggle-row" for="bvl-rgpd">
+          <span class="tl-main">Le bénévole autorise MIAA à utiliser ses données personnelles</span>
+          <span class="toggle-switch" aria-hidden="true">
+            <span class="toggle-track"></span>
+            <span class="toggle-thumb"></span>
+          </span>
+          <input type="checkbox" id="bvl-rgpd">
         </label>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-benevole')">Annuler</button>
+      <button class="btn-secondary" onclick="closeBvlModal('modal-benevole')">Annuler</button>
       <button class="btn-primary" id="btn-save-bvl" onclick="saveBenévole()">
         <i class="fas fa-save" aria-hidden="true"></i> Enregistrer
       </button>
@@ -158,19 +178,22 @@
   <div class="modal modal-confirm">
     <div class="modal-header">
       <h3 id="modal-del-title">Supprimer le bénévole</h3>
-      <button class="modal-close" onclick="closeModal('modal-confirm-delete')"
+      <button class="modal-close" onclick="closeBvlModal('modal-confirm-delete')"
               aria-label="Fermer">×</button>
     </div>
     <div class="modal-body">
-      <div class="confirm-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
+      <div class="confirm-icon" aria-hidden="true">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
       <p>Vous êtes sur le point de supprimer définitivement</p>
       <p class="confirm-name" id="confirm-del-name">—</p>
       <p style="font-size:13px;color:#888;margin-top:8px">
-        Cette action supprimera aussi toutes les inscriptions associées. Elle est irréversible.
+        Cette action supprimera aussi toutes les inscriptions associées.<br>
+        Elle est irréversible.
       </p>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-confirm-delete')">Annuler</button>
+      <button class="btn-secondary" onclick="closeBvlModal('modal-confirm-delete')">Annuler</button>
       <button class="btn-tertiary" onclick="confirmDelete()">
         <i class="fas fa-trash" aria-hidden="true"></i> Supprimer définitivement
       </button>
@@ -179,11 +202,10 @@
 </div>
 
 <!-- Toast -->
-<div id="toast" class="toast" aria-live="polite" aria-atomic="true">
+<div id="toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
   <span id="toast-msg"></span>
 </div>
 
-<!-- Scripts -->
 <script src="js/admin-site.js"></script>
 <script src="js/benevoles-admin.js"></script>
 </body>

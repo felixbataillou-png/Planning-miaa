@@ -98,8 +98,23 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  min-width: 900px;
+  min-width: 1100px;
+  table-layout: fixed;
 }
+
+/* Largeurs des colonnes */
+.benevoles-table colgroup col:nth-child(1)  { width: 140px; } /* commentaires */
+.benevoles-table colgroup col:nth-child(2)  { width: 110px; } /* nom */
+.benevoles-table colgroup col:nth-child(3)  { width: 100px; } /* prenom */
+.benevoles-table colgroup col:nth-child(4)  { width: 180px; } /* email */
+.benevoles-table colgroup col:nth-child(5)  { width: 110px; } /* tel */
+.benevoles-table colgroup col:nth-child(6)  { width: 60px;  } /* permis */
+.benevoles-table colgroup col:nth-child(7)  { width: 120px; } /* profession */
+.benevoles-table colgroup col:nth-child(8)  { width: 160px; } /* adresse */
+.benevoles-table colgroup col:nth-child(9)  { width: 70px;  } /* cp */
+.benevoles-table colgroup col:nth-child(10) { width: 100px; } /* ville */
+.benevoles-table colgroup col:nth-child(11) { width: 160px; } /* urgence */
+.benevoles-table colgroup col:nth-child(12) { width: 44px;  } /* actions */
 
 .benevoles-table th {
   background: #f7f9fc;
@@ -121,11 +136,11 @@
   padding: 10px 12px;
   border-bottom: 1px solid #f0f0f0;
   color: #333;
-  vertical-align: middle;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  vertical-align: top;
+  /* Texte lisible — retour à la ligne si trop long */
+  white-space: normal;
+  word-break: break-word;
+  overflow: visible;
 }
 
 .benevoles-table tr:last-child td { border-bottom: none; }
