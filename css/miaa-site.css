@@ -161,7 +161,6 @@ h1, h2, h3, h4 {
 }
 
 /* ── Sidebar donation ──────────────────────────────────────────── */
-.sidebar { /* positionnement géré par la grille */ }
 .donation-box {
   background: var(--color-primary, #128BAD);
   color: #fff; border-radius: 8px; padding: 24px;

@@ -164,7 +164,7 @@
   border-bottom: 2px solid #e0e8f0;
   white-space: nowrap;
   position: sticky;
-  top: 135;
+  top: 130px;
   z-index: 1;
   border-right: 1px solid #e0e8f0;
 }
@@ -413,6 +413,7 @@
   .header-right { display: none; }
   .burger      { display: block; }
   .site-header .logo { height: 50px; }
+  .benevoles-table th { top: 86.5px; }
 }
 
 /* Responsive modale bénévoles */
