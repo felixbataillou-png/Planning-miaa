@@ -4,50 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Planning Admin</title>
-  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
   <link rel="stylesheet" href="css/miaa-components.css">
   <link rel="stylesheet" href="css/planning-admin.css">
   <link rel="stylesheet" href="css/admin-site.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <!-- Librairie Supabase (doit précéder supabase-config.js) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- Config Supabase partagée -->
   <script src="js/supabase-config.js"></script>
-  <!-- Utilitaires de date partagés -->
-  <script src="js/date-utils.js"></script>
 </head>
 <body>
 
-  <!-- Écran de connexion -->
-<div id="login-screen" class="login-screen">
-  <div class="login-card">
-    <h2 class="login-title">MIAA — Espace Admin</h2>
-    <p class="login-subtitle">Connexion sécurisée par mot de passe</p>
-
-    <div id="login-step-email">
-      <div class="form-group">
-        <label for="login-email">Adresse email</label>
-        <input type="email" id="login-email" placeholder="admin@miaa.fr">
-      </div>
-      <div class="form-group">
-        <label for="login-password">Mot de passe</label>
-        <input type="password" id="login-password" placeholder="••••••••">
-      </div>
-      <button class="btn-primary btn-full" onclick="sendLoginCode()">Se connecter</button>
-      <p id="login-error" class="login-error"></p>
-    </div>
-  </div>
-</div>
-
 <a class="sr-only" href="#main-content">Aller au contenu principal</a>
-
-<div class="topbar">
-  <div class="topbar-admin-badge"><i class="fas fa-lock" aria-hidden="true"></i> Espace Administration</div>
-  <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Page Facebook MIAA (nouvel onglet)">
-    <i class="fab fa-facebook-f" aria-hidden="true"></i>
-  </a>
-</div>
-
 <admin-header></admin-header>
 
 <section class="hero" aria-label="En-tête planning admin">
@@ -96,16 +63,10 @@
     <div class="modal-body">
       <p class="form-required-legend"><span class="req-star" aria-hidden="true">*</span> Champs requis</p>
       <div class="form-group">
-        <label for="add-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="add-nom" placeholder="Dupont" autocomplete="off"
-         required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
+        <label for="add-nom">Nom et prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
+        <input type="text" id="add-nom" placeholder="Marie Dupont" autocomplete="off"
+               required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
         <div class="error-msg" id="add-err-nom" role="alert">Veuillez indiquer un nom.</div>
-      </div>
-      <div class="form-group">
-        <label for="add-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="add-prenom" placeholder="Marie" autocomplete="off"
-         required aria-required="true" aria-describedby="add-err-prenom" aria-invalid="false">
-        <div class="error-msg" id="add-err-prenom" role="alert">Veuillez indiquer un prénom.</div>
       </div>
       <div class="form-group">
         <label for="add-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
@@ -182,34 +143,24 @@
       <button class="modal-close" onclick="closeModal('modal-edit')" aria-label="Fermer la fenêtre">×</button>
     </div>
     <div class="modal-body">
-
-      <!-- Bloc infos bénévole en lecture seule -->
-      <div class="volunteer-info-block">
-        <div class="vib-row">
-          <span class="vib-label">Nom</span>
-          <span class="vib-value" id="edit-nom">—</span>
-        </div>
-        <div class="vib-row">
-          <span class="vib-label">Prénom</span>
-          <span class="vib-value" id="edit-prenom">—</span>
-        </div>
-        <div class="vib-row">
-          <span class="vib-label">Téléphone</span>
-          <span class="vib-value" id="edit-tel">—</span>
-        </div>
-        <div class="vib-row">
-          <span class="vib-label">Email</span>
-          <span class="vib-value" id="edit-email">—</span>
-        </div>
-        <div class="vib-row" id="edit-permis-display" style="display:none">
-          <span class="vib-label">Permis</span>
-          <span class="vib-value vib-value--permis">
-            <i class="fas fa-car" aria-hidden="true"></i> Oui
-          </span>
+      <div class="form-group">
+        <label for="edit-nom">Nom et prénom</label>
+        <input type="text" id="edit-nom" readonly style="background:#f8f9fa;cursor:default">
+      </div>
+      <div class="form-group">
+        <label for="edit-tel">Téléphone</label>
+        <input type="tel" id="edit-tel" readonly style="background:#f8f9fa;cursor:default">
+      </div>
+      <div class="form-group">
+        <label for="edit-email">Email</label>
+        <input type="email" id="edit-email" readonly style="background:#f8f9fa;cursor:default">
+      </div>
+      <div id="edit-permis-display" style="display:none">
+        <div style="background:#f0f9fc;border:1px solid #b8e0ec;border-radius:4px;padding:10px 12px;font-size:12px;color:#0f6980;display:flex;align-items:center;gap:8px">
+          <i class="fas fa-car" aria-hidden="true"></i>
+          <span>Possède le permis de conduire</span>
         </div>
       </div>
-
-      <!-- Statut modifiable -->
       <div class="form-group" id="edit-status-group">
         <label for="edit-status">Statut de l'inscription</label>
         <select id="edit-status">
@@ -217,14 +168,13 @@
           <option value="pending">En attente de validation</option>
         </select>
       </div>
-
     </div>
     <div class="modal-footer">
-      <button class="btn-tertiary btn-auto-width" onclick="deleteFromEdit()">
-        <i class="fas fa-trash" aria-hidden="true"></i>Supprimer
+      <button class="btn-tertiary" onclick="deleteFromEdit()" style="flex:0 0 auto;padding:12px 18px">
+        <i class="fas fa-trash" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Supprimer
       </button>
       <button class="btn-primary" id="edit-save-btn" onclick="saveEdit()" disabled>
-        <i class="fas fa-save" aria-hidden="true"></i>Enregistrer
+        <i class="fas fa-save" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Enregistrer
       </button>
     </div>
   </div>
@@ -304,8 +254,6 @@
   <span id="toast-msg"></span>
 </div>
 
-<!-- Logique de la page planning admin -->
-<script>window.ADMIN_PAGE = 'planning'</script>
 <script src="js/admin-site.js"></script>
 <script src="js/planning-admin.js"></script>
 </body>
