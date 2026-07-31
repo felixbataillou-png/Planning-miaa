@@ -124,10 +124,10 @@ async function renderWeek() {
     const config = await configRes.json()
     if (config.masquer) {
       document.getElementById('planning-grid').innerHTML =
-        `<div class="planning-masque">
-          <i class="fas fa-pause-circle" aria-hidden="true"></i>
-          <p>${config.message}</p>
-        </div>`
+      `<div class="planning-masque">
+      <i class="fas fa-pause-circle" aria-hidden="true"></i>
+      <div class="planning-masque__message">${marked.parse(config.message)}</div>
+    </div>`
       document.getElementById('btn-prev').style.display = 'none'
       document.getElementById('btn-next').style.display = 'none'
       document.querySelector('.week-nav').style.display = 'none'
