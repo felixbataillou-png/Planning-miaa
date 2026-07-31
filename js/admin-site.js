@@ -40,7 +40,7 @@
     return `
       <div class="topbar">
         <div class="topbar-admin-badge">
-          <i class="fas fa-lock" aria-hidden="true"></i> Espace Administration
+          <i class="fas fa-shield-alt" aria-hidden="true"></i> Espace Administration
         </div>
         <a href="https://www.facebook.com/pages/Association-MIAA/377808022330859"
            target="_blank" rel="noopener"
@@ -57,11 +57,9 @@
           ${navItems}
         </nav>
         <div class="header-right">
-          <div class="admin-label">
-            <i class="fas fa-shield-alt" aria-hidden="true"></i> Admin
-          </div>
           <button onclick="AdminSite.logout()" class="btn-secondary"
-                  style="font-size:12px;padding:6px 14px">
+                  style="font-size:12px;padding:6px 14px"
+                  aria-label="Se déconnecter de l'espace administration">
             <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Déconnexion
           </button>
         </div>

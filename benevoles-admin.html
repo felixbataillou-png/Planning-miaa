@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Bénévoles</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="css/colors_and_types.css">
   <link rel="stylesheet" href="css/miaa-components.css">
   <link rel="stylesheet" href="css/planning-admin.css">
   <link rel="stylesheet" href="css/admin-site.css">
@@ -38,8 +38,9 @@
     </div>
     <span class="benevoles-count" id="benevoles-count">Chargement…</span>
     <button class="btn-primary" onclick="openAddModal()"
-            style="white-space:nowrap">
-      <i class="fas fa-plus" aria-hidden="true"></i> Ajouter un bénévole
+            style="white-space:nowrap;max-width:200px"
+            aria-label="Ajouter un nouveau bénévole">
+      <i class="fas fa-plus" aria-hidden="true"></i> Ajouter
     </button>
   </div>
 
@@ -48,7 +49,7 @@
     <table class="benevoles-table" aria-label="Liste des bénévoles">
       <thead>
         <tr>
-          <th>Commentaire</th>
+          <th>commentaires</th>
           <th>Nom</th>
           <th>Prénom</th>
           <th>Email</th>
@@ -87,8 +88,8 @@
     </div>
     <div class="modal-body">
       <div class="form-group form-group-full">
-        <label for="bvl-commentaire">Commentaire</label>
-        <textarea id="bvl-commentaire" rows="2" placeholder="Notes internes…"></textarea>
+        <label for="bvl-commentaires">commentaires</label>
+        <textarea id="bvl-commentaires" rows="2" placeholder="Notes internes…"></textarea>
       </div>
       <div class="form-group">
         <label for="bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
