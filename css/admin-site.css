@@ -148,7 +148,7 @@
 
 /* Colonne permis */
 .permis-oui { color: #27ae60; font-size: 15px; }
-.permis-non { color: #ddd; font-size: 15px; }
+.permis-non { color: #232323; font-size: 15px; }
 
 /* Colonne actions */
 .td-actions {
@@ -316,3 +316,55 @@
   margin-top: 10px; display: none;
 }
 .btn-full { width: 100%; margin-top: 12px; }
+
+/* ── Modale large bénévoles ───────────────────────────────── */
+.modal-benevole-wide {
+  width: min(720px, 95vw);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Grille 2 colonnes dans la modale */
+.modal-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.modal-body-grid .form-group-full { grid-column: 1 / -1; }
+
+/* Textarea style identique aux inputs */
+.textarea-styled {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-family: var(--miaa-font, 'Raleway', sans-serif);
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s;
+  resize: vertical;
+  min-height: 70px;
+  box-sizing: border-box;
+}
+.textarea-styled:focus { border-color: var(--color-primary, #128BAD); }
+
+/* Redimensionnement des colonnes */
+.col-resizer {
+  position: absolute;
+  right: -3px; top: 0; bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 2;
+}
+.col-resizer:hover,
+.col-resizer:active {
+  background: var(--color-primary, #128BAD);
+  opacity: 0.4;
+}
+
+/* Responsive modale bénévoles */
+@media (max-width: 600px) {
+  .modal-body-grid { grid-template-columns: 1fr; }
+  .modal-body-grid .form-group-full { grid-column: 1; }
+}

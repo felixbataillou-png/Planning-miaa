@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Bénévoles</title>
   <link rel="icon" href="assets/logo.png" type="image/png">
-  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="_ds/miaa-design-system-b62b7d11-0543-4d14-b4c8-f961f965314b/colors_and_type.css">
   <link rel="stylesheet" href="css/miaa-components.css">
   <link rel="stylesheet" href="css/planning-admin.css">
   <link rel="stylesheet" href="css/admin-site.css">
@@ -43,25 +43,27 @@
   </div>
 
   <div class="table-wrap" role="region" aria-label="Liste des bénévoles" tabindex="0">
-    <table class="benevoles-table">
-      <colgroup>
-        <col><col><col><col><col><col>
-        <col><col><col><col><col><col>
+    <table class="benevoles-table" id="benevoles-table">
+      <colgroup id="benevoles-colgroup">
+        <col style="width:140px"><col style="width:110px"><col style="width:100px">
+        <col style="width:180px"><col style="width:110px"><col style="width:60px">
+        <col style="width:120px"><col style="width:160px"><col style="width:70px">
+        <col style="width:100px"><col style="width:160px"><col style="width:44px">
       </colgroup>
-      <thead>
+      <thead id="benevoles-thead">
         <tr>
-          <th scope="col">Commentaire</th>
-          <th scope="col">Nom</th>
-          <th scope="col">Prénom</th>
-          <th scope="col">Email</th>
-          <th scope="col">Téléphone</th>
-          <th scope="col">Permis</th>
-          <th scope="col">Profession</th>
-          <th scope="col">Adresse</th>
-          <th scope="col">CP</th>
-          <th scope="col">Ville</th>
-          <th scope="col">Urgence</th>
-          <th scope="col"><span class="sr-only">Actions</span></th>
+          <th scope="col" data-col="0">Commentaire</th>
+          <th scope="col" data-col="1">Nom</th>
+          <th scope="col" data-col="2">Prénom</th>
+          <th scope="col" data-col="3">Email</th>
+          <th scope="col" data-col="4">Téléphone</th>
+          <th scope="col" data-col="5">Permis</th>
+          <th scope="col" data-col="6">Profession</th>
+          <th scope="col" data-col="7">Adresse</th>
+          <th scope="col" data-col="8">CP</th>
+          <th scope="col" data-col="9">Ville</th>
+          <th scope="col" data-col="10">Urgence</th>
+          <th scope="col" data-col="11"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody id="benevoles-tbody">
@@ -76,95 +78,179 @@
 
 </main>
 
-<!-- ── Modale : Modifier / Ajouter ───────────────────────── -->
-<div class="modal-overlay" id="modal-benevole" role="dialog"
-     aria-modal="true" aria-labelledby="modal-bvl-title"
-     onclick="handleModalOverlayClick(event, 'modal-benevole')">
-  <div class="modal modal-benevole">
+<!-- ── Modale : Ajouter un bénévole ──────────────────────── -->
+<div class="modal-overlay" id="modal-add-bvl" role="dialog"
+     aria-modal="true" aria-labelledby="modal-add-bvl-title"
+     onclick="handleModalOverlayClick(event, 'modal-add-bvl')">
+  <div class="modal modal-benevole-wide">
     <div class="modal-header">
-      <h3 id="modal-bvl-title">Modifier le bénévole</h3>
-      <button class="modal-close" onclick="closeBvlModal('modal-benevole')"
+      <h3 id="modal-add-bvl-title">Ajouter un bénévole</h3>
+      <button class="modal-close" onclick="closeBvlModal('modal-add-bvl')"
               aria-label="Fermer la fenêtre">×</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body modal-body-grid">
+      <p class="form-required-legend form-group-full">
+        <span class="req-star" aria-hidden="true">*</span> Champs requis
+      </p>
       <div class="form-group">
-        <label for="bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="bvl-nom" placeholder="Dupont"
-               required aria-required="true" aria-describedby="err-bvl-nom">
-        <div class="error-msg" id="err-bvl-nom" role="alert">Champ requis.</div>
+        <label for="add-bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-bvl-nom" placeholder="Dupont"
+               required aria-required="true" aria-describedby="err-add-bvl-nom">
+        <div class="error-msg" id="err-add-bvl-nom" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
-        <label for="bvl-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="bvl-prenom" placeholder="Marie"
-               required aria-required="true" aria-describedby="err-bvl-prenom">
-        <div class="error-msg" id="err-bvl-prenom" role="alert">Champ requis.</div>
+        <label for="add-bvl-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-bvl-prenom" placeholder="Marie"
+               required aria-required="true" aria-describedby="err-add-bvl-prenom">
+        <div class="error-msg" id="err-add-bvl-prenom" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
-        <label for="bvl-email">Email <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="email" id="bvl-email" placeholder="marie@exemple.fr"
-               required aria-required="true" aria-describedby="err-bvl-email">
-        <div class="error-msg" id="err-bvl-email" role="alert">Email invalide.</div>
+        <label for="add-bvl-email">Email <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="email" id="add-bvl-email" placeholder="marie@exemple.fr"
+               required aria-required="true" aria-describedby="err-add-bvl-email">
+        <div class="error-msg" id="err-add-bvl-email" role="alert">Email invalide.</div>
       </div>
       <div class="form-group">
-        <label for="bvl-tel">Téléphone</label>
-        <input type="tel" id="bvl-tel" placeholder="06 12 34 56 78">
-      </div>
-      <div class="form-group">
-        <label for="bvl-secu">N° Sécu <span class="req-star" aria-hidden="true">*</span></label>
-        <input type="text" id="bvl-secu" placeholder="1 23 45 678 901 23"
-               required aria-required="true" aria-describedby="err-bvl-secu">
-        <div class="error-msg" id="err-bvl-secu" role="alert">Champ requis.</div>
-      </div>
-      <div class="form-group">
-        <label for="bvl-profession">Profession</label>
-        <input type="text" id="bvl-profession" placeholder="Comédien·ne…">
+        <label for="add-bvl-tel">Téléphone</label>
+        <input type="tel" id="add-bvl-tel" placeholder="06 12 34 56 78">
       </div>
       <div class="form-group form-group-full">
-        <label for="bvl-adresse">Adresse</label>
-        <input type="text" id="bvl-adresse" placeholder="12 rue de Belleville">
+        <label for="add-bvl-secu">N° Sécu <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-bvl-secu" placeholder="1 23 45 678 901 23"
+               required aria-required="true" aria-describedby="err-add-bvl-secu">
+        <div class="error-msg" id="err-add-bvl-secu" role="alert">Champ requis.</div>
       </div>
       <div class="form-group">
-        <label for="bvl-codepostal">Code postal</label>
-        <input type="text" id="bvl-codepostal" placeholder="75019">
+        <label for="add-bvl-profession">Profession</label>
+        <input type="text" id="add-bvl-profession" placeholder="Comédien·ne…">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="add-bvl-adresse">Adresse</label>
+        <input type="text" id="add-bvl-adresse" placeholder="12 rue de Belleville">
       </div>
       <div class="form-group">
-        <label for="bvl-ville">Ville</label>
-        <input type="text" id="bvl-ville" placeholder="Paris">
+        <label for="add-bvl-codepostal">Code postal</label>
+        <input type="text" id="add-bvl-codepostal" placeholder="75019">
+      </div>
+      <div class="form-group">
+        <label for="add-bvl-ville">Ville</label>
+        <input type="text" id="add-bvl-ville" placeholder="Paris">
       </div>
       <div class="form-group form-group-full">
-        <label for="bvl-urgence">Personne à contacter en urgence</label>
-        <input type="text" id="bvl-urgence" placeholder="Marie Dupont / 06 12 34 56 78">
+        <label for="add-bvl-urgence">Personne à contacter en urgence</label>
+        <input type="text" id="add-bvl-urgence" placeholder="Marie Dupont / 06 12 34 56 78">
       </div>
       <div class="form-group form-group-full">
-        <label for="bvl-commentaires">Commentaires</label>
-        <textarea id="bvl-commentaires" rows="2" placeholder="Notes internes…"></textarea>
+        <label for="add-bvl-commentaires">Commentaires</label>
+        <textarea id="add-bvl-commentaires" rows="2" placeholder="Notes internes…"
+                  class="textarea-styled"></textarea>
       </div>
       <!-- Permis -->
       <div class="form-group form-group-full">
-        <label class="toggle-row" for="bvl-permis">
+        <label class="toggle-row" for="add-bvl-permis">
           <span class="tl-main">Possède le permis et disponible pour conduire</span>
-          <span class="toggle-switch" aria-hidden="true">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="add-bvl-permis" aria-label="Permis de conduire">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
           </span>
-          <input type="checkbox" id="bvl-permis">
         </label>
       </div>
       <!-- RGPD -->
       <div class="form-group form-group-full">
-        <label class="toggle-row" for="bvl-rgpd">
+        <label class="toggle-row" for="add-bvl-rgpd">
           <span class="tl-main">Le bénévole autorise MIAA à utiliser ses données personnelles</span>
-          <span class="toggle-switch" aria-hidden="true">
-            <span class="toggle-track"></span>
-            <span class="toggle-thumb"></span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="add-bvl-rgpd" aria-label="Consentement RGPD">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
           </span>
-          <input type="checkbox" id="bvl-rgpd">
         </label>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeBvlModal('modal-benevole')">Annuler</button>
-      <button class="btn-primary" id="btn-save-bvl" onclick="saveBenévole()">
+      <button class="btn-secondary" onclick="closeBvlModal('modal-add-bvl')">Annuler</button>
+      <button class="btn-primary" id="btn-save-add-bvl" onclick="saveNewBenévole()">
+        <i class="fas fa-plus" aria-hidden="true"></i> Ajouter
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modale : Modifier un bénévole ─────────────────────── -->
+<div class="modal-overlay" id="modal-edit-bvl" role="dialog"
+     aria-modal="true" aria-labelledby="modal-edit-bvl-title"
+     onclick="handleModalOverlayClick(event, 'modal-edit-bvl')">
+  <div class="modal modal-benevole-wide">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-edit-bvl-title">Modifier le bénévole</h3>
+        <div class="mh-sub" id="edit-bvl-sub">—</div>
+      </div>
+      <button class="modal-close" onclick="closeBvlModal('modal-edit-bvl')"
+              aria-label="Fermer la fenêtre">×</button>
+    </div>
+    <div class="modal-body modal-body-grid">
+      <div class="form-group">
+        <label for="edit-bvl-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="edit-bvl-nom" placeholder="Dupont"
+               required aria-required="true" aria-describedby="err-edit-bvl-nom">
+        <div class="error-msg" id="err-edit-bvl-nom" role="alert">Champ requis.</div>
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="edit-bvl-prenom" placeholder="Marie"
+               required aria-required="true" aria-describedby="err-edit-bvl-prenom">
+        <div class="error-msg" id="err-edit-bvl-prenom" role="alert">Champ requis.</div>
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-email">Email</label>
+        <input type="email" id="edit-bvl-email" placeholder="marie@exemple.fr">
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-tel">Téléphone</label>
+        <input type="tel" id="edit-bvl-tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-profession">Profession</label>
+        <input type="text" id="edit-bvl-profession" placeholder="Comédien·ne…">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="edit-bvl-adresse">Adresse</label>
+        <input type="text" id="edit-bvl-adresse" placeholder="12 rue de Belleville">
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-codepostal">Code postal</label>
+        <input type="text" id="edit-bvl-codepostal" placeholder="75019">
+      </div>
+      <div class="form-group">
+        <label for="edit-bvl-ville">Ville</label>
+        <input type="text" id="edit-bvl-ville" placeholder="Paris">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="edit-bvl-urgence">Personne à contacter en urgence</label>
+        <input type="text" id="edit-bvl-urgence" placeholder="Marie Dupont / 06 12 34 56 78">
+      </div>
+      <div class="form-group form-group-full">
+        <label for="edit-bvl-commentaires">Commentaires</label>
+        <textarea id="edit-bvl-commentaires" rows="2" placeholder="Notes internes…"
+                  class="textarea-styled"></textarea>
+      </div>
+      <!-- Permis -->
+      <div class="form-group form-group-full">
+        <label class="toggle-row" for="edit-bvl-permis">
+          <span class="tl-main">Possède le permis et disponible pour conduire</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="edit-bvl-permis" aria-label="Permis de conduire">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeBvlModal('modal-edit-bvl')">Annuler</button>
+      <button class="btn-primary" id="btn-save-edit-bvl" onclick="saveEditBenévole()">
         <i class="fas fa-save" aria-hidden="true"></i> Enregistrer
       </button>
     </div>
@@ -175,27 +261,26 @@
 <div class="modal-overlay" id="modal-confirm-delete" role="dialog"
      aria-modal="true" aria-labelledby="modal-del-title"
      onclick="handleModalOverlayClick(event, 'modal-confirm-delete')">
-  <div class="modal modal-confirm">
-    <div class="modal-header">
-      <h3 id="modal-del-title">Supprimer le bénévole</h3>
+  <div class="modal">
+    <div class="modal-header danger">
+      <div>
+        <h3 id="modal-del-title">Supprimer le bénévole</h3>
+        <div class="mh-sub" id="confirm-del-sub">—</div>
+      </div>
       <button class="modal-close" onclick="closeBvlModal('modal-confirm-delete')"
               aria-label="Fermer">×</button>
     </div>
     <div class="modal-body">
-      <div class="confirm-icon" aria-hidden="true">
-        <i class="fas fa-exclamation-triangle"></i>
+      <div class="person-info-box" id="confirm-del-info" aria-live="polite"></div>
+      <div class="confirm-warning">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <span>Cette action supprimera aussi toutes les inscriptions associées. Elle est irréversible.</span>
       </div>
-      <p>Vous êtes sur le point de supprimer définitivement</p>
-      <p class="confirm-name" id="confirm-del-name">—</p>
-      <p style="font-size:13px;color:#888;margin-top:8px">
-        Cette action supprimera aussi toutes les inscriptions associées.<br>
-        Elle est irréversible.
-      </p>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeBvlModal('modal-confirm-delete')">Annuler</button>
-      <button class="btn-tertiary" onclick="confirmDelete()">
-        <i class="fas fa-trash" aria-hidden="true"></i> Supprimer définitivement
+      <button class="btn-danger" onclick="confirmDelete()">
+        <i class="fas fa-trash" aria-hidden="true"></i> Supprimer
       </button>
     </div>
   </div>
