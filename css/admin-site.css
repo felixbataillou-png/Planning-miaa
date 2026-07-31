@@ -79,11 +79,7 @@
   font-size: 13px;
 }
 
-.benevoles-count {
-  font-size: 13px;
-  color: #666;
-  white-space: nowrap;
-}
+
 
 /* ── Tableau ──────────────────────────────────────────────── */
 .table-wrap {
@@ -364,7 +360,7 @@
 }
 
 /* Responsive modale bénévoles */
-@media (max-width: 600px) {
+@media (max-width: 810px) {
   .modal-body-grid { grid-template-columns: 1fr; }
   .modal-body-grid .form-group-full { grid-column: 1; }
 }

@@ -21,7 +21,6 @@ window.onAdminReady = async function () {
 
 // ── Chargement ───────────────────────────────────────────────────
 async function loadBenevoles () {
-  document.getElementById('benevoles-count').textContent = 'Chargement…'
   const { data, error } = await db
     .from('volunteers')
     .select('id, commentaires, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgence_contact, rgpd')
@@ -59,9 +58,7 @@ function renderTable () {
   const total = filteredList.length
   const start = (currentPage - 1) * PAGE_SIZE
   const page  = filteredList.slice(start, Math.min(start + PAGE_SIZE, total))
-  document.getElementById('benevoles-count').textContent =
-    `${total} bénévole${total > 1 ? 's' : ''}`
-
+  
   const tbody = document.getElementById('benevoles-tbody')
   if (page.length === 0) {
     tbody.innerHTML = `<tr><td colspan="12" class="table-empty">Aucun bénévole trouvé.</td></tr>`
