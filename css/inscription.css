@@ -50,7 +50,7 @@
   font-size: 16px;
   line-height: 1.7;
   color: #333;
-  text-align: left;
+  text-align: center;
 }
 .planning-masque__message p { margin-bottom: 12px; }
 .planning-masque__message strong { color: var(--color-primary, #128BAD); }
