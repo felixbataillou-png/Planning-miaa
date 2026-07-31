@@ -135,7 +135,7 @@ h3.miaa-adminslot__role { margin: 0; }
 .planning-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
 .planning-grid {
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px; min-width: 900px; max-width: 1200px; margin: 0 auto;
+  gap: 12px; min-width: 8100px; max-width: 1200px; margin: 0 auto;
 }
 .day-col { display: flex; flex-direction: column; gap: 10px; }
 

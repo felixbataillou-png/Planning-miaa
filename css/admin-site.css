@@ -137,10 +137,12 @@
   white-space: normal;
   word-break: break-word;
   overflow: visible;
+  border-right: 1px solid #e0e8f0;
 }
 
 .benevoles-table tr:last-child td { border-bottom: none; }
 .benevoles-table tr:hover td { background: #f7f9fc; }
+.benevoles-table td:last-child { border-right: none; }
 
 /* Colonne permis */
 .permis-oui { color: #27ae60; font-size: 15px; }
@@ -315,7 +317,7 @@
 
 /* ── Modale large bénévoles ───────────────────────────────── */
 .modal-benevole-wide {
-  width: min(720px, 95vw);
+  width: min(600px, 95vw);
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -357,6 +359,18 @@
 .col-resizer:active {
   background: var(--color-primary, #128BAD);
   opacity: 0.4;
+}
+
+/* Responsive header */
+@media (max-width: 900px) {
+  .site-header { padding: 15px 20px; height: auto; min-height: 70px; }
+  .topbar      { padding-left: 20px; padding-right: 20px; }
+  .hero        { padding-left: 20px; padding-right: 20px; height: 140px; }
+  .hero h1     { font-size: 28px; }
+  .admin-nav   { display: none; }
+  .header-right { display: none; }
+  .burger      { display: block; }
+  .site-header .logo { height: 50px; }
 }
 
 /* Responsive modale bénévoles */

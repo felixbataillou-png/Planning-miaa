@@ -43,8 +43,8 @@
           <i class="fas fa-shield-alt" aria-hidden="true"></i> Espace Administration
         </div>
         <a href="https://www.facebook.com/pages/Association-MIAA/377808022330859"
-           target="_blank" rel="noopener"
-           aria-label="Page Facebook MIAA (nouvel onglet)">
+          target="_blank" rel="noopener"
+          aria-label="Page Facebook MIAA (nouvel onglet)">
           <i class="fab fa-facebook-f" aria-hidden="true"></i>
         </a>
       </div>
@@ -58,12 +58,38 @@
         </nav>
         <div class="header-right">
           <button onclick="AdminSite.logout()" class="btn-secondary"
-                  style="font-size:12px;padding:6px 14px"
-                  aria-label="Se déconnecter de l'espace administration">
+              style="font-size:12px;padding:6px 14px"
+              aria-label="Se déconnecter de l'espace administration">
             <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Déconnexion
           </button>
         </div>
-      </header>`
+        <button class="burger" id="admin-burger-btn" type="button"
+              aria-label="Ouvrir le menu de navigation"
+              aria-expanded="false"
+              aria-controls="admin-mobile-menu"
+              onclick="AdminSite.openMobileMenu()">
+           <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+      </header>
+
+      <div class="mobile-menu" id="admin-mobile-menu"
+            role="dialog" aria-label="Menu de navigation administration" aria-modal="true">
+          <button class="mobile-menu-close" type="button"
+              aria-label="Fermer le menu"
+              onclick="AdminSite.closeMobileMenu()">
+            <i class="fas fa-times" aria-hidden="true"></i>
+          </button>
+          <nav>
+            ${ADMIN_NAV.map(item => `
+              <a href="${item.href}" class="${item.key === activePage ? 'active' : ''}">
+                <i class="fas ${item.icon}" aria-hidden="true"></i> ${item.label}
+              </a>
+            `).join('')}
+            <a href="#" onclick="AdminSite.logout(); return false;" style="color:#e74c3c">
+              <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Déconnexion
+            </a>
+          </nav>
+      </div>`
   }
 
   // ── Écran de connexion ────────────────────────────────────────────
@@ -153,6 +179,22 @@
     async logout () {
       await db.auth.signOut()
       window.location.href = 'planning-admin.html'
+    },
+
+    openMobileMenu () {
+      const menu = document.getElementById('admin-mobile-menu')
+      const btn  = document.getElementById('admin-burger-btn')
+      if (menu) menu.classList.add('open')
+      if (btn)  btn.setAttribute('aria-expanded', 'true')
+      document.body.style.overflow = 'hidden'
+    },
+    
+    closeMobileMenu () {
+      const menu = document.getElementById('admin-mobile-menu')
+      const btn  = document.getElementById('admin-burger-btn')
+      if (menu) menu.classList.remove('open')
+      if (btn)  btn.setAttribute('aria-expanded', 'false')
+      document.body.style.overflow = ''
     }
   }
 
