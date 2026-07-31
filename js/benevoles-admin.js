@@ -188,7 +188,6 @@ function initColumnResize () {
     const resizer = document.createElement('span')
     resizer.className = 'col-resizer'
     resizer.setAttribute('aria-hidden', 'true')
-    th.style.position = 'relative'
     th.appendChild(resizer)
 
     let startX, startW
