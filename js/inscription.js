@@ -467,6 +467,7 @@ function validateEmail(v) {
  */
 async function submitForm() {
   const nom    = document.getElementById('inp-nom').value.trim()
+  const prenom = document.getElementById('inp-prenom').value.trim()
   const tel    = document.getElementById('inp-tel').value.trim()
   const email  = document.getElementById('inp-email').value.trim()
   const permis = document.getElementById('inp-permis').checked

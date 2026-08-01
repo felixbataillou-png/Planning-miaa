@@ -107,15 +107,28 @@ function initFloatingMenu () {
   div.className = 'actions-menu'
   div.setAttribute('role', 'menu')
   div.innerHTML = `
-    <button role="menuitem" onclick="openEditModal()">
+    <button role="menuitem" id="floating-menu-edit">
       <i class="fas fa-pen" aria-hidden="true"></i> Modifier
     </button>
     <hr>
-    <button class="danger" role="menuitem" onclick="openDeleteModal()">
+    <button class="danger" role="menuitem" id="floating-menu-delete">
       <i class="fas fa-trash" aria-hidden="true"></i> Supprimer
     </button>`
   document.body.appendChild(div)
   menuEl = div
+  // Listeners avec stopPropagation pour éviter que document.click ferme le menu avant l'action
+  div.querySelector('#floating-menu-edit').addEventListener('click', e => {
+    e.stopPropagation()
+    const id = activeMenuId
+    closeFloatingMenu()
+    openEditModal(id)
+  })
+  div.querySelector('#floating-menu-delete').addEventListener('click', e => {
+    e.stopPropagation()
+    const id = activeMenuId
+    closeFloatingMenu()
+    openDeleteModal(id)
+  })
 }
 
 function getBenevoleById (id) { return allBenevoles.find(v => v.id === id) }
@@ -298,10 +311,8 @@ async function saveNewBenévole () {
 }
 
 // ── Modale Modifier ───────────────────────────────────────────────
-function openEditModal () {
-  const id = activeMenuId
-  closeFloatingMenu()
-  const b = getBenevoleById(activeMenuId || editingId)
+function openEditModal (id) {
+  const b = getBenevoleById(id)
   if (!b) return
   editingId = b.id
 
@@ -361,10 +372,8 @@ async function saveEditBenévole () {
 }
 
 // ── Modale Supprimer ──────────────────────────────────────────────
-function openDeleteModal () {
-  const id = activeMenuId
-  closeFloatingMenu()
-  const b = getBenevoleById(activeMenuId || pendingDeleteId)
+function openDeleteModal (id) {
+  const b = getBenevoleById(id)
   if (!b) return
   pendingDeleteId = b.id
 
