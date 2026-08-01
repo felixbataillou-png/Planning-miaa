@@ -62,7 +62,7 @@ function escAttr(s) {
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
-    .select(`id, status, Confirm_token, volunteers ( id, nom, email, tel, permis )`)
+    .select(`id, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )`)
     .eq('date', ds)
     .eq('role', roleId)
   return data || []
@@ -142,7 +142,7 @@ async function renderPage() {
   const dateKeys = days.map(d => localDateKey(d))
   const { data: allRegs } = await db
     .from('registrations')
-    .select(`id, date, role, status, Confirm_token, volunteers ( id, nom, email, tel, permis )`)
+    .select(`id, date, role, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )`)
     .in('date', dateKeys)
 
   const regsData = allRegs || []
@@ -334,10 +334,10 @@ async function openEdit(dateStr, roleId, regId, event) {
   const role = ROLES.find(r => r.id === roleId)
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
   document.getElementById('edit-modal-sub').textContent          = `${role.label} · ${role.time}`
-  document.getElementById('edit-nom').textContent                = volNom
-  document.getElementById('edit-prenom').textContent             = reg.volunteers.prenom || '—'
-  document.getElementById('edit-tel').textContent                = reg.volunteers.tel    || '—'
-  document.getElementById('edit-email').textContent              = reg.volunteers.email  || '—'
+  document.getElementById('edit-nom').value                      = volNom
+  document.getElementById('edit-prenom').value                   = reg.volunteers.prenom || '—'
+  document.getElementById('edit-tel').value                      = reg.volunteers.tel    || '—'
+  document.getElementById('edit-email').value                    = reg.volunteers.email  || '—'
   document.getElementById('edit-status').value                   = reg.status
   document.getElementById('edit-permis-display').style.display   = role.isMaraude && reg.volunteers.permis ? 'flex' : 'none'
 

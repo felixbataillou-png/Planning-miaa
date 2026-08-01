@@ -160,7 +160,7 @@ async function renderWeek() {
   const dateKeys = days.map(d => dateKey(d))
   const { data: allRegs } = await db
     .from('registrations')
-    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, email, tel, permis )')
+    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )')
     .in('date', dateKeys)
 
   // Fonctions de comptage locales (évitent des requêtes supplémentaires)
