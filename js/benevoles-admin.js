@@ -299,6 +299,7 @@ async function saveNewBenévole () {
 
 // ── Modale Modifier ───────────────────────────────────────────────
 function openEditModal () {
+  const id = activeMenuId
   closeFloatingMenu()
   const b = getBenevoleById(activeMenuId || editingId)
   if (!b) return
@@ -361,6 +362,7 @@ async function saveEditBenévole () {
 
 // ── Modale Supprimer ──────────────────────────────────────────────
 function openDeleteModal () {
+  const id = activeMenuId
   closeFloatingMenu()
   const b = getBenevoleById(activeMenuId || pendingDeleteId)
   if (!b) return

@@ -503,10 +503,10 @@ async function submitForm() {
   if (existing) {
     try {
       if (pendingIsDouble) {
-        await storeReg(pendingDate, 'cuisinier', nom, email, tel, false)
-        await storeReg(pendingDate, 'maraudeur', nom, email, tel, permis)
+        await storeReg(pendingDate, 'cuisinier', nom, prenom, email, tel, false)
+        await storeReg(pendingDate, 'maraudeur', nom, prenom, email, tel, permis)
       } else {
-        await storeReg(pendingDate, pendingRole, nom, email, tel, permis)
+        await storeReg(pendingDate, pendingRole, nom, prenom, email, tel, permis)
       }
       document.getElementById('modal-form-content').style.display   = 'none'
       document.getElementById('modal-success-content').style.display = 'block'
