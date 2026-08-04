@@ -363,6 +363,9 @@ async function saveEditBenévole () {
     commentaires:    document.getElementById('edit-bvl-commentaires').value.trim(),
   }).eq('id', editingId)
 
+  console.log('Résultat update - error:', error)
+  console.log('editingId utilisé:', editingId)
+
   btn.disabled = false
   btn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Enregistrer'
 

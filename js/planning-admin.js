@@ -25,6 +25,13 @@ window.onAdminReady = async function () {
     currentWeekOffset = Math.max(0, Math.min(4, Math.round(diff)))
   }
   await renderPage()
+
+    // Ouvre automatiquement la modale si on vient d'une confirmation
+  const regId = urlParams.get('reg')
+  if (regId) {
+    const btn = document.querySelector(`button[onclick*="${regId}"]`)
+    if (btn) btn.click()
+  }
 }
 
 // ── Constantes ────────────────────────────────────────────────────
