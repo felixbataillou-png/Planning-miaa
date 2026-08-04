@@ -16,6 +16,14 @@ window.ADMIN_PAGE = 'planning'
 
 // ── Point d'entrée appelé par admin-site.js ───────────────────────
 window.onAdminReady = async function () {
+  // Ouverture automatique sur la bonne semaine si redirection depuis confirm-registration
+  const urlParams = new URLSearchParams(window.location.search)
+  const confirmDate = urlParams.get('date')
+  if (confirmDate) {
+    const target = new Date(confirmDate + 'T00:00:00')
+    const diff = Math.round((target - TODAY) / (7 * 86400000))
+    currentWeekOffset = Math.max(0, Math.min(4, Math.round(diff)))
+  }
   await renderPage()
 }
 

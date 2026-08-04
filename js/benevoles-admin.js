@@ -336,6 +336,7 @@ function openEditModal (id) {
 }
 
 async function saveEditBenévole () {
+  console.log('editingId:', editingId)
   const nom    = document.getElementById('edit-bvl-nom').value.trim()
   const prenom = document.getElementById('edit-bvl-prenom').value.trim()
 
