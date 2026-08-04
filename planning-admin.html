@@ -132,6 +132,39 @@
   </div>
 </div>
 
+<!-- Modale : Suppression confirmée -->
+<div class="modal-overlay" id="modal-delete-confirm"
+     onclick="if(event.target===this){closeModal('modal-delete-confirm')}">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="delete-confirm-title">
+    <div class="modal-header">
+      <div>
+        <h3 id="delete-confirm-title">Inscription supprimée</h3>
+        <div class="mh-sub">L'inscription a bien été supprimée</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-delete-confirm')"
+              aria-label="Fermer">×</button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:24px">
+      <div style="font-size:40px;margin-bottom:16px">✅</div>
+      <p style="font-size:15px;color:#333;margin-bottom:8px">
+        L'inscription a été supprimée avec succès.
+      </p>
+      <p style="font-size:14px;color:#e67e22;font-weight:600">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+        N'oubliez pas d'envoyer un mail à
+        <strong id="delete-confirm-name">—</strong>
+        (<span id="delete-confirm-email" style="font-weight:400">—</span>)
+        pour le prévenir.
+      </p>
+    </div>
+    <div class="modal-footer" style="justify-content:center">
+      <button class="btn-primary" onclick="closeModal('modal-delete-confirm')">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal : Modifier l'inscription -->
 <div class="modal-overlay" id="modal-edit" onclick="handleOverlayClick(event,'modal-edit')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">

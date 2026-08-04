@@ -560,23 +560,14 @@ async function confirmDelete() {
   await deleteReg(regId)
   closeModal('modal-delete')
   await renderPage()
-  showToast('red', 'Inscription supprimée.')
 
+  // Affiche la modale de confirmation au lieu d'ouvrir Gmail
   if (reg && reg.volunteers) {
-    const role   = ROLES.find(r => r.id === roleId)
-    const d      = new Date(dateStr + 'T00:00:00')
-    const dateFr = d.toLocaleDateString('fr-FR', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    })
-    const volNom     = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
-    const wasPending = reg.status === 'pending'
-    const subject    = wasPending ? `MIAA — À propos de ta demande d'inscription` : `MIAA — Annulation de ton créneau`
-    const body       = wasPending
-      ? `Bonjour ${volNom},\n\n`
-      : `Bonjour ${volNom},\n\nTon créneau du ${dateFr} (${role.label}) a été annulé.\n\n`
-
-    const mailtoURL = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(reg.volunteers.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    window.open(mailtoURL, '_blank')
+    const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+    document.getElementById('delete-confirm-name').textContent = volNom
+    document.getElementById('delete-confirm-email').textContent = reg.volunteers.email || ''
+    document.getElementById('modal-delete-confirm').classList.add('open')
+    document.body.style.overflow = 'hidden'
   }
 }
 
