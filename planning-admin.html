@@ -60,26 +60,43 @@
       </div>
       <button class="modal-close" onclick="closeModal('modal-add')" aria-label="Fermer la fenêtre">×</button>
     </div>
+
     <div class="modal-body">
       <p class="form-required-legend"><span class="req-star" aria-hidden="true">*</span> Champs requis</p>
-      <div class="form-group">
-        <label for="add-nom">Nom et prénom <span style="color:#c0392b" aria-hidden="true">*</span></label>
-        <input type="text" id="add-nom" placeholder="Marie Dupont" autocomplete="off"
-               required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
-        <div class="error-msg" id="add-err-nom" role="alert">Veuillez indiquer un nom.</div>
-      </div>
-      <div class="form-group">
-        <label for="add-tel">Téléphone <span style="color:#c0392b" aria-hidden="true">*</span></label>
-        <input type="tel" id="add-tel" placeholder="06 12 34 56 78" autocomplete="off"
-               required aria-required="true" aria-describedby="add-err-tel" aria-invalid="false">
-        <div class="error-msg" id="add-err-tel" role="alert">Veuillez indiquer un numéro.</div>
-      </div>
-      <div class="form-group">
-        <label for="add-email">Email <span style="color:#c0392b" aria-hidden="true">*</span></label>
+
+      <!-- Email en premier — déclenche l'autocomplétion -->
+      <div class="form-group" style="position:relative">
+        <label for="add-email">Email <span class="req-star" aria-hidden="true">*</span></label>
         <input type="email" id="add-email" placeholder="marie.dupont@email.com" autocomplete="off"
-               required aria-required="true" aria-describedby="add-err-email" aria-invalid="false">
+           required aria-required="true" aria-describedby="add-err-email" aria-invalid="false">
+        <span id="add-email-loading" style="display:none;position:absolute;right:10px;
+          bottom:10px;font-size:12px;color:#888">
+          <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
+        </span>
         <div class="error-msg" id="add-err-email" role="alert">Email invalide.</div>
       </div>
+
+      <div class="form-group">
+        <label for="add-nom">Nom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-nom" placeholder="Dupont" autocomplete="off"
+           required aria-required="true" aria-describedby="add-err-nom" aria-invalid="false">
+        <div class="error-msg" id="add-err-nom" role="alert">Veuillez indiquer un nom.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="add-prenom">Prénom <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="text" id="add-prenom" placeholder="Marie" autocomplete="off"
+           required aria-required="true" aria-describedby="add-err-prenom" aria-invalid="false">
+        <div class="error-msg" id="add-err-prenom" role="alert">Veuillez indiquer un prénom.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="add-tel">Téléphone <span class="req-star" aria-hidden="true">*</span></label>
+        <input type="tel" id="add-tel" placeholder="06 12 34 56 78" autocomplete="off"
+           required aria-required="true" aria-describedby="add-err-tel" aria-invalid="false">
+        <div class="error-msg" id="add-err-tel" role="alert">Veuillez indiquer un numéro.</div>
+      </div>
+
       <div class="form-group">
         <label for="add-status">Statut</label>
         <select id="add-status">
@@ -87,6 +104,7 @@
           <option value="pending">En attente de validation</option>
         </select>
       </div>
+
       <div id="add-permis-group" style="display:none">
         <span id="add-permis-label" style="font-size:14px;font-weight:700;color:#333;display:block;margin-bottom:8px">Permis de conduire</span>
         <label class="toggle-row">
@@ -99,6 +117,7 @@
         </label>
       </div>
     </div>
+
     <div class="modal-footer">
       <button class="btn-primary" onclick="submitAdd()">
         <i class="fas fa-plus" aria-hidden="true" style="margin-right:6px;font-size:11px"></i>Ajouter
@@ -149,7 +168,7 @@
       <p style="font-size:15px;color:#333;margin-bottom:8px">
         L'inscription a été supprimée avec succès.
       </p>
-      <p style="font-size:14px;color:#e67e22;font-weight:600">
+      <p style="font-size:14px;color: #c0392b;font-weight:600">
         <i class="fas fa-envelope" aria-hidden="true"></i>
         N'oubliez pas d'envoyer un mail à
         <strong id="delete-confirm-name">—</strong>
@@ -177,7 +196,7 @@
     </div>
     <div class="modal-body">
       <div class="form-group">
-        <label for="edit-nom">Nom et prénom</label>
+        <label for="edit-nom">Nom</label>
         <input type="text" id="edit-nom" readonly style="background:#f8f9fa;cursor:default">
       </div>
       <div class="form-group">

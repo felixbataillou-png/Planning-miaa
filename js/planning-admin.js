@@ -349,7 +349,7 @@ async function openEdit(dateStr, roleId, regId, event) {
   const role = ROLES.find(r => r.id === roleId)
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
   document.getElementById('edit-modal-sub').textContent          = `${role.label} · ${role.time}`
-  document.getElementById('edit-nom').value                      = volNom
+  document.getElementById('edit-nom').value                      = reg.volunteers.nom || '—'
   document.getElementById('edit-prenom').value                   = reg.volunteers.prenom || '—'
   document.getElementById('edit-tel').value                      = reg.volunteers.tel    || '—'
   document.getElementById('edit-email').value                    = reg.volunteers.email  || '—'
@@ -407,23 +407,63 @@ function deleteFromEdit() {
 function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   addTarget    = { dateStr, roleId }
   addIsMaraude = isMaraude
-  document.getElementById('add-modal-sub').textContent          = `${roleLabel} · ${roleTime}`
-  document.getElementById('add-permis-group').style.display     = isMaraude ? 'block' : 'none'
-  ;['add-nom', 'add-tel', 'add-email'].forEach(id => {
+  document.getElementById('add-modal-sub').textContent      = `${roleLabel} · ${roleTime}`
+  document.getElementById('add-permis-group').style.display = isMaraude ? 'block' : 'none'
+
+  ;['add-nom', 'add-prenom', 'add-tel', 'add-email'].forEach(id => {
     const el = document.getElementById(id)
-    el.value = ''; el.classList.remove('error'); el.setAttribute('aria-invalid', 'false')
+    el.value = ''
+    el.classList.remove('autocompleted')
+    el.setAttribute('aria-invalid', 'false')
+  })
+  ;['add-err-nom','add-err-prenom','add-err-tel','add-err-email'].forEach(id => {
+    document.getElementById(id).style.display = 'none'
   })
   document.getElementById('add-permis').checked = false
   document.getElementById('add-status').value   = 'confirmed'
-  ;['add-err-nom','add-err-tel','add-err-email'].forEach(id => {
-    document.getElementById(id).style.display = 'none'
-  })
+
   openModalEl('modal-add')
-  setTimeout(() => document.getElementById('add-nom').focus(), 120)
+  setTimeout(() => document.getElementById('add-email').focus(), 120)
+
+  // Autocomplétion depuis la base bénévoles
+  initAddEmailAutocomplete()
+}
+
+function initAddEmailAutocomplete () {
+  const emailInput = document.getElementById('add-email')
+  // Retire l'ancien listener s'il existe
+  const newInput = emailInput.cloneNode(true)
+  emailInput.parentNode.replaceChild(newInput, emailInput)
+
+  newInput.addEventListener('blur', async () => {
+    const email = newInput.value.trim()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return
+
+    document.getElementById('add-email-loading').style.display = 'inline'
+
+    const { data: vol } = await db
+      .from('volunteers')
+      .select('nom, prenom, tel, permis')
+      .eq('email', email)
+      .maybeSingle()
+
+    document.getElementById('add-email-loading').style.display = 'none'
+
+    if (vol) {
+      document.getElementById('add-nom').value    = vol.nom    || ''
+      document.getElementById('add-prenom').value = vol.prenom || ''
+      document.getElementById('add-tel').value    = vol.tel    || ''
+      if (addIsMaraude) document.getElementById('add-permis').checked = vol.permis || false
+      ;['add-nom','add-prenom','add-tel'].forEach(id => {
+        document.getElementById(id).classList.add('autocompleted')
+      })
+    }
+  })
 }
 
 async function submitAdd() {
   const nom    = document.getElementById('add-nom').value.trim()
+  const prenom = document.getElementById('add-prenom').value.trim()
   const tel    = document.getElementById('add-tel').value.trim()
   const email  = document.getElementById('add-email').value.trim()
   const status = document.getElementById('add-status').value
@@ -431,9 +471,10 @@ async function submitAdd() {
 
   let valid = true, firstInvalid = null
   const checks = [
-    { ok: nom.length > 0,                            errId: 'add-err-nom',   inputId: 'add-nom'   },
-    { ok: tel.length > 0,                            errId: 'add-err-tel',   inputId: 'add-tel'   },
     { ok: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), errId: 'add-err-email', inputId: 'add-email' },
+    { ok: nom.length > 0,                            errId: 'add-err-nom',   inputId: 'add-nom'   },
+    { ok: prenom.length > 0,                         errId: 'add-err-prenom',inputId: 'add-prenom' },
+    { ok: tel.length > 0,                            errId: 'add-err-tel',   inputId: 'add-tel'   },
   ]
   checks.forEach(c => {
     const errEl = document.getElementById(c.errId)

@@ -165,8 +165,8 @@ h3.miaa-adminslot__role { margin: 0; }
   display: flex; justify-content: space-between; align-items: flex-start;
 }
 .modal-header.danger { background: #c0392b; }
-.modal-header h3  { font-size: 17px; font-weight: 700; line-height: 1.2; }
-.mh-sub { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+.modal-header h3  { font-size: 17px; font-weight: 700; line-height: 1.2; color: #fff; }
+.mh-sub { font-size: 12px; opacity: 1; margin-top: 4px; }
 .modal-close {
   background: none; border: none; color: #fff; font-size: 22px;
   cursor: pointer; opacity: 0.75; flex-shrink: 0; margin-left: 12px; padding: 0;
@@ -244,7 +244,7 @@ h3.miaa-adminslot__role { margin: 0; }
 .form-group input[readonly] { background: #f8f9fa; cursor: default; }
 .error-msg { font-size: 12px; color: #c0392b; display: none; }
 .form-required-legend { font-size: 12px; color: #666; margin-bottom: 6px; }
-.form-required-legend .req-star { color: #c0392b; font-weight: 700; }
+.form-required-legend .req-star { color: #c0392b; font-size: 18px; font-weight: 700; }
 
 /* Toggle switch */
 .toggle-row {

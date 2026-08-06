@@ -428,7 +428,7 @@
    Astérisque rouge utilisé à côté des labels de champs obligatoires,
    et en ligne dans les textes (ex : à l'intérieur de .miaa-consent__text).
    ===================================================================== */
-.req-star { color: var(--miaa-red-ink); }
+.req-star { color: var(--miaa-red-ink); font-size: 18px; font-weight: var(--fw-bold, 700); }
 
 /* =====================================================================
    11. MESSAGE DE CHARGEMENT  — .loading-message
