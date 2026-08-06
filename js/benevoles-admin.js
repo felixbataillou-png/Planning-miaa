@@ -21,18 +21,30 @@ window.onAdminReady = async function () {
 
 // ── Chargement ───────────────────────────────────────────────────
 async function loadBenevoles () {
-  const { data, error } = await db
-    .from('volunteers')
-    .select('id, commentaires, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgence_contact, rgpd')
-    .order('nom', { ascending: true })
+  let allData = []
+  let from = 0
+  const batchSize = 1000
 
-  if (error) {
-    console.error(error)
-    document.getElementById('benevoles-tbody').innerHTML =
-      `<tr><td colspan="12" class="table-empty">Erreur de chargement : ${error.message}</td></tr>`
-    return
+  while (true) {
+    const { data, error } = await db
+      .from('volunteers')
+      .select('id, commentaires, nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville, urgence_contact, rgpd')
+      .order('nom', { ascending: true })
+      .range(from, from + batchSize - 1)
+
+    if (error) {
+      console.error(error)
+      document.getElementById('benevoles-tbody').innerHTML =
+        `<tr><td colspan="12" class="table-empty">Erreur de chargement.</td></tr>`
+      return
+    }
+
+    allData = allData.concat(data || [])
+    if (!data || data.length < batchSize) break
+    from += batchSize
   }
-  allBenevoles = data || []
+
+  allBenevoles = allData
   filteredList = allBenevoles
   currentPage  = 1
   renderTable()
