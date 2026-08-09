@@ -29,13 +29,13 @@
 
 .admin-nav a:hover {
   background: #f0f9fc;
-  color: var(--color-primary, #128BAD);
+  color: var(--color-primary, #18809D);
 }
 
 .admin-nav a.active {
-  background: var(--color-primary, #128BAD);
+  background: var(--color-primary, #18809D);
   color: #fff;
-  border-color: var(--color-primary, #128BAD);
+  border-color: var(--color-primary, #18809D);
 }
 
 .admin-nav a i { font-size: 11px; }
@@ -72,7 +72,7 @@
   text-transform: uppercase; letter-spacing: 0.04em;
   text-decoration: none;
 }
-.mobile-menu nav a:hover { color: var(--color-primary, #128BAD); }
+.mobile-menu nav a:hover { color: var(--color-primary, #18809D); }
 .mobile-menu nav .sub-link {
   padding-left: 20px; font-weight: 600;
   text-transform: none; letter-spacing: 0;
@@ -107,7 +107,7 @@
   transition: border-color 0.15s;
 }
 
-.benevoles-search input:focus { border-color: var(--color-primary, #128BAD); }
+.benevoles-search input:focus { border-color: var(--color-primary, #18809D); }
 
 .benevoles-search i {
   position: absolute;
@@ -230,7 +230,7 @@
   transition: background 0.12s;
 }
 .actions-menu button:hover { background: #f7f9fc; }
-.actions-menu button.danger { color: #e74c3c; }
+.actions-menu button.danger { color: #E51700; }
 .actions-menu button.danger:hover { background: #fdf0ef; }
 .actions-menu button i { width: 14px; text-align: center; font-size: 12px; }
 
@@ -262,10 +262,10 @@
   color: #333;
   transition: background 0.12s, border-color 0.12s;
 }
-.pagination button:hover { background: #f0f9fc; border-color: var(--color-primary, #128BAD); }
+.pagination button:hover { background: #f0f9fc; border-color: var(--color-primary, #18809D); }
 .pagination button.active {
-  background: var(--color-primary, #128BAD);
-  border-color: var(--color-primary, #128BAD);
+  background: var(--color-primary, #18809D);
+  border-color: var(--color-primary, #18809D);
   color: #fff;
 }
 .pagination button:disabled { opacity: 0.4; cursor: default; }
@@ -293,7 +293,7 @@
 }
 .modal-confirm .confirm-icon {
   font-size: 48px;
-  color: #e74c3c;
+  color: #E51700;
   margin-bottom: 16px;
 }
 .modal-confirm p {
@@ -303,7 +303,7 @@
 }
 .modal-confirm .confirm-name {
   font-weight: 700;
-  color: var(--color-primary, #128BAD);
+  color: var(--color-primary, #18809D);
 }
 
 /* ── État vide / chargement ───────────────────────────────── */
@@ -334,7 +334,7 @@
 }
 .login-title {
   margin-bottom: 8px;
-  color: var(--color-primary, #128BAD);
+  color: var(--color-primary, #18809D);
   font-size: 22px; font-weight: 800;
 }
 .login-subtitle {
@@ -376,7 +376,7 @@
   min-height: 70px;
   box-sizing: border-box;
 }
-.textarea-styled:focus { border-color: var(--color-primary, #128BAD); }
+.textarea-styled:focus { border-color: var(--color-primary, #18809D); }
 
 /* Redimensionnement des colonnes */
 .col-resizer {
@@ -388,7 +388,7 @@
 }
 .col-resizer:hover,
 .col-resizer:active {
-  background: var(--color-primary, #128BAD);
+  background: var(--color-primary, #18809D);
   opacity: 0.4;
 }
 

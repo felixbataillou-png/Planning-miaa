@@ -18,7 +18,7 @@
 
 .skip-link {
   position: absolute; left: -9999px; top: 0; z-index: 9999;
-  background: var(--color-primary, #128BAD); color: #fff;
+  background: var(--color-primary, #18809D); color: #fff;
   padding: 8px 16px; border-radius: 0 0 4px 4px; font-weight: 700;
   font-family: var(--font-sans, 'Raleway', sans-serif);
 }
@@ -26,12 +26,12 @@
 
 /* Focus visible — RGAA 10.7 */
 *:focus-visible {
-  outline: 2px solid var(--color-primary, #128BAD);
+  outline: 2px solid var(--color-primary, #18809D);
   outline-offset: 2px;
   border-radius: 2px;
 }
 .miaa-slot__cta:focus-visible  { outline-offset: -3px; outline-color: #fff; }
-.miaa-double:focus-visible      { outline-color: var(--color-primary, #128BAD); outline-offset: 2px; }
+.miaa-double:focus-visible      { outline-color: var(--color-primary, #18809D); outline-offset: 2px; }
 
 /* Si le planning est masqué depuis le CMS */
 .planning-masque {
@@ -42,7 +42,7 @@
 }
 .planning-masque i {
   font-size: 48px;
-  color: var(--color-primary, #128BAD);
+  color: var(--color-primary, #18809D);
   margin-bottom: 20px;
   display: block;
 }
@@ -53,7 +53,7 @@
   text-align: center;
 }
 .planning-masque__message p { margin-bottom: 12px; }
-.planning-masque__message strong { color: var(--color-primary, #128BAD); }
+.planning-masque__message strong { color: var(--color-primary, #18809D); }
 
 
 /* Espace entre deux paragraphes consécutifs (ex : section intro) */
@@ -67,7 +67,7 @@
 .week-nav button {
   background: none; border: 1px solid var(--color-border, #ddd); padding: 9px 18px;
   font-family: var(--font-sans, 'Raleway', sans-serif); font-size: 14px;
-  font-weight: var(--fw-bold, 700); color: var(--color-primary, #128BAD);
+  font-weight: var(--fw-bold, 700); color: var(--color-primary, #18809D);
   cursor: pointer; border-radius: var(--radius-card, 4px); transition: background 0.15s;
   white-space: nowrap;
 }
@@ -87,9 +87,9 @@
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; color: #fff;
 }
-.pip-urgent { background: var(--miaa-red,    #e74c3c); }
-.pip-soon   { background: var(--miaa-orange, #f39c12); }
-.pip-normal { background: var(--color-primary, #128BAD); }
+.pip-urgent { background: var(--miaa-red,    #E51700); }
+.pip-soon   { background: var(--miaa-orange, #bb5c03); }
+.pip-normal { background: var(--color-primary, #18809D); }
 .pip-full   { background: #ccc; }
 
 /* ── Grille du planning ── */
@@ -145,7 +145,7 @@ h3.miaa-slot__role { margin: 0; }
 }
 
 .modal-header {
-  background: var(--color-primary, #128BAD); color: #fff;
+  background: var(--color-primary, #18809D); color: #fff;
   padding: 20px 24px; border-radius: 8px 8px 0 0;
   display: flex; justify-content: space-between; align-items: flex-start;
 }
@@ -167,7 +167,7 @@ h3.miaa-slot__role { margin: 0; }
 
 .autocompleted {
   background: #f0f9fc;
-  border-color: var(--color-primary, #128BAD);
+  border-color: var(--color-primary, #18809D);
   color: #333;
 }
 
@@ -181,8 +181,8 @@ h3.miaa-slot__role { margin: 0; }
   padding: 10px 14px; font-family: var(--font-sans, 'Raleway', sans-serif);
   font-size: 15px; color: var(--color-text, #333); outline: none; transition: border-color 0.15s;
 }
-.form-group input:focus  { border-color: var(--color-primary, #128BAD); }
-.form-group input.error  { border-color: var(--miaa-red, #e74c3c); }
+.form-group input:focus  { border-color: var(--color-primary, #18809D); }
+.form-group input.error  { border-color: var(--miaa-red, #E51700); }
 
 .error-msg             { font-size: 12px; color: var(--miaa-red-ink, #c0392b); display: none; }
 .form-required-legend  { font-size: 12px; color: #666; margin-bottom: 6px; }
@@ -200,7 +200,7 @@ h3.miaa-slot__role { margin: 0; }
   cursor: pointer; transition: border-color 0.15s, background 0.15s;
   user-select: none;
 }
-.toggle-row:hover   { border-color: var(--color-primary, #128BAD); background: #f0f9fc; }
+.toggle-row:hover   { border-color: var(--color-primary, #18809D); background: #f0f9fc; }
 .toggle-row .tl-main { font-size: 14px; color: var(--color-text, #333); font-weight: 600; }
 
 .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
@@ -209,13 +209,13 @@ h3.miaa-slot__role { margin: 0; }
   opacity: 0; margin: 0; padding: 0; width: 100%; height: 100%; cursor: pointer;
 }
 .toggle-switch input:focus-visible + .toggle-track {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary, #128BAD);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--color-primary, #18809D);
 }
 .toggle-track {
   position: absolute; inset: 0; border-radius: 24px;
   background: #ddd; transition: background 0.2s; cursor: pointer;
 }
-.toggle-switch input:checked + .toggle-track { background: var(--color-primary, #128BAD); }
+.toggle-switch input:checked + .toggle-track { background: var(--color-primary, #18809D); }
 .toggle-thumb {
   position: absolute; top: 3px; left: 3px;
   width: 18px; height: 18px; border-radius: 50%;
@@ -229,8 +229,8 @@ h3.miaa-slot__role { margin: 0; }
   padding: 11px 14px; font-size: 13px; color: #0f6980; line-height: 1.5;
 }
 /* Variante avec accent de marque (ex : message d'accueil nouveau bénévole) */
-.modal-info--accent { border-color: var(--color-primary, #128BAD); }
-.modal-info--accent strong { color: var(--color-primary, #128BAD); }
+.modal-info--accent { border-color: var(--color-primary, #18809D); }
+.modal-info--accent strong { color: var(--color-primary, #18809D); }
 
 /* Espacement entre deux champs empilés dans un même .form-group (ex : nom + tél d'urgence) */
 .field-spaced { margin-bottom: 8px; }
@@ -241,7 +241,7 @@ h3.miaa-slot__role { margin: 0; }
 .modal-footer { padding: 0 24px 24px; display: flex; gap: 10px; }
 
 .btn-primary {
-  flex: 1; background: var(--color-primary, #128BAD); color: #fff; border: none;
+  flex: 1; background: var(--color-primary, #18809D); color: #fff; border: none;
   padding: 13px 24px; font-family: var(--font-sans, 'Raleway', sans-serif);
   font-size: 15px; font-weight: var(--fw-bold, 700); cursor: pointer;
   border-radius: var(--radius-card, 4px); transition: background 0.15s;
@@ -249,7 +249,7 @@ h3.miaa-slot__role { margin: 0; }
 .btn-primary:hover     { background: #0f7a99; }
 .btn-primary:disabled,
 .btn-primary:disabled:hover {
-  background: var(--color-primary, #128BAD);
+  background: var(--color-primary, #18809D);
   opacity: 0.4;
   cursor: not-allowed;
 }
@@ -273,7 +273,7 @@ h3.miaa-slot__role { margin: 0; }
 }
 .success-icon {
   width: 64px; height: 64px; border-radius: 50%;
-  background: var(--color-primary, #128BAD);
+  background: var(--color-primary, #18809D);
   display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff;
 }
 .modal-success h3  { font-size: 22px; font-weight: var(--fw-bold, 700); color: var(--color-text, #333); }
@@ -283,7 +283,7 @@ h3.miaa-slot__role { margin: 0; }
   padding: 12px 16px; font-size: 14px; color: #0f6980; line-height: 1.5; max-width: 380px;
 }
 .close-btn {
-  background: var(--color-primary, #128BAD); color: #fff; border: none;
+  background: var(--color-primary, #18809D); color: #fff; border: none;
   padding: 12px 32px; font-family: var(--font-sans, 'Raleway', sans-serif);
   font-size: 15px; font-weight: var(--fw-bold, 700); cursor: pointer;
   border-radius: var(--radius-card, 4px); margin-top: 4px;
@@ -292,7 +292,7 @@ h3.miaa-slot__role { margin: 0; }
 
 /* ── Pied de page ── */
 .site-footer {
-  background: var(--color-footer-bg, #128BAD);
+  background: var(--color-footer-bg, #18809D);
   height: var(--topbar-height, 40px);
   display: flex; align-items: center; justify-content: center;
 }

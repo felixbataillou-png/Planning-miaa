@@ -47,7 +47,7 @@ Donations via HelloAsso: tinyurl.com/donmiaahelloasso
 
 **Numbers:** Used frequently and concretely — "120 repas", "5€ = 1,25€ après réduction fiscale", "1€ = 4 repas par an". Impact is made tangible.
 
-**Links:** Inline text links in the brand teal (`#128BAD`). Short URLs (tinyurl) used for printed/shared contexts.
+**Links:** Inline text links in the brand teal (`#18809D`). Short URLs (tinyurl) used for printed/shared contexts.
 
 **Examples of copy:**
 > "Depuis 2008, l'association MIAA propose un geste de solidarité simple : préparer et distribuer 120 repas complets par jour à destination des plus démunis."
@@ -61,7 +61,7 @@ Donations via HelloAsso: tinyurl.com/donmiaahelloasso
 ## Visual Foundations
 
 ### Colors
-- **Primary teal** `#128BAD` — top bar, footer, sidebar, nav active, links, headings on dark
+- **Primary teal** `#18809D` — top bar, footer, sidebar, nav active, links, headings on dark
 - **Light teal** `#02AED6` — hero gradient accent
 - **Text** `#333333` — all body and heading text on white
 - **White** `#FFFFFF` — page background, card surfaces, all text on teal

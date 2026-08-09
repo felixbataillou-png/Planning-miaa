@@ -18,7 +18,7 @@
   /* ── Repris du design system MIAA (colors_and_type.css) ──────────
      Chaque var pointe sur le token DS, avec un repli identique si la
      feuille du DS n'est pas chargée. */
-  --miaa-teal:        var(--color-primary, #128BAD);
+  --miaa-teal:        var(--color-primary, #18809D);
   --miaa-ink:         var(--color-text, #333333);
   --miaa-surface:     var(--color-white, #FFFFFF);
   --miaa-bg-light:    var(--color-bg-light, #F8F9FA);
@@ -34,10 +34,10 @@
   --miaa-teal-tint:   #e8f5f9;
 
   /* États / urgence (planning) */
-  --miaa-red:         #e74c3c;
+  --miaa-red:         #E51700;
   --miaa-red-tint:    #fdecea;
   --miaa-red-ink:     #c0392b;
-  --miaa-orange:      #f39c12;
+  --miaa-orange:      #bb5c03;
   --miaa-orange-tint: #fef3e2;
   --miaa-orange-ink:  #d68910;
   --miaa-green:       #27ae60;

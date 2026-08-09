@@ -85,7 +85,7 @@
                 <i class="fas ${item.icon}" aria-hidden="true"></i> ${item.label}
               </a>
             `).join('')}
-            <a href="#" onclick="AdminSite.logout(); return false;" style="color:#e74c3c">
+            <a href="#" onclick="AdminSite.logout(); return false;" style="color:#E51700">
               <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Déconnexion
             </a>
           </nav>

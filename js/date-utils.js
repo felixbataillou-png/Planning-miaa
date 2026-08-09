@@ -13,7 +13,11 @@
 // ── Constantes ────────────────────────────────────────────────────
 
 /** Date du jour à minuit (heure locale) */
-const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
+const TODAY = (() => {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
+})()
 
 const DAYS_FR     = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven']
 const MONTHS_FR   = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc']
@@ -76,7 +80,6 @@ function urgency(d) {
   const diff = dayDiff(d)
   if (diff < 0)  return 'past'
   if (diff <= 1) return 'urgent'
-  if (diff <= 3) return 'soon'
   return 'normal'
 }
 
@@ -103,6 +106,11 @@ function getParisHour() {
  * @returns {Date[]}
  */
 function getWeekDays(offset) {
-  const mon = getMonday(addDays(TODAY, offset * 7))
+  const day = TODAY.getDay()
+  // Samedi ou dimanche → on part du lundi suivant
+  const base = (day === 6 || day === 0)
+    ? addDays(getMonday(addDays(TODAY, 7)), 0)
+    : TODAY
+  const mon = getMonday(addDays(base, offset * 7))
   return Array.from({ length: 5 }, (_, i) => addDays(mon, i))
 }

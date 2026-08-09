@@ -10,7 +10,7 @@
 /* ── Base Color Tokens ───────────────────────────────────── */
 :root {
   /* Brand */
-  --color-primary:        #128BAD;   /* teal – top bar, sidebar, footer, links */
+  --color-primary:        #18809D;   /* teal – top bar, sidebar, footer, links */
   --color-primary-light:  #02AED6;   /* lighter teal – hero bg gradient */
 
   /* Neutrals */

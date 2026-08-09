@@ -259,7 +259,6 @@ function buildBadge(isFull, urg, remaining) {
     </span>`
   }
   const icon = urg === 'urgent' ? '<i class="fas fa-bolt" aria-hidden="true"></i> '
-             : urg === 'soon'   ? '<i class="fas fa-clock" aria-hidden="true"></i> '
              : ''
   const plural = remaining > 1
   return `<span class="miaa-slot__badge">${icon}${remaining} place${plural ? 's' : ''}</span>`

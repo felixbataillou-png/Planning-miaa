@@ -620,7 +620,7 @@ function personInfoHTML(reg, isMaraude) {
     <div class="pib-row"><i class="fas fa-envelope" aria-hidden="true"></i>${escHtml(reg.volunteers.email)}</div>
     ${isMaraude && reg.volunteers.permis ? '<div class="pib-row"><i class="fas fa-car" aria-hidden="true"></i>Possède le permis</div>' : ''}
     <div class="pib-row"><i class="fas fa-circle" aria-hidden="true"
-      style="color:${reg.status==='confirmed'?'#27ae60':'#f39c12'};font-size:8px"></i>
+      style="color:${reg.status==='confirmed'?'#27ae60':'#bb5c03'};font-size:8px"></i>
       ${reg.status==='confirmed' ? 'Confirmé' : 'En attente de validation'}
     </div>
   `
