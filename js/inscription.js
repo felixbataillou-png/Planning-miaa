@@ -48,65 +48,24 @@ let lastFocusedTrigger = null
 async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
                         secu = '', profession = '', adresse = '', codepostal = '',
                         ville = '', urgenceContact = '') {
-  // 1. Recherche ou création du bénévole
-const { data: existing } = await db
-    .from('volunteers')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
-
-  let volunteerId
-
-  if (existing) {
-    volunteerId = existing.id
-  } else {
-    const { data: newVol, error: volError } = await db
-    .from('volunteers')
-    .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
-              urgence_contact: urgenceContact, rgpd: true })
-    .select('id')
-    .single()
-
-    
-    if (newVol) volunteerId = newVol.id
-  }
-
-  // 2. Vérification anti-doublon sur ce créneau
-  const { count: existingReg } = await db
-    .from('registrations')
-    .select('*', { count: 'exact', head: true })
-    .eq('volunteers_id', volunteerId)
-    .eq('date', ds)
-    .eq('role', roleId)
-
-  if (existingReg && existingReg > 0) {
-    throw new Error('Vous êtes déjà inscrit à ce créneau pour cette activité.')
-  }
-
-  // 3. Création de l'inscription avec un token unique (utilisé pour la validation admin)
-  const token = crypto.randomUUID()
-
-  const { data: reg, error: regError } = await db
-    .from('registrations')
-    .insert({
-      volunteers_id: volunteerId,
-      date:          ds,
-      role:          roleId,
-      status:        'pending',
-      Confirm_token: token
+  // Tout le flux (find-or-create bénévole + anti-doublon + insertion +
+  // notification) est désormais géré côté serveur par la fonction "register",
+  // qui utilise la clé service_role. Nécessaire depuis le verrouillage RLS :
+  // un anonyme ne peut plus lire/insérer-avec-select sur volunteers/registrations.
+  const res = await fetch('/.netlify/functions/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      date: ds, role: roleId, nom, prenom, email, tel, permis,
+      secu, profession, adresse, codepostal, ville, urgenceContact
     })
-    .select('id')
-    .single()
-
-  // 4. Notification email aux admins
-  const notifyRes = await fetch('/.netlify/functions/notify', {
-   method: 'POST',
-   headers: { 'Content-Type': 'application/json' },
-   body: JSON.stringify({ registration_id: reg.id })
   })
 
-  if (!notifyRes.ok) {
-   throw new Error('NOTIFY_FAILED')
+  if (res.status === 409) {
+    throw new Error('Vous êtes déjà inscrit à ce créneau pour cette activité.')
+  }
+  if (!res.ok) {
+    throw new Error('NOTIFY_FAILED')
   }
 }
 
@@ -156,11 +115,15 @@ async function renderWeek() {
   document.getElementById('planning-grid').innerHTML =
     '<div class="loading-message">Chargement…</div>'
 
-  // Requête Supabase unique pour toute la semaine
+  // Requête Supabase unique pour toute la semaine.
+  // Passe par la vue "planning_public" (date, role, status, permis) plutôt que
+  // par la table registrations directement : la page publique n'a besoin
+  // d'aucune donnée personnelle (nom/email/tel/Confirm_token) pour afficher
+  // les compteurs de places.
   const dateKeys = days.map(d => dateKey(d))
   const { data: allRegs } = await db
-    .from('registrations')
-    .select('id, date, role, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )')
+    .from('planning_public')
+    .select('date, role, status, permis')
     .in('date', dateKeys)
 
   // Fonctions de comptage locales (évitent des requêtes supplémentaires)
@@ -168,7 +131,7 @@ async function renderWeek() {
     return (allRegs || []).filter(r => r.date === ds && r.role === roleId).length
   }
   function countPermis(ds) {
-    return (allRegs || []).filter(r => r.date === ds && r.role === 'maraudeur' && r.volunteers?.permis).length
+    return (allRegs || []).filter(r => r.date === ds && r.role === 'maraudeur' && r.permis).length
   }
 
   // Construction du HTML
@@ -418,16 +381,12 @@ function initEmailAutocomplete() {
     // Affiche le spinner
     document.getElementById('email-loading').style.display = 'inline'
 
-    const { data: vol } = await db
-      .from('volunteers')
-      .select('nom, prenom, tel, permis')
-      .eq('email', email)
-      .maybeSingle()
+    const vol = await lookupVolunteer(email)
 
     // Cache le spinner
     document.getElementById('email-loading').style.display = 'none'
 
-    if (vol) {
+    if (vol && vol.exists) {
       // Bénévole existant — remplit les champs automatiquement
       document.getElementById('inp-nom').value    = vol.nom    || ''
       document.getElementById('inp-prenom').value = vol.prenom || ''
@@ -440,6 +399,26 @@ function initEmailAutocomplete() {
       })
     }
   })
+}
+
+/**
+ * Cherche un bénévole par email via la fonction serverless "lookup-volunteer"
+ * (utilise la clé service_role côté serveur — la lecture anonyme directe de
+ * volunteers est désormais bloquée par RLS).
+ * @returns {Promise<{exists:boolean,nom?:string,prenom?:string,tel?:string,permis?:boolean}>}
+ */
+async function lookupVolunteer(email) {
+  try {
+    const res = await fetch('/.netlify/functions/lookup-volunteer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+    if (!res.ok) return { exists: false }
+    return await res.json()
+  } catch {
+    return { exists: false }
+  }
 }
 
 function closeModal() {
@@ -492,15 +471,11 @@ async function submitForm() {
   btnConfirm.disabled    = true
   btnConfirm.textContent = 'Vérification…'
 
-  // Vérifie si le bénévole est déjà connu
-  const { data: existing } = await db
-    .from('volunteers')
-    .select('id')
-    .eq('email', email)
-    .maybeSingle()
+  // Vérifie si le bénévole est déjà connu (via la fonction serverless :
+  // la lecture anonyme directe de volunteers est bloquée par RLS)
+  const existing = await lookupVolunteer(email)
 
-
-  if (existing) {
+  if (existing && existing.exists) {
     try {
       if (pendingIsDouble) {
         await storeReg(pendingDate, 'cuisinier', nom, prenom, email, tel, false)

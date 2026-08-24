@@ -1,0 +1,103 @@
+const crypto = require('crypto')
+
+// Regroupe tout le flux d'inscription publique côté serveur (clé service_role) :
+// find-or-create du bénévole, anti-doublon sur le créneau, insertion de
+// l'inscription, notification admin. Nécessaire depuis le verrouillage RLS :
+// un anonyme ne peut plus lire volunteers/registrations, donc ne peut plus
+// faire ces étapes lui-même depuis le navigateur avec la clé anon.
+exports.handler = async (event) => {
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method not allowed' }
+  }
+
+  try {
+    if (!event.body) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Body manquant' }) }
+    }
+
+    const {
+      date, role, nom, prenom, email, tel, permis,
+      secu = '', profession = '', adresse = '', codepostal = '',
+      ville = '', urgenceContact = ''
+    } = JSON.parse(event.body)
+
+    if (!date || !role || !nom || !email || !tel) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Champs requis manquants' }) }
+    }
+
+    const supabaseUrl = process.env.SUPABASE_URL
+    const serviceKey  = process.env.SUPABASE_SERVICE_ROLE
+    const headers = {
+      'Content-Type': 'application/json',
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`
+    }
+
+    // 1. Recherche ou création du bénévole
+    const findRes  = await fetch(
+      `${supabaseUrl}/rest/v1/volunteers?select=id&email=eq.${encodeURIComponent(email)}`,
+      { headers }
+    )
+    const findData = await findRes.json()
+
+    let volunteerId = Array.isArray(findData) && findData.length > 0 ? findData[0].id : null
+
+    if (!volunteerId) {
+      const createRes = await fetch(`${supabaseUrl}/rest/v1/volunteers`, {
+        method: 'POST',
+        headers: { ...headers, Prefer: 'return=representation' },
+        body: JSON.stringify({
+          nom, prenom, email, tel, permis, secu, profession, adresse,
+          codepostal, ville, urgence_contact: urgenceContact, rgpd: true
+        })
+      })
+      const created = await createRes.json()
+      if (!createRes.ok || !created[0]) {
+        return { statusCode: 500, body: JSON.stringify({ error: 'Erreur création bénévole' }) }
+      }
+      volunteerId = created[0].id
+    }
+
+    // 2. Vérification anti-doublon sur ce créneau
+    const dupRes = await fetch(
+      `${supabaseUrl}/rest/v1/registrations?select=id&volunteers_id=eq.${volunteerId}&date=eq.${date}&role=eq.${role}`,
+      { headers }
+    )
+    const dupData = await dupRes.json()
+    if (Array.isArray(dupData) && dupData.length > 0) {
+      return { statusCode: 409, body: JSON.stringify({ error: 'DEJA_INSCRIT' }) }
+    }
+
+    // 3. Création de l'inscription avec un token unique (utilisé pour la validation admin)
+    const token  = crypto.randomUUID()
+    const regRes = await fetch(`${supabaseUrl}/rest/v1/registrations`, {
+      method: 'POST',
+      headers: { ...headers, Prefer: 'return=representation' },
+      body: JSON.stringify({
+        volunteers_id: volunteerId, date, role, status: 'pending', Confirm_token: token
+      })
+    })
+    const regData = await regRes.json()
+    if (!regRes.ok || !regData[0]) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Erreur création inscription' }) }
+    }
+
+    // 4. Notification email aux admins
+    const notifyRes = await fetch(`${supabaseUrl}/functions/v1/Notify_admin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${serviceKey}`
+      },
+      body: JSON.stringify({ registration_id: regData[0].id })
+    })
+
+    if (!notifyRes.ok) {
+      return { statusCode: 502, body: JSON.stringify({ error: 'NOTIFY_FAILED' }) }
+    }
+
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) }
+  } catch (e) {
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) }
+  }
+}
