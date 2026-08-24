@@ -1,3 +1,5 @@
+const { checkRateLimit } = require('./_rate-limit')
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' }
@@ -11,6 +13,14 @@ exports.handler = async (event) => {
     const { email } = JSON.parse(event.body)
     if (!email) {
       return { statusCode: 400, body: JSON.stringify({ error: 'email manquant' }) }
+    }
+
+    // Cette fonction est un oracle d'énumération par nature (existe/n'existe
+    // pas + nom/tel) : limite plus stricte que register pour freiner le scan
+    // d'adresses email.
+    const allowed = await checkRateLimit('lookup-volunteer', event, 10, 5)
+    if (!allowed) {
+      return { statusCode: 429, body: JSON.stringify({ error: 'Trop de requêtes, merci de réessayer plus tard.' }) }
     }
 
     const supabaseUrl = process.env.SUPABASE_URL

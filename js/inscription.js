@@ -52,12 +52,15 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
   // notification) est désormais géré côté serveur par la fonction "register",
   // qui utilise la clé service_role. Nécessaire depuis le verrouillage RLS :
   // un anonyme ne peut plus lire/insérer-avec-select sur volunteers/registrations.
+  const website = document.getElementById('inp-website')?.value || ''
+
   const res = await fetch('/.netlify/functions/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       date: ds, role: roleId, nom, prenom, email, tel, permis,
-      secu, profession, adresse, codepostal, ville, urgenceContact
+      secu, profession, adresse, codepostal, ville, urgenceContact,
+      website // piège à bots — doit rester vide
     })
   })
 

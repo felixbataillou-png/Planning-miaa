@@ -152,6 +152,12 @@
           <div class="error-msg" id="err-tel" role="alert">Veuillez indiquer votre numéro.</div>
         </div>
 
+        <!-- Piège à bots : invisible pour un humain, souvent auto-rempli par les bots -->
+        <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true">
+          <label for="inp-website">Site web</label>
+          <input type="text" id="inp-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
         <!-- Permis -->
         <div id="permis-group" style="display:none">
           <label for="inp-permis" class="toggle-row">

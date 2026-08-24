@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const { checkRateLimit } = require('./_rate-limit')
 
 // Regroupe tout le flux d'inscription publique côté serveur (clé service_role) :
 // find-or-create du bénévole, anti-doublon sur le créneau, insertion de
@@ -18,11 +19,22 @@ exports.handler = async (event) => {
     const {
       date, role, nom, prenom, email, tel, permis,
       secu = '', profession = '', adresse = '', codepostal = '',
-      ville = '', urgenceContact = ''
+      ville = '', urgenceContact = '', website = ''
     } = JSON.parse(event.body)
+
+    // Piège à bots : un champ censé rester vide, invisible pour un humain.
+    // On répond succès sans rien écrire, pour ne pas révéler le mécanisme.
+    if (website) {
+      return { statusCode: 200, body: JSON.stringify({ ok: true }) }
+    }
 
     if (!date || !role || !nom || !email || !tel) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Champs requis manquants' }) }
+    }
+
+    const allowed = await checkRateLimit('register', event, 5, 10)
+    if (!allowed) {
+      return { statusCode: 429, body: JSON.stringify({ error: 'Trop de tentatives, merci de réessayer plus tard.' }) }
     }
 
     const supabaseUrl = process.env.SUPABASE_URL
