@@ -149,7 +149,7 @@ h3.miaa-slot__role { margin: 0; }
   padding: 20px 24px; border-radius: 8px 8px 0 0;
   display: flex; justify-content: space-between; align-items: flex-start;
 }
-.modal-header h3 { font-size: 18px; font-weight: var(--fw-bold, 700); line-height: 1.2; }
+.modal-header h3 { font-size: 18px; font-weight: var(--fw-bold, 700); line-height: 1.2; color: #fff; }
 
 .mh-meta { display: flex; gap: 8px; margin-top: 7px; flex-wrap: wrap; }
 .mh-tag  {

@@ -170,6 +170,18 @@
           </label>
         </div>
 
+        <!-- Première fois à ce poste (toujours visible, quel que soit le rôle) -->
+        <div id="firsttime-group">
+          <label for="inp-firsttime" class="toggle-row">
+            <span class="tl-main">Il s'agit de ma première fois à ce poste</span>
+            <span class="toggle-switch">
+              <input type="checkbox" id="inp-firsttime">
+              <span class="toggle-track" aria-hidden="true"></span>
+              <span class="toggle-thumb" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+
         <div class="modal-info">
           <strong>Vos informations restent confidentielles.</strong>
           Elles ne sont transmises qu'aux responsables du planning et n'apparaissent jamais sur le site.
@@ -253,13 +265,23 @@
       </div>
 
       <div class="form-group">
-        <label>Personne à prévenir en cas d'urgence <span style="color:#c0392b" aria-hidden="true">*</span></label>
+        <label>Personne à prévenir en cas d'urgence</label>
         <input type="text" id="inp-urgence-nom" placeholder="Nom et prénom"
-               aria-required="true" aria-describedby="err-urgence" aria-invalid="false"
                style="margin-bottom:8px">
-        <input type="tel" id="inp-urgence-tel" placeholder="Numéro de téléphone"
-               aria-required="true" aria-invalid="false">
-        <div class="error-msg" id="err-urgence" role="alert">Veuillez indiquer une personne à prévenir.</div>
+        <input type="tel" id="inp-urgence-tel" placeholder="Numéro de téléphone">
+      </div>
+
+      <!-- Permis (toujours visible ici, quel que soit le rôle initial ; pré-rempli
+           depuis la modale principale si déjà coché là-bas pour la maraude) -->
+      <div class="form-group">
+        <label for="inp-extra-permis" class="toggle-row">
+          <span class="tl-main">Je possède le permis et suis disponible pour conduire</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="inp-extra-permis">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
       </div>
 
       <label class="miaa-consent">

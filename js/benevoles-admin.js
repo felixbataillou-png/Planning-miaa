@@ -73,7 +73,7 @@ function renderTable () {
   
   const tbody = document.getElementById('benevoles-tbody')
   if (page.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="12" class="table-empty">Aucun bénévole trouvé.</td></tr>`
+    tbody.innerHTML = `<tr><td colspan="13" class="table-empty">Aucun bénévole trouvé.</td></tr>`
     renderPagination(total); return
   }
 
@@ -93,6 +93,7 @@ function renderTable () {
       <td>${esc(b.adresse)}</td>
       <td>${esc(b.codepostal)}</td>
       <td>${esc(b.ville)}</td>
+      <td>${esc(b.secu)}</td>
       <td>${esc(b.urgence_contact)}</td>
       <td class="td-actions">
         <button class="btn-actions"

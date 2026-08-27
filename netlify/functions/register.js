@@ -19,7 +19,7 @@ exports.handler = async (event) => {
     const {
       date, role, nom, prenom, email, tel, permis,
       secu = '', profession = '', adresse = '', codepostal = '',
-      ville = '', urgenceContact = '', website = ''
+      ville = '', urgenceContact = '', firstTime = false, website = ''
     } = JSON.parse(event.body)
 
     // Piège à bots : un champ censé rester vide, invisible pour un humain.
@@ -30,6 +30,12 @@ exports.handler = async (event) => {
 
     if (!date || !role || !nom || !email || !tel) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Champs requis manquants' }) }
+    }
+
+    // Rôles accessibles au formulaire public uniquement — le rôle "cdm" est
+    // réservé aux ajouts manuels depuis planning-admin (voir js/planning-admin.js)
+    if (!['cuisinier', 'maraudeur'].includes(role)) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Rôle invalide' }) }
     }
 
     const allowed = await checkRateLimit('register', event, 5, 10)
@@ -86,7 +92,8 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: { ...headers, Prefer: 'return=representation' },
       body: JSON.stringify({
-        volunteers_id: volunteerId, date, role, status: 'pending', Confirm_token: token
+        volunteers_id: volunteerId, date, role, status: 'pending', Confirm_token: token,
+        first_time: !!firstTime
       })
     })
     const regData = await regRes.json()

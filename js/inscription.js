@@ -52,7 +52,8 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
   // notification) est désormais géré côté serveur par la fonction "register",
   // qui utilise la clé service_role. Nécessaire depuis le verrouillage RLS :
   // un anonyme ne peut plus lire/insérer-avec-select sur volunteers/registrations.
-  const website = document.getElementById('inp-website')?.value || ''
+  const website   = document.getElementById('inp-website')?.value || ''
+  const firstTime = document.getElementById('inp-firsttime')?.checked || false
 
   const res = await fetch('/.netlify/functions/register', {
     method: 'POST',
@@ -60,6 +61,7 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
     body: JSON.stringify({
       date: ds, role: roleId, nom, prenom, email, tel, permis,
       secu, profession, adresse, codepostal, ville, urgenceContact,
+      firstTime,
       website // piège à bots — doit rester vide
     })
   })
@@ -355,7 +357,8 @@ function openModal(dateStr, roleId, roleLabel, roleTime, isMaraude) {
     el.classList.remove('error')
     el.setAttribute('aria-invalid', 'false')
   })
-  document.getElementById('inp-permis').checked = false
+  document.getElementById('inp-permis').checked    = false
+  document.getElementById('inp-firsttime').checked = false
   ;['err-nom', 'err-tel', 'err-email'].forEach(id => {
     document.getElementById(id).style.display = 'none'
   })
@@ -522,21 +525,16 @@ function openModalExtra() {
   })
   document.getElementById('inp-rgpd').checked           = false
   document.getElementById('err-secu').style.display     = 'none'
-  document.getElementById('err-urgence').style.display  = 'none'
   document.getElementById('btn-confirm-extra').disabled = true
 
-  // 3. Ajoute les écouteurs APRÈS avoir vidé
-  const secu       = document.getElementById('inp-secu')
-  const urgenceNom = document.getElementById('inp-urgence-nom')
-  const urgenceTel = document.getElementById('inp-urgence-tel')
+  // Permis : pré-rempli depuis la modale principale (utile si déjà coché pour
+  // la maraude), reste modifiable — c'est cette valeur qui sera enregistrée.
+  document.getElementById('inp-extra-permis').checked = document.getElementById('inp-permis').checked
 
+  // 3. Ajoute l'écouteur APRÈS avoir vidé
+  const secu = document.getElementById('inp-secu')
   secu.removeEventListener('input', checkExtraFormValid)
-  urgenceNom.removeEventListener('input', checkExtraFormValid)
-  urgenceTel.removeEventListener('input', checkExtraFormValid)
-
   secu.addEventListener('input', checkExtraFormValid)
-  urgenceNom.addEventListener('input', checkExtraFormValid)
-  urgenceTel.addEventListener('input', checkExtraFormValid)
 
   // 4. Ouvre la modale
   document.getElementById('modal-overlay').classList.remove('open')
@@ -557,17 +555,13 @@ function handleOverlayClickExtra(e) {
   if (e.target === document.getElementById('modal-overlay-extra')) closeModalExtra()
 }
 
-/** Active/désactive le bouton de confirmation selon la case RGPD */
+/** Active/désactive le bouton de confirmation selon la case RGPD (seuls
+ * secu + rgpd sont requis ; la personne à prévenir en urgence est optionnelle) */
 function checkExtraFormValid() {
-  const secu       = document.getElementById('inp-secu').value.trim()
-  const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
-  const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
-  const rgpd       = document.getElementById('inp-rgpd').checked
+  const secu = document.getElementById('inp-secu').value.trim()
+  const rgpd = document.getElementById('inp-rgpd').checked
 
-  console.log('check:', { secu, urgenceNom, urgenceTel, rgpd })
-
-  document.getElementById('btn-confirm-extra').disabled =
-    !(secu && urgenceNom && urgenceTel && rgpd)
+  document.getElementById('btn-confirm-extra').disabled = !(secu && rgpd)
 }
 
 function handleRgpdChange() {
@@ -582,7 +576,8 @@ async function submitFormExtra() {
   const secu       = document.getElementById('inp-secu').value.trim()
   const urgenceNom = document.getElementById('inp-urgence-nom').value.trim()
   const urgenceTel = document.getElementById('inp-urgence-tel').value.trim()
-  const urgenceContact = `${urgenceNom} / ${urgenceTel}`.trim()
+  // Optionnel : n'assemble que les parties renseignées (évite un " / " vide)
+  const urgenceContact = [urgenceNom, urgenceTel].filter(Boolean).join(' / ')
   const profession = document.getElementById('inp-profession').value.trim()
   const adresse     = document.getElementById('inp-adresse').value.trim()
   const codepostal  = document.getElementById('inp-codepostal').value.trim()
@@ -591,7 +586,8 @@ async function submitFormExtra() {
   const prenom = document.getElementById('inp-prenom').value.trim()
   const tel        = document.getElementById('inp-tel').value.trim()
   const email      = document.getElementById('inp-email').value.trim()
-  const permis     = document.getElementById('inp-permis').checked
+  // Valeur de la modale complémentaire = valeur finale enregistrée (voir openModalExtra)
+  const permis     = document.getElementById('inp-extra-permis').checked
 
   let valid = true
   if (!secu) {
@@ -601,12 +597,6 @@ async function submitFormExtra() {
   } else {
     document.getElementById('err-secu').style.display = 'none'
     document.getElementById('inp-secu').setAttribute('aria-invalid', 'false')
-  }
-  if (!urgenceNom || !urgenceTel) {
-    document.getElementById('err-urgence').style.display = 'block'
-    valid = false
-  } else {
-    document.getElementById('err-urgence').style.display = 'none'
   }
   if (!valid) return
 

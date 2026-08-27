@@ -396,6 +396,13 @@
 }
 .miaa-volunteer__permis i { font-size: 8px; color: var(--miaa-ink-soft); }
 
+/* Badge "1ère fois à ce poste" à l'intérieur de l'info bénévole */
+.miaa-volunteer__firsttime {
+  font-size: 9px; color: var(--miaa-orange-ink); font-weight: 700;
+  display: flex; align-items: center; gap: 3px; margin-top: 1px;
+}
+.miaa-volunteer__firsttime i { font-size: 8px; color: var(--miaa-orange-ink); }
+
 /* Requête de conteneur — carte étroite : masquer l'avatar, laisser le nom s'enrouler */
 @container adminslot (max-width: 200px) {
   .miaa-volunteer__identity-btn > .miaa-volunteer__avatar { display: none; }

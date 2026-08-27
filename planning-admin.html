@@ -116,6 +116,18 @@
           </span>
         </label>
       </div>
+
+      <!-- Première fois à ce poste (toujours visible, quel que soit le rôle) -->
+      <div id="add-firsttime-group">
+        <label for="add-firsttime" class="toggle-row">
+          <span class="tl-main">Il s'agit de sa première fois à ce poste</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="add-firsttime">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
+      </div>
     </div>
 
     <div class="modal-footer">
@@ -275,13 +287,23 @@
       </div>
 
       <div class="form-group">
-        <label>Personne à prévenir en cas d'urgence <span style="color:#c0392b" aria-hidden="true">*</span></label>
+        <label>Personne à prévenir en cas d'urgence</label>
         <input type="text" id="add-extra-urgence-nom" placeholder="Nom et prénom"
-               aria-required="true" aria-describedby="add-extra-err-urgence" aria-invalid="false"
                style="margin-bottom:8px">
-        <input type="tel" id="add-extra-urgence-tel" placeholder="Numéro de téléphone"
-               aria-required="true" aria-invalid="false">
-        <div class="error-msg" id="add-extra-err-urgence" role="alert">Veuillez indiquer une personne à prévenir.</div>
+        <input type="tel" id="add-extra-urgence-tel" placeholder="Numéro de téléphone">
+      </div>
+
+      <!-- Permis (toujours visible ici, quel que soit le rôle initial ; pré-rempli
+           depuis la modale principale si déjà coché là-bas pour la maraude) -->
+      <div class="form-group">
+        <label for="add-extra-permis" class="toggle-row">
+          <span class="tl-main">Possède le permis et disponible pour conduire</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="add-extra-permis">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
       </div>
 
       <label style="border:1px solid #ddd;border-radius:4px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;cursor:pointer">

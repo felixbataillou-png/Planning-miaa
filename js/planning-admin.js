@@ -42,6 +42,9 @@ const MONTHS_FULL = ['janvier','février','mars','avril','mai','juin','juillet',
 const DAYS_FULL   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
 
 const ROLES = [
+  // CDM : ajouté uniquement depuis planning-admin (pas de card publique sur
+  // inscription.html, register.js rejette d'ailleurs ce rôle côté serveur).
+  { id: 'cdm',       label: 'CDM',       quota: 1, time: '',                       isMaraude: false, isCdm: true },
   { id: 'cuisinier', label: 'Cuisiniers', quota: 5, time: '8h – 12h',             isMaraude: false },
   { id: 'maraudeur', label: 'Maraudeurs', quota: 4, time: '11h – début après-midi', isMaraude: true  },
 ]
@@ -77,7 +80,7 @@ function escAttr(s) {
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
-    .select(`id, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, status, Confirm_token, first_time, volunteers ( id, nom, prenom, email, tel, permis )`)
     .eq('date', ds)
     .eq('role', roleId)
   return data || []
@@ -91,8 +94,8 @@ async function deleteReg(regId) {
   await db.from('registrations').delete().eq('id', regId)
 }
 
-async function addReg(ds, roleId, nom, email, tel, permis, status,
-                      secu='', profession='', adresse='', urgenceNom='', urgenceTel='') {
+async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
+                      secu = '', profession = '', adresse = '', urgenceContact = '', firstTime = false) {
   const { data: existing } = await db
     .from('volunteers').select('id').eq('email', email).maybeSingle()
 
@@ -102,8 +105,8 @@ async function addReg(ds, roleId, nom, email, tel, permis, status,
   } else {
     const { data: newVol } = await db
       .from('volunteers')
-      .insert({ nom, email, tel, permis, secu, profession, adresse,
-                urgence_nom: urgenceNom, urgence_tel: urgenceTel, rgpd: true })
+      .insert({ nom, prenom, email, tel, permis, secu, profession, adresse,
+                urgence_contact: urgenceContact, rgpd: true })
       .select('id').single()
     volunteerId = newVol.id
   }
@@ -111,7 +114,7 @@ async function addReg(ds, roleId, nom, email, tel, permis, status,
   const token = crypto.randomUUID()
   await db.from('registrations').insert({
     volunteers_id: volunteerId, date: ds, role: roleId,
-    status: status, Confirm_token: token
+    status: status, Confirm_token: token, first_time: !!firstTime
   })
 }
 
@@ -157,7 +160,7 @@ async function renderPage() {
   const dateKeys = days.map(d => localDateKey(d))
   const { data: allRegs } = await db
     .from('registrations')
-    .select(`id, date, role, status, Confirm_token, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, date, role, status, Confirm_token, first_time, volunteers ( id, nom, prenom, email, tel, permis )`)
     .in('date', dateKeys)
 
   const regsData = allRegs || []
@@ -223,24 +226,34 @@ async function renderPage() {
       const countTxt  = isFull ? 'Complet' : `${filled}/${role.quota}`
 
       html += `<div class="miaa-adminslot${isPast ? ' miaa-adminslot--past' : ''}">`
-      html += `<div class="miaa-adminslot__header">
-        <div class="miaa-adminslot__info">
-          <h3 class="miaa-adminslot__role">${escHtml(role.label)}</h3>
-          <span class="miaa-adminslot__time">${escHtml(role.time)}</span>
-        </div>
-        <span class="miaa-adminslot__count${countMod}">${countTxt}</span>
-      </div>`
+      if (role.isCdm) {
+        // CDM : card réduite au strict nécessaire (pas d'horaire, pas de
+        // badge de quota, pas de rangée de points).
+        html += `<div class="miaa-adminslot__header">
+          <div class="miaa-adminslot__info">
+            <h3 class="miaa-adminslot__role">${escHtml(role.label)}</h3>
+          </div>
+        </div>`
+      } else {
+        html += `<div class="miaa-adminslot__header">
+          <div class="miaa-adminslot__info">
+            <h3 class="miaa-adminslot__role">${escHtml(role.label)}</h3>
+            <span class="miaa-adminslot__time">${escHtml(role.time)}</span>
+          </div>
+          <span class="miaa-adminslot__count${countMod}">${countTxt}</span>
+        </div>`
 
-      html += `<div class="miaa-adminslot__dots" aria-hidden="true">`
-      for (let s = 0; s < role.quota; s++) {
-        if (s < filled) {
-          const dotMod = regs[s].status === 'pending' ? ' miaa-dot--pending' : ' miaa-dot--taken'
-          html += `<div class="miaa-dot${dotMod}"></div>`
-        } else {
-          html += `<div class="miaa-dot"></div>`
+        html += `<div class="miaa-adminslot__dots" aria-hidden="true">`
+        for (let s = 0; s < role.quota; s++) {
+          if (s < filled) {
+            const dotMod = regs[s].status === 'pending' ? ' miaa-dot--pending' : ' miaa-dot--taken'
+            html += `<div class="miaa-dot${dotMod}"></div>`
+          } else {
+            html += `<div class="miaa-dot"></div>`
+          }
         }
+        html += `</div>`
       }
-      html += `</div>`
 
       html += `<div class="miaa-adminslot__list">`
       if (regs.length === 0) {
@@ -253,6 +266,9 @@ async function renderPage() {
           const stTxt       = isPending ? 'En attente' : 'Confirmé'
           const permisBadge = role.isMaraude && reg.volunteers.permis
             ? `<span class="miaa-volunteer__permis"><i class="fas fa-car" aria-hidden="true"></i>Permis</span>`
+            : ''
+          const firstTimeBadge = reg.first_time
+            ? `<span class="miaa-volunteer__firsttime"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i>1ere fois</span>`
             : ''
           const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
           const identityLabel = escAttr(`Modifier l'inscription de ${volNom}, ${role.label.toLowerCase()}, ${dateLabel}`)
@@ -267,6 +283,7 @@ async function renderPage() {
                 <span class="miaa-volunteer__name">${escHtml(volNom)}</span>
                 <span class="miaa-volunteer__meta">${escHtml(reg.volunteers.tel)}</span>
                 ${permisBadge}
+                ${firstTimeBadge}
               </span>
             </button>
             <div class="miaa-volunteer__actions">
@@ -348,7 +365,7 @@ async function openEdit(dateStr, roleId, regId, event) {
 
   const role = ROLES.find(r => r.id === roleId)
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
-  document.getElementById('edit-modal-sub').textContent          = `${role.label} · ${role.time}`
+  document.getElementById('edit-modal-sub').textContent          = role.time ? `${role.label} · ${role.time}` : role.label
   document.getElementById('edit-nom').value                      = reg.volunteers.nom || '—'
   document.getElementById('edit-prenom').value                   = reg.volunteers.prenom || '—'
   document.getElementById('edit-tel').value                      = reg.volunteers.tel    || '—'
@@ -407,7 +424,7 @@ function deleteFromEdit() {
 function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   addTarget    = { dateStr, roleId }
   addIsMaraude = isMaraude
-  document.getElementById('add-modal-sub').textContent      = `${roleLabel} · ${roleTime}`
+  document.getElementById('add-modal-sub').textContent      = roleTime ? `${roleLabel} · ${roleTime}` : roleLabel
   document.getElementById('add-permis-group').style.display = isMaraude ? 'block' : 'none'
 
   ;['add-nom', 'add-prenom', 'add-tel', 'add-email'].forEach(id => {
@@ -419,8 +436,9 @@ function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   ;['add-err-nom','add-err-prenom','add-err-tel','add-err-email'].forEach(id => {
     document.getElementById(id).style.display = 'none'
   })
-  document.getElementById('add-permis').checked = false
-  document.getElementById('add-status').value   = 'confirmed'
+  document.getElementById('add-permis').checked    = false
+  document.getElementById('add-firsttime').checked = false
+  document.getElementById('add-status').value      = 'confirmed'
 
   openModalEl('modal-add')
   setTimeout(() => document.getElementById('add-email').focus(), 120)
@@ -462,12 +480,13 @@ function initAddEmailAutocomplete () {
 }
 
 async function submitAdd() {
-  const nom    = document.getElementById('add-nom').value.trim()
-  const prenom = document.getElementById('add-prenom').value.trim()
-  const tel    = document.getElementById('add-tel').value.trim()
-  const email  = document.getElementById('add-email').value.trim()
-  const status = document.getElementById('add-status').value
-  const permis = document.getElementById('add-permis').checked
+  const nom       = document.getElementById('add-nom').value.trim()
+  const prenom    = document.getElementById('add-prenom').value.trim()
+  const tel       = document.getElementById('add-tel').value.trim()
+  const email     = document.getElementById('add-email').value.trim()
+  const status    = document.getElementById('add-status').value
+  const permis    = document.getElementById('add-permis').checked
+  const firstTime = document.getElementById('add-firsttime').checked
 
   let valid = true, firstInvalid = null
   const checks = [
@@ -491,7 +510,8 @@ async function submitAdd() {
 
   if (existing) {
     try {
-      await addReg(addTarget.dateStr, addTarget.roleId, nom, email, tel, permis, status)
+      await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status,
+        '', '', '', '', firstTime)
       closeModal('modal-add')
       await renderPage()
       showToast('green', `${nom} ajouté(e) au créneau.`)
@@ -501,21 +521,25 @@ async function submitAdd() {
     }
   } else {
     closeModal('modal-add')
-    openAddExtra(nom, email, tel, permis, status)
+    openAddExtra(nom, prenom, email, tel, permis, status, firstTime)
   }
 }
 
-function openAddExtra(nom, email, tel, permis, status) {
-  addExtraData = { nom, email, tel, permis, status }
+function openAddExtra(nom, prenom, email, tel, permis, status, firstTime) {
+  addExtraData = { nom, prenom, email, tel, permis, status, firstTime }
   document.getElementById('add-extra-tag-date').textContent = document.getElementById('add-modal-sub').textContent
   ;['add-extra-secu','add-extra-profession','add-extra-adresse',
     'add-extra-urgence-nom','add-extra-urgence-tel'].forEach(id => {
     document.getElementById(id).value = ''
   })
-  document.getElementById('add-extra-rgpd').checked              = false
-  document.getElementById('add-extra-err-secu').style.display    = 'none'
-  document.getElementById('add-extra-err-urgence').style.display = 'none'
-  document.getElementById('btn-confirm-add-extra').disabled      = true
+  document.getElementById('add-extra-rgpd').checked           = false
+  document.getElementById('add-extra-err-secu').style.display = 'none'
+  document.getElementById('btn-confirm-add-extra').disabled   = true
+
+  // Permis : pré-rempli depuis la modale principale (utile si déjà coché pour
+  // la maraude), reste modifiable — c'est cette valeur qui sera enregistrée.
+  document.getElementById('add-extra-permis').checked = document.getElementById('add-permis').checked
+
   openModalEl('modal-add-extra')
 }
 
@@ -538,19 +562,18 @@ async function submitAddExtra() {
   const secu       = document.getElementById('add-extra-secu').value.trim()
   const urgenceNom = document.getElementById('add-extra-urgence-nom').value.trim()
   const urgenceTel = document.getElementById('add-extra-urgence-tel').value.trim()
+  // Optionnel : n'assemble que les parties renseignées (évite un " / " vide)
+  const urgenceContact = [urgenceNom, urgenceTel].filter(Boolean).join(' / ')
   const profession = document.getElementById('add-extra-profession').value.trim()
   const adresse    = document.getElementById('add-extra-adresse').value.trim()
+  // Valeur de la modale complémentaire = valeur finale enregistrée (voir openAddExtra)
+  const permis     = document.getElementById('add-extra-permis').checked
 
   let valid = true
   if (!secu) {
     document.getElementById('add-extra-err-secu').style.display = 'block'; valid = false
   } else {
     document.getElementById('add-extra-err-secu').style.display = 'none'
-  }
-  if (!urgenceNom || !urgenceTel) {
-    document.getElementById('add-extra-err-urgence').style.display = 'block'; valid = false
-  } else {
-    document.getElementById('add-extra-err-urgence').style.display = 'none'
   }
   if (!valid) return
 
@@ -559,8 +582,8 @@ async function submitAddExtra() {
 
   try {
     await addReg(addTarget.dateStr, addTarget.roleId,
-      addExtraData.nom, addExtraData.email, addExtraData.tel, addExtraData.permis, addExtraData.status,
-      secu, profession, adresse, urgenceNom, urgenceTel)
+      addExtraData.nom, addExtraData.prenom, addExtraData.email, addExtraData.tel, permis, addExtraData.status,
+      secu, profession, adresse, urgenceContact, addExtraData.firstTime)
     closeAddExtra()
     await renderPage()
     showToast('green', `${addExtraData.nom} ajouté(e) au créneau.`)
@@ -585,7 +608,7 @@ async function openDelete(dateStr, roleId, regId, event) {
 
   pendingAction = { type: 'delete', dateStr, roleId, regId }
   const role = ROLES.find(r => r.id === roleId)
-  document.getElementById('del-modal-sub').textContent    = `${role.label} · ${role.time}`
+  document.getElementById('del-modal-sub').textContent    = role.time ? `${role.label} · ${role.time}` : role.label
   document.getElementById('del-person-info').innerHTML    = personInfoHTML(reg, role.isMaraude)
   document.getElementById('del-warning-text').textContent = reg.status === 'pending'
     ? "Cette personne sera supprimée et notifiée que sa demande n'a pas été retenue."
