@@ -95,7 +95,8 @@ async function deleteReg(regId) {
 }
 
 async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
-                      secu = '', profession = '', adresse = '', urgenceContact = '', firstTime = false) {
+                      secu = '', profession = '', adresse = '', codepostal = '', ville = '',
+                      urgenceContact = '', firstTime = false) {
   const { data: existing } = await db
     .from('volunteers').select('id').eq('email', email).maybeSingle()
 
@@ -105,7 +106,7 @@ async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
   } else {
     const { data: newVol } = await db
       .from('volunteers')
-      .insert({ nom, prenom, email, tel, permis, secu, profession, adresse,
+      .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
                 urgence_contact: urgenceContact, rgpd: true })
       .select('id').single()
     volunteerId = newVol.id
@@ -511,7 +512,7 @@ async function submitAdd() {
   if (existing) {
     try {
       await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status,
-        '', '', '', '', firstTime)
+        '', '', '', '', '', '', firstTime)
       closeModal('modal-add')
       await renderPage()
       showToast('green', `${nom} ajouté(e) au créneau.`)
@@ -528,7 +529,7 @@ async function submitAdd() {
 function openAddExtra(nom, prenom, email, tel, permis, status, firstTime) {
   addExtraData = { nom, prenom, email, tel, permis, status, firstTime }
   document.getElementById('add-extra-tag-date').textContent = document.getElementById('add-modal-sub').textContent
-  ;['add-extra-secu','add-extra-profession','add-extra-adresse',
+  ;['add-extra-secu','add-extra-profession','add-extra-adresse','add-extra-codepostal','add-extra-ville',
     'add-extra-urgence-nom','add-extra-urgence-tel'].forEach(id => {
     document.getElementById(id).value = ''
   })
@@ -566,6 +567,8 @@ async function submitAddExtra() {
   const urgenceContact = [urgenceNom, urgenceTel].filter(Boolean).join(' / ')
   const profession = document.getElementById('add-extra-profession').value.trim()
   const adresse    = document.getElementById('add-extra-adresse').value.trim()
+  const codepostal = document.getElementById('add-extra-codepostal').value.trim()
+  const ville      = document.getElementById('add-extra-ville').value.trim()
   // Valeur de la modale complémentaire = valeur finale enregistrée (voir openAddExtra)
   const permis     = document.getElementById('add-extra-permis').checked
 
@@ -583,7 +586,7 @@ async function submitAddExtra() {
   try {
     await addReg(addTarget.dateStr, addTarget.roleId,
       addExtraData.nom, addExtraData.prenom, addExtraData.email, addExtraData.tel, permis, addExtraData.status,
-      secu, profession, adresse, urgenceContact, addExtraData.firstTime)
+      secu, profession, adresse, codepostal, ville, urgenceContact, addExtraData.firstTime)
     closeAddExtra()
     await renderPage()
     showToast('green', `${addExtraData.nom} ajouté(e) au créneau.`)
