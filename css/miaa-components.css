@@ -45,7 +45,7 @@
   --miaa-green-ink:   #0e5e2f;
 
   /* Neutres complémentaires */
-  --miaa-ink-soft:    #555;
+  --miaa-ink-soft:    #414141;
   --miaa-ink-mute:    #666;
   --miaa-gray:        #aaa;
   --miaa-gray-sq:     #ddd;
@@ -261,7 +261,7 @@
   display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
 }
 .miaa-adminslot__role { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--miaa-ink-soft); margin: 0; }
-.miaa-adminslot__time { font-size: 12px; color: var(--miaa-ink-soft); }
+.miaa-adminslot__time { font-size: 12px; font-weight: 500; color: var(--miaa-ink-soft); }
 .miaa-adminslot__count {
   font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 8px;
   white-space: nowrap; flex-shrink: 0;
@@ -307,8 +307,8 @@
 
 /* Pastille de statut */
 .miaa-volunteer__status {
-  font-size: 12px; font-weight: 700; border-radius: 10px; padding: 3px 7px;
-  text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap;
+  font-size: 11px; font-weight: 700; border-radius: 10px; padding: 3px 7px;
+  text-transform: capitalize; letter-spacing: 0.04em; white-space: nowrap;
 }
 .miaa-volunteer--confirmed .miaa-volunteer__status { background: var(--miaa-green-tint); color: var(--miaa-green-ink); }
 .miaa-volunteer--pending   .miaa-volunteer__status { background: #fde9c8; color: #7a4d00; }
@@ -373,7 +373,7 @@
 
 /* État vide */
 .miaa-adminslot__empty {
-  padding: 10px 12px; font-size: 11px; color: #888; font-style: italic;
+  padding: 10px 12px; font-size: 12px; color: var(--miaa-ink-mute); font-style: italic;
   border-top: 1px solid #f5f5f5; text-align: center;
 }
 
