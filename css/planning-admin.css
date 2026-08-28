@@ -58,7 +58,7 @@ h3.miaa-adminslot__role { margin: 0; }
   color: #fff; background: var(--miaa-red, #E51700);
   border-radius: var(--radius-card, 4px); padding: 3px 10px;
 }
-.admin-label i { margin-right: 5px; font-size: 9px; }
+.admin-label i { margin-right: 5px; font-size: 12px; }
 
 .btn-logout { font-size: 12px; padding: 6px 14px; }
 .btn-logout i { margin-right: 5px; }
@@ -245,6 +245,16 @@ h3.miaa-adminslot__role { margin: 0; }
 .error-msg { font-size: 12px; color: #c0392b; display: none; }
 .form-required-legend { font-size: 12px; color: #666; margin-bottom: 6px; }
 .form-required-legend .req-star { color: #c0392b; font-size: 18px; font-weight: 700; }
+
+/* Ligne code postal / ville (modale infos complémentaires) */
+.adresse-row { display: flex; gap: 12px; margin-top: 10px; }
+.adresse-col { display: flex; flex-direction: column; gap: 5px; }
+.adresse-col--cp    { flex: 0 0 90px; }
+.adresse-col--ville { flex: 1; }
+@media (max-width: 480px) {
+  .adresse-row { flex-direction: column; }
+  .adresse-col--cp { flex: 0 0 auto; }
+}
 
 /* Toggle switch */
 .toggle-row {
