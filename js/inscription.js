@@ -531,6 +531,12 @@ function openModalExtra() {
   // la maraude), reste modifiable — c'est cette valeur qui sera enregistrée.
   document.getElementById('inp-extra-permis').checked = document.getElementById('inp-permis').checked
 
+  // On n'atteint cette modale que pour un bénévole inconnu (voir submitForm) :
+  // "1ère fois à ce poste" est donc forcément vrai — coché automatiquement,
+  // sans action de la part du bénévole. Repris dans le planning admin et le
+  // mail de notification (voir storeReg → firstTime lu sur ce même champ).
+  document.getElementById('inp-firsttime').checked = true
+
   // 3. Ajoute l'écouteur APRÈS avoir vidé
   const secu = document.getElementById('inp-secu')
   secu.removeEventListener('input', checkExtraFormValid)
