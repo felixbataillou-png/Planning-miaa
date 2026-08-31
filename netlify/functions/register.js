@@ -59,6 +59,7 @@ exports.handler = async (event) => {
     const findData = await findRes.json()
 
     let volunteerId = Array.isArray(findData) && findData.length > 0 ? findData[0].id : null
+    const isNewVolunteer = !volunteerId
 
     if (!volunteerId) {
       const createRes = await fetch(`${supabaseUrl}/rest/v1/volunteers`, {
@@ -93,7 +94,7 @@ exports.handler = async (event) => {
       headers: { ...headers, Prefer: 'return=representation' },
       body: JSON.stringify({
         volunteers_id: volunteerId, date, role, status: 'pending', Confirm_token: token,
-        first_time: !!firstTime
+        first_time: !!firstTime, new_volunteer: isNewVolunteer
       })
     })
     const regData = await regRes.json()

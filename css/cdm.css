@@ -1,0 +1,16 @@
+/* ============================================================
+   MIAA — Espace CDM — ajustements spécifiques à cette page
+   Dépend de : colors_and_type.css, miaa-components.css, planning-admin.css
+   ============================================================ */
+
+/* Sur cette page, aucun CTA "Ajouter une personne" ne suit jamais la
+   liste — le message "Aucune inscription" se retrouve donc seul dans la
+   card. On lui réserve la même hauteur que celle qu'aurait occupée le
+   bouton sur planning-admin, et on le centre dedans pour garder une
+   card visuellement équilibrée. */
+.miaa-adminslot__list:has(> .miaa-adminslot__empty:only-child) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64px;
+}

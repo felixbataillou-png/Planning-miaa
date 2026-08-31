@@ -49,6 +49,19 @@ const ROLES = [
   { id: 'maraudeur', label: 'Maraudeurs', quota: 4, time: '11h – début après-midi', isMaraude: true  },
 ]
 
+// Champs du dropdown "Information" (card CDM) — ordre d'affichage = ordre
+// du tableau. Ajouter/réordonner/renommer un champ se fait uniquement ici :
+// le HTML est généré depuis cette config (voir dayInfoFieldHTML), aucune
+// modification à faire ailleurs dans le fichier. `key` doit correspondre à
+// la fois à la colonne day_info et au paramètre attendu par la fonction RPC
+// upsert_day_info (voir saveDayInfoField). Repris à l'identique dans
+// js/cdm.js — les deux pages partagent le même dropdown.
+const DAY_INFO_FIELDS = [
+  { key: 'nombre',    label: 'Nombre',       type: 'number'   },
+  { key: 'repas',     label: 'Repas',        type: 'textarea' },
+  { key: 'info_jour', label: 'Info du jour', type: 'textarea' },
+]
+
 // ── Helpers ───────────────────────────────────────────────────────
 function getMonday(d) {
   const date = new Date(d), day = date.getDay() || 7
@@ -80,10 +93,35 @@ function escAttr(s) {
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
-    .select(`id, status, Confirm_token, first_time, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, status, Confirm_token, first_time, note, volunteers ( id, nom, prenom, email, tel, permis )`)
     .eq('date', ds)
     .eq('role', roleId)
   return data || []
+}
+
+/** Sauvegarde la note (par inscription) via la fonction RPC dédiée — seule
+ * voie d'écriture pour cette colonne (aussi utilisée par l'espace CDM). */
+async function updateRegistrationNote(regId, note) {
+  return db.rpc('update_registration_note', { p_registration_id: regId, p_note: note })
+}
+
+/** Charge repas/nombre/info_jour pour un lot de dates (indépendant de la
+ * présence d'un CDM inscrit — voir day_info_for_planning). */
+async function loadDayInfo(dateKeys) {
+  const { data } = await db
+    .from('day_info_for_planning')
+    .select('date, repas, nombre, info_jour')
+    .in('date', dateKeys)
+  return Object.fromEntries((data || []).map(d => [d.date, d]))
+}
+
+/** Sauvegarde un champ de day_info (repas/nombre/info_jour) pour une date,
+ * via la fonction RPC dédiée (aussi utilisée par l'espace CDM). `field`
+ * est directement une clé de DAY_INFO_FIELDS. */
+async function saveDayInfoField(date, field, value) {
+  const args = { p_date: date, p_repas: null, p_nombre: null, p_info_jour: null }
+  args[`p_${field}`] = value
+  return db.rpc('upsert_day_info', args)
 }
 
 async function setSlotStatus(regId, newStatus) {
@@ -128,6 +166,7 @@ let addTarget         = null
 let addIsMaraude      = false
 let addExtraData      = null
 let editOriginalStatus = null
+let editOriginalNote   = null
 let lastFocusedTrigger = null
 
 // ── Week helpers ──────────────────────────────────────────────────
@@ -161,10 +200,11 @@ async function renderPage() {
   const dateKeys = days.map(d => localDateKey(d))
   const { data: allRegs } = await db
     .from('registrations')
-    .select(`id, date, role, status, Confirm_token, first_time, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, date, role, status, Confirm_token, first_time, note, volunteers ( id, nom, prenom, email, tel, permis )`)
     .in('date', dateKeys)
 
   const regsData = allRegs || []
+  const dayInfoMap = await loadDayInfo(dateKeys)
 
   let total = 0, confirmed = 0, pending = 0, spots = 0
   ROLES.forEach(role => {
@@ -258,7 +298,9 @@ async function renderPage() {
 
       html += `<div class="miaa-adminslot__list">`
       if (regs.length === 0) {
-        html += `<div class="miaa-adminslot__empty">Aucune inscription</div>`
+        // Pour le CDM, aucun texte "Aucune inscription" — seul le CTA
+        // "Ajouter une personne" (plus bas) indique le créneau vacant.
+        if (!role.isCdm) html += `<div class="miaa-adminslot__empty">Aucune inscription</div>`
       } else {
         regs.forEach(reg => {
           if (!reg.volunteers) return
@@ -270,6 +312,9 @@ async function renderPage() {
             : ''
           const firstTimeBadge = reg.first_time
             ? `<span class="miaa-volunteer__firsttime"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i>1ere fois</span>`
+            : ''
+          const noteDisplay = reg.note
+            ? `<span class="miaa-volunteer__note">${escHtml(reg.note)}</span>`
             : ''
           const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
           const identityLabel = escAttr(`Modifier l'inscription de ${volNom}, ${role.label.toLowerCase()}, ${dateLabel}`)
@@ -285,6 +330,7 @@ async function renderPage() {
                 <span class="miaa-volunteer__meta">${escHtml(reg.volunteers.tel)}</span>
                 ${permisBadge}
                 ${firstTimeBadge}
+                ${noteDisplay}
               </span>
             </button>
             <div class="miaa-volunteer__actions">
@@ -300,7 +346,24 @@ async function renderPage() {
       }
       html += `</div>`
 
-      if (!isPast) {
+      if (role.isCdm) {
+        // Le dropdown "Information" est toujours en bas de card, sous le
+        // CTA "Ajouter une personne" (visible/éditable qu'un CDM soit
+        // inscrit ou non — rattaché à la date, pas à une inscription précise).
+        if (regs.length > 0) html += `<hr class="miaa-adminslot__divider">`
+        if (!isPast && !isFull) {
+          const addLabel = escAttr(`Ajouter au créneau ${role.label.toLowerCase()}, ${dateLabel}`)
+          html += `<button class="miaa-add"
+            data-date="${ds}" data-role="${role.id}"
+            data-label="${escAttr(role.label)}" data-time="${escAttr(role.time)}"
+            data-maraude="${role.isMaraude}"
+            onclick="handleAdd(this)" aria-label="${addLabel}">
+            <i class="fas fa-plus" aria-hidden="true"></i> Ajouter une personne
+          </button>`
+        }
+        html += `<hr class="miaa-adminslot__divider">`
+        html += cdmInfoDropdownHTML(ds, dayInfoMap[ds])
+      } else if (!isPast) {
         const addLabel = escAttr(`Ajouter au créneau ${role.label.toLowerCase()}, ${dateLabel}`)
         if (regs.length > 0) html += `<hr class="miaa-adminslot__divider">`
         if (!isFull) {
@@ -321,6 +384,9 @@ async function renderPage() {
   })
 
   document.getElementById('planning-grid').innerHTML = html
+  // Note : le dropdown est fermé par défaut (display:none), donc son
+  // scrollHeight est nul tant qu'il n'est pas ouvert — l'ajustement de
+  // hauteur initial se fait dans toggleCdmDropdown() à l'ouverture.
 }
 
 // ── handleAdd ─────────────────────────────────────────────────────
@@ -363,6 +429,7 @@ async function openEdit(dateStr, roleId, regId, event) {
 
   pendingAction      = { type: 'edit', dateStr, roleId, regId }
   editOriginalStatus = reg.status
+  editOriginalNote   = reg.note || ''
 
   const role = ROLES.find(r => r.id === roleId)
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
@@ -372,7 +439,10 @@ async function openEdit(dateStr, roleId, regId, event) {
   document.getElementById('edit-tel').value                      = reg.volunteers.tel    || '—'
   document.getElementById('edit-email').value                    = reg.volunteers.email  || '—'
   document.getElementById('edit-status').value                   = reg.status
-  document.getElementById('edit-permis-display').style.display   = role.isMaraude && reg.volunteers.permis ? 'flex' : 'none'
+  document.getElementById('edit-note').value                     = editOriginalNote
+  // Affiché quel que soit le rôle (cuisine incluse) — seule la vue planning
+  // globale continue de réserver ce badge à la maraude.
+  document.getElementById('edit-permis-display').style.display   = reg.volunteers.permis ? 'flex' : 'none'
 
   const saveBtn     = document.getElementById('edit-save-btn')
   const statusGroup = document.getElementById('edit-status-group')
@@ -387,13 +457,16 @@ async function openEdit(dateStr, roleId, regId, event) {
   }
 
   document.getElementById('edit-status').addEventListener('change', checkEditChanges)
+  document.getElementById('edit-note').addEventListener('input', checkEditChanges)
   openModalEl('modal-edit')
 }
 
 function checkEditChanges() {
   const newStatus = document.getElementById('edit-status').value
+  const newNote   = document.getElementById('edit-note').value
+  const noteChanged = newNote !== editOriginalNote
   document.getElementById('edit-save-btn').disabled =
-    editOriginalStatus !== 'pending' && newStatus === editOriginalStatus
+    editOriginalStatus !== 'pending' && newStatus === editOriginalStatus && !noteChanged
 }
 
 async function saveEdit() {
@@ -405,9 +478,13 @@ async function saveEdit() {
   const newStatus = editOriginalStatus === 'pending'
     ? 'confirmed'
     : document.getElementById('edit-status').value
+  const newNote = document.getElementById('edit-note').value
 
   await setSlotStatus(regId, newStatus)
+  if (newNote !== editOriginalNote) await updateRegistrationNote(regId, newNote)
+
   document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
+  document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
   closeModal('modal-edit')
   await renderPage()
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
@@ -416,6 +493,7 @@ async function saveEdit() {
 
 function deleteFromEdit() {
   document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
+  document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
   closeModal('modal-edit')
   const { dateStr, roleId, regId } = pendingAction
   openDelete(dateStr, roleId, regId)
@@ -650,6 +728,73 @@ function personInfoHTML(reg, isMaraude) {
       ${reg.status==='confirmed' ? 'Confirmé' : 'En attente de validation'}
     </div>
   `
+}
+
+// ── Dropdown "Information" (card CDM) ──────────────────────────────
+// Repas / Nombre / Info du jour, rattachés à la date (jamais à une
+// inscription précise : visible/éditable même sans CDM inscrit).
+// Enregistrement automatique à la perte de focus — pas de bouton.
+// Éditable ici (planning-admin) et depuis l'espace CDM (même RPC).
+function cdmInfoDropdownHTML(date, info) {
+  info = info || {}
+  const id = escAttr(date)
+  const fieldsHtml = DAY_INFO_FIELDS.map(f => dayInfoFieldHTML(f, id, info[f.key])).join('')
+  return `
+    <div class="miaa-dropdown" id="cdm-dropdown-${id}">
+      <button type="button" class="miaa-dropdown__toggle" onclick="toggleCdmDropdown('${id}')"
+        aria-expanded="false" aria-controls="cdm-panel-${id}">
+        <span>Information</span>
+        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <div class="miaa-dropdown__panel" id="cdm-panel-${id}">
+        ${fieldsHtml}
+      </div>
+    </div>
+  `
+}
+
+/** Génère le markup d'un champ du dropdown à partir de sa config
+ * (voir DAY_INFO_FIELDS) — textarea auto-ajustable ou input number selon
+ * `field.type`. `date` est déjà échappé (id HTML), la valeur ne l'est pas. */
+function dayInfoFieldHTML(field, date, value) {
+  const elId  = `cdm-${field.key}-${date}`
+  const blur  = `saveDayInfoFieldFromInput(this,'${date}','${field.key}')`
+  const input = field.type === 'textarea'
+    ? `<textarea id="${elId}" rows="1" oninput="autoResizeTextarea(this)"
+        onblur="${blur}">${escHtml(value || '')}</textarea>`
+    : `<input type="${field.type}" inputmode="numeric" id="${elId}" value="${escAttr(value || '')}"
+        onblur="${blur}">`
+  return `
+        <div class="miaa-dropdown__field">
+          <label for="${elId}">${escHtml(field.label)}</label>
+          ${input}
+        </div>`
+}
+
+function toggleCdmDropdown(date) {
+  const dropdown = document.getElementById(`cdm-dropdown-${date}`)
+  if (!dropdown) return
+  const nowOpen = dropdown.classList.toggle('open')
+  const toggle = dropdown.querySelector('.miaa-dropdown__toggle')
+  if (toggle) toggle.setAttribute('aria-expanded', nowOpen)
+  // Un textarea caché (display:none) a un scrollHeight de 0 : on ne peut
+  // ajuster sa hauteur qu'une fois le panneau réellement visible.
+  if (nowOpen) dropdown.querySelectorAll('textarea').forEach(autoResizeTextarea)
+}
+
+/** Fait grandir/rétrécir un textarea pour s'ajuster à son contenu. */
+function autoResizeTextarea(el) {
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
+
+async function saveDayInfoFieldFromInput(el, date, field) {
+  try {
+    await saveDayInfoField(date, field, el.value.trim())
+  } catch (err) {
+    console.error(err)
+    showToast('red', "Une erreur est survenue lors de l'enregistrement.")
+  }
 }
 
 // ── Toast ─────────────────────────────────────────────────────────

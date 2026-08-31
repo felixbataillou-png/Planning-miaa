@@ -254,6 +254,7 @@
   overflow: hidden;
   font-family: var(--miaa-font);
   width: 248px;
+  min-height: 127px;
   display: flex; flex-direction: column;
 }
 .miaa-adminslot__header {
@@ -447,4 +448,59 @@
   padding: 40px;
   color: var(--miaa-ink-mute);
   font-size: 14px;
+}
+
+/* =====================================================================
+   12. CHAMP « PRÉSENTATION »  — .miaa-field-display
+   Affiche une valeur en lecture seule sans apparence de champ de
+   formulaire éditable (pas de bordure/fond/curseur texte) — utilisé pour
+   les infos bénévole non modifiables (planning-admin, espace CDM).
+   Le champ garde son <input readonly> d'origine ; seul le style change.
+   ===================================================================== */
+.form-group input.miaa-field-display[readonly],
+.form-group textarea.miaa-field-display[readonly] {
+  border: none; background: transparent; padding: 0px 0;
+  color: var(--miaa-ink, #333); font-weight: 400; cursor: default;
+}
+.form-group input.miaa-field-display[readonly]:focus,
+.form-group textarea.miaa-field-display[readonly]:focus { outline: none; }
+
+/* =====================================================================
+   13. MENU DÉROULANT « INFORMATION »  — .miaa-dropdown
+   Bloc repliable à chevron, utilisé dans la card CDM (planning-admin et
+   espace CDM) pour les champs repas / nombre / info du jour.
+   Slots : bouton titre + chevron · panneau (masqué par défaut)
+   ===================================================================== */
+.miaa-dropdown { margin-top: 2px; }
+.miaa-dropdown__toggle {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 10px 12px; background: none; border: none; cursor: pointer;
+  font-family: var(--miaa-font); font-size: 13px; font-weight: 700;
+  color: var(--miaa-ink-soft); text-transform: capitalize; letter-spacing: 0.04em;
+}
+.miaa-dropdown__toggle i { font-size: 12px; transition: transform 0.15s; }
+.miaa-dropdown.open .miaa-dropdown__toggle i { transform: rotate(180deg); }
+.miaa-dropdown__panel { display: none; }
+.miaa-dropdown.open .miaa-dropdown__panel {
+  display: flex; flex-direction: column; gap: 10px; padding: 4px 12px 14px;
+}
+.miaa-dropdown__field label {
+  display: block; font-size: 12px; font-weight: 700; color: var(--miaa-ink-soft); margin-bottom: 4px;
+}
+.miaa-dropdown__field input,
+.miaa-dropdown__field textarea {
+  width: 100%; border: 1px solid var(--miaa-gray-sq, #ddd); border-radius: var(--miaa-radius, 4px);
+  padding: 7px 10px; font-family: var(--miaa-font); font-size: 13px; color: var(--miaa-ink);
+  box-sizing: border-box;
+}
+/* Champs "texte" du dropdown (repas / info du jour) : hauteur ajustée au
+ * contenu via autoResizeTextarea() — pas de scrollbar, pas de redimension
+ * manuel qui contredirait l'ajustement automatique. */
+.miaa-dropdown__field textarea {
+  overflow: hidden; resize: none; min-height: 34px;
+}
+
+/* Note / commentaire sous le nom du bénévole — même style que le téléphone */
+.miaa-volunteer__note {
+  font-size: 12px; font-weight: var(--fw-bold, 700); color: var(--miaa-ink-soft); line-height: 1.4; margin-top: 1px; border-top: 1px dashed var(--miaa-ink-soft); padding: 3px;
 }
