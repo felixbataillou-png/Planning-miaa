@@ -1,0 +1,62 @@
+/* ============================================================
+   newsletter-liste.css — accordéon des newsletters archivées
+   Dépend de : colors_and_type.css, miaa-site.css
+   ============================================================ */
+
+.newsletter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.newsletter-item {
+  border: 1px solid #e0e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.newsletter-item__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #333);
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+.newsletter-item__toggle:hover,
+.newsletter-item__toggle:focus-visible {
+  background: #f0f9fc;
+  color: var(--color-primary, #18809D);
+}
+
+.newsletter-item__toggle i {
+  font-size: 14px;
+  color: var(--color-primary, #18809D);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.newsletter-item__toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+
+.newsletter-item__panel {
+  padding: 4px 18px 18px;
+  border-top: 1px solid #e0e8f0;
+  font-size: 15px;
+  color: #333;
+  line-height: 1.6;
+}
+.newsletter-item__panel[hidden] { display: none; }
+.newsletter-item__panel p { margin-bottom: 12px; }
+.newsletter-item__panel p:last-child { margin-bottom: 0; }
+.newsletter-item__panel a { color: var(--color-primary, #18809D); text-decoration: underline; }
+.newsletter-item__panel ul, .newsletter-item__panel ol { margin: 0 0 12px 20px; }

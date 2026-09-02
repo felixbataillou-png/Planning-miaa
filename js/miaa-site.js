@@ -36,12 +36,7 @@
     },
     { label: 'Contact',     href: 'contact.html',     key: 'contact' },
     { label: 'Inscription', href: 'inscription.html', key: 'inscription' },
-    {
-      label: 'Newsletter',  href: '#',                 key: 'newsletter',
-      children: [
-        { label: 'Liste Newsletters', href: 'newsletter-liste.html' },
-      ]
-    },
+    { label: 'Newsletters', href: 'newsletter-liste.html', key: 'newsletter' },
   ]
 
   // ── Construction du HTML du header ────────────────────────────
@@ -102,6 +97,11 @@
            target="_blank" rel="noopener"
            aria-label="Page Facebook de l'association MIAA (nouvel onglet)">
           <i class="fab fa-facebook-f" aria-hidden="true"></i>
+        </a>
+        <a href="https://www.instagram.com/associationmiaa"
+           target="_blank" rel="noopener"
+           aria-label="Page Instagram de l'association MIAA (nouvel onglet)">
+          <i class="fab fa-instagram" aria-hidden="true"></i>
         </a>
       </div>
 
@@ -194,6 +194,27 @@
     // Init des comportements après injection
     initDropdowns()
     initMobileMenu()
+    applyHeroImages()
+  }
+
+  // ── Photos d'en-tête (CMS, une par page) ───────────────────────
+  // La page pose <div class="hero" data-hero-key="inscription">... ; si le
+  // CMS ne fournit rien pour cette clé, la photo par défaut (définie en CSS
+  // dans .hero) reste inchangée.
+  function applyHeroImages () {
+    const heroes = document.querySelectorAll('.hero[data-hero-key]')
+    if (heroes.length === 0) return
+
+    fetch('_content/hero-images.json')
+      .then(r => r.json())
+      .then(images => {
+        heroes.forEach(el => {
+          const key = el.getAttribute('data-hero-key')
+          const url = images[key]
+          if (url) el.style.backgroundImage = `url('${url}')`
+        })
+      })
+      .catch(() => {}) // pas de photo personnalisée trouvée : garde la valeur par défaut du CSS
   }
 
   // ── Sous-menus desktop : hover avec délai anti-fermeture ──────

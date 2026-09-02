@@ -11,12 +11,16 @@ locale: fr
 
 collections:
 
-  # Actualités (page d'accueil)
+  # Actualités (page d'accueil) & Newsletters (page Newsletters)
+  # Une même liste sert les deux pages : "Visible sur l'accueil" contrôle
+  # l'affichage sur la page d'accueil, "Archivée" contrôle l'affichage dans
+  # la liste des newsletters. Les deux sont indépendants — un article peut
+  # être sur les deux pages à la fois, sur une seule, ou sur aucune.
   - name: actualites
-    label: "Actualités (page d'accueil)"
+    label: "Actualités & Newsletters"
     files:
       - name: actualites
-        label: "Liste des actualités"
+        label: "Liste des actualités / newsletters"
         file: _content/actualites.json
         fields:
           - label: "Articles"
@@ -27,7 +31,9 @@ collections:
             fields:
               - { label: "Titre", name: titre, widget: string }
               - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
-              - { label: "Visible sur le site", name: visible, widget: boolean, default: true }
+              - { label: "Visible sur la page d'accueil", name: visible, widget: boolean, default: true }
+              - { label: "Archivée (apparaît dans Newsletters)", name: archivee, widget: boolean, default: false,
+                  hint: "Une fois archivée, cette newsletter reste consultable dans la liste Newsletters même si vous la retirez de l'accueil plus tard. Pour la retirer de l'accueil SANS perdre son archive : décochez 'Visible sur la page d'accueil' ci-dessus, ne supprimez pas cet article — le supprimer ici le retire aussi de l'archive." }
               - { label: "Contenu", name: contenu, widget: markdown }
 
   # Équipe
@@ -109,6 +115,25 @@ collections:
               - { label: "Lien externe", name: lien, widget: string, required: false }
               - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
 
+
+  # Photos d'en-tête (une par page publique, indépendantes les unes des
+  # autres). Champ vide = photo par défaut (assets/hero-banner.jpg).
+  - name: hero-images
+    label: "Photos d'en-tête"
+    files:
+      - name: hero-images
+        label: "Photo par page"
+        file: _content/hero-images.json
+        fields:
+          - { label: "Accueil", name: accueil, widget: image, required: false, hint: "Laisser vide pour la photo par défaut." }
+          - { label: "Inscription", name: inscription, widget: image, required: false }
+          - { label: "Contact", name: contact, widget: image, required: false }
+          - { label: "Informations pratiques", name: informations_pratiques, widget: image, required: false }
+          - { label: "Équipe", name: equipe, widget: image, required: false }
+          - { label: "Partenaires", name: partenaires, widget: image, required: false }
+          - { label: "Presse et médias", name: presse_medias, widget: image, required: false }
+          - { label: "RGPD", name: rgpd, widget: image, required: false }
+          - { label: "Newsletters", name: newsletter, widget: image, required: false }
 
   # Configuration du planning
   - name: planning-config

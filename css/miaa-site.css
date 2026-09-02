@@ -177,6 +177,16 @@ h1, h2, h3, h4 {
 .donation-box a:hover { opacity: 0.85; text-decoration: none; }
 .donation-box img { margin: 16px auto 0; border-radius: 6px; }
 
+/* ── Boutton ─────────────────────────────────────────── */
+.btn-primary {
+  flex: 1; background: var(--color-primary, #18809D); color: #fff; border: none;
+  padding: 12px 20px; font-family: var(--font-sans, 'Raleway', sans-serif);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  border-radius: var(--radius-card, 4px); transition: background 0.15s, opacity 0.15s;
+}
+.btn-primary:hover:not(:disabled) { background: #0f7a99; }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
 /* ── Contenu éditorial ─────────────────────────────────────────── */
 .article-content h2 {
   font-size: 20px; font-weight: 800;

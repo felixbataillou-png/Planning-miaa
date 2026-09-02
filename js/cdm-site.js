@@ -26,6 +26,18 @@
         <div class="topbar-admin-badge">
           <i class="fas fa-utensils" aria-hidden="true"></i> Espace CDM
         </div>
+        <div>
+          <a href="https://www.facebook.com/pages/Association-MIAA/377808022330859"
+            target="_blank" rel="noopener"
+            aria-label="Page Facebook MIAA (nouvel onglet)">
+            <i class="fab fa-facebook-f" aria-hidden="true"></i>
+          </a>
+          <a href="https://www.instagram.com/associationmiaa"
+             target="_blank" rel="noopener"
+             aria-label="Page Instagram de l'association MIAA (nouvel onglet)">
+            <i class="fab fa-instagram" aria-hidden="true"></i>
+          </a>
+        </div>
       </div>
 
       <header class="site-header">

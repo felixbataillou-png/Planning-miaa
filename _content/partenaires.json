@@ -1,0 +1,88 @@
+{
+  "partenaires": [
+    {
+      "nom": "AFR — Association Française des Régisseurs",
+      "url": "http://www.afrcinetv.org/",
+      "description": "",
+      "logo": "assets/afr_logo.png"
+    },
+    {
+      "nom": "Paris Anim Mercoeur",
+      "url": "",
+      "description": "",
+      "logo": "assets/Logo-ParisAnimMercoeur.jpeg"
+    },
+    {
+      "nom": "AOA — Assistants Opérateurs Associés",
+      "url": "http://www.aoassocies.com/",
+      "description": "",
+      "logo": "assets/Logo-AOA-accueil-10012017.png"
+    },
+    {
+      "nom": "Association Française des Accessoiristes de Plateau",
+      "url": "",
+      "description": "",
+      "logo": "assets/Logo-AFAP.jpg"
+    },
+    {
+      "nom": "AFAR — Association Française des Assistants Réalisateurs",
+      "url": "https://www.afar-fiction.com/",
+      "description": "",
+      "logo": "assets/logo_afar.png"
+    },
+    {
+      "nom": "Association Française du Son à l'Image (AFSI)",
+      "url": "",
+      "description": "",
+      "logo": "assets/Logo-AFSI.png"
+    },
+    {
+      "nom": "Transpa Machinerie",
+      "url": "",
+      "description": "",
+      "logo": "assets/logos-TRANSPA-machinerie.png"
+    },
+    {
+      "nom": "TSF",
+      "url": "https://www.tsf.fr/",
+      "description": "",
+      "logo": "assets/tsf-site-logo-1.png"
+    },
+    {
+      "nom": "LSA — Les Scriptes Associés",
+      "url": "https://www.lesscriptesassocies.org/",
+      "description": "",
+      "logo": "assets/logo_lsa.png"
+    },
+    {
+      "nom": "Mairie du 11e arrondissement",
+      "url": "https://mairie11.paris.fr/",
+      "description": "",
+      "logo": "assets/mairie 11_logo.png"
+    },
+    {
+      "nom": "FLAM&Co",
+      "url": "http://www.flam-and-co.fr/",
+      "description": "",
+      "logo": "assets/logo-FlamAndCo.jpg"
+    },
+    {
+      "nom": "Les Studios de la Montjoie",
+      "url": "",
+      "description": "",
+      "logo": "assets/Logo-Studio-Montjoie.png"
+    },
+    {
+      "nom": "Centre d'Excellence des Professions Culinaires (CEPROC)",
+      "url": "",
+      "description": "",
+      "logo": "assets/Logo-CEPROC.jpeg"
+    },
+    {
+      "nom": "ADAMI",
+      "url": "https://www.adami.fr/",
+      "description": "",
+      "logo": "assets/Logo-adami.jpeg"
+    }
+  ]
+}
