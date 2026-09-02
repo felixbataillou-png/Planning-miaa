@@ -23,20 +23,20 @@
 
   // ── Structure de navigation ────────────────────────────────────
   const NAV = [
-    { label: 'Accueil',     href: 'index.html',       key: 'accueil' },
+    { label: 'Accueil',              href: 'index.html',                   key: 'accueil' },
+    { label: 'Informations pratiques', href: 'informations-pratiques.html', key: 'informations-pratiques' },
     {
       label: 'Association', href: '#',                 key: 'association',
       children: [
-        { label: 'Informations pratiques', href: 'informations-pratiques.html' },
         { label: 'Équipe',                 href: 'equipe.html' },
         { label: 'Partenaires',            href: 'partenaires.html' },
         { label: 'Presse et Médias',       href: 'presse-medias.html' },
+        { label: 'Newsletters',            href: 'newsletter-liste.html' },
         { label: 'RGPD',                   href: 'rgpd.html' },
       ]
     },
     { label: 'Contact',     href: 'contact.html',     key: 'contact' },
     { label: 'Inscription', href: 'inscription.html', key: 'inscription' },
-    { label: 'Newsletters', href: 'newsletter-liste.html', key: 'newsletter' },
   ]
 
   // ── Construction du HTML du header ────────────────────────────
