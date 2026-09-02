@@ -1,15 +1,14 @@
 /**
  * galerie-photo.js
- * Carrousels à défilement infini + lightbox, pilotés par _content/galerie.json
- * (CMS : collection "Galerie photo").
+ * Carrousels (défilement borné, pas de boucle) + lightbox, pilotés par
+ * _content/galerie.json (CMS : collection "Galerie photo").
  *
- * Technique du défilement infini : chaque piste (.carousel__track) reçoit,
- * en plus des vraies photos, un clone de la dernière photo au début et un
- * clone de la première à la fin. On démarre positionné sur la première
- * vraie photo. Quand le scroll (souris, tactile, ou chevrons) atteint un
- * clone, on saute instantanément (sans animation) à la photo réelle
- * correspondante — invisible pour l'utilisateur, l'impression de boucle
- * infinie est préservée quel que soit le mode de défilement.
+ * Défilement : scroll natif (souris/tactile/trackpad) ET chevrons, borné
+ * — impossible d'aller au-delà de la première ou de la dernière photo, les
+ * chevrons se désactivent en bout de piste. Une marge invisible est ajoutée
+ * en fin de piste pour que la dernière photo puisse tout de même atteindre
+ * la même position de repos que les autres (sinon le scroll est plafonné
+ * avant, et la dernière photo reste coincée contre le bord droit).
  */
 
 ;(function () {
@@ -119,11 +118,8 @@
     section.setAttribute('aria-label', carrousel.titre || 'Carrousel photo')
 
     const n = photos.length
-    // Ordre des items dans le DOM : [clone dernière] + [vraies photos] + [clone première]
-    const domPhotos = n > 1 ? [photos[n - 1], ...photos, photos[0]] : [...photos]
-    const firstRealDomIndex = n > 1 ? 1 : 0
 
-    const itemsHtml = domPhotos.map((p, i) => `
+    const itemsHtml = photos.map((p, i) => `
       <button type="button" class="carousel__item" data-dom-index="${i}"
         aria-label="${esc(p.legende) || 'Voir la photo en grand'}">
         <img src="${esc(p.image)}" alt="${esc(p.legende)}" loading="lazy">
@@ -155,11 +151,12 @@
     }
 
     // Marge invisible en fin de piste : sans elle, le navigateur ne peut pas
-    // faire défiler assez loin pour aligner les dernières photos contre le
-    // bord gauche (le scroll est plafonné par scrollWidth - clientWidth) —
-    // les derniers sauts de la boucle infinie n'atteignaient jamais leur
-    // cible. On lui donne juste assez de place pour que n'importe quelle
-    // photo, y compris la toute dernière, puisse s'aligner.
+    // faire défiler assez loin pour aligner la toute dernière photo contre
+    // le bord gauche (le scroll est plafonné par scrollWidth - clientWidth,
+    // qui s'arrête avant d'atteindre cette position dès qu'il n'y a plus
+    // d'autres photos après pour "pousser"). Cette marge remplace les
+    // photos suivantes qui n'existent pas, pour que la dernière atteigne
+    // la même position de repos que toutes les autres.
     const spacer = document.createElement('div')
     spacer.className = 'carousel__spacer'
     spacer.setAttribute('aria-hidden', 'true')
@@ -177,48 +174,47 @@
       spacer.style.width = Math.max(0, track.clientWidth - itemW) + 'px'
     }
 
-    // Index DOM "voulu" — pas déduit de scrollLeft, pour rester correct même
-    // si une mesure de layout a échoué entre-temps (ex. onglet non visible).
-    let currentDomIndex = firstRealDomIndex
+    // Index "voulu" — pas déduit de scrollLeft, pour rester correct même si
+    // une mesure de layout a échoué entre-temps (ex. onglet non visible).
+    let currentIndex = 0
 
-    function goToDomIndex(domIndex, smooth) {
-      currentDomIndex = domIndex
-      const target = domIndex * itemStep()
+    function updateNavState() {
+      prevBtn.disabled = currentIndex <= 0
+      nextBtn.disabled = currentIndex >= n - 1
+    }
+
+    function goToIndex(index, smooth) {
+      currentIndex = Math.max(0, Math.min(n - 1, index))
+      updateNavState()
+      const target = currentIndex * itemStep()
       if (smooth) smoothScrollTo(track, target)
       else track.scrollLeft = target
     }
 
+    // Garde currentIndex synchronisé quand l'utilisateur défile "à la main"
+    // (souris/tactile/trackpad), pour que les chevrons se désactivent au bon
+    // moment même sans être passés par eux.
     let settleTimer = null
     track.addEventListener('scroll', () => {
       clearTimeout(settleTimer)
       settleTimer = setTimeout(() => {
-        if (n <= 1) return
         const step = itemStep()
         if (!step) return
-        const nearest = Math.round(track.scrollLeft / step)
-        currentDomIndex = nearest
-        if (nearest === 0) {
-          // Sur le clone de la dernière photo → saute à la vraie dernière
-          goToDomIndex(n, false)
-        } else if (nearest === n + 1) {
-          // Sur le clone de la première photo → saute à la vraie première
-          goToDomIndex(1, false)
-        }
+        currentIndex = Math.max(0, Math.min(n - 1, Math.round(track.scrollLeft / step)))
+        updateNavState()
       }, 120)
     }, { passive: true })
 
-    prevBtn.addEventListener('click', () => goToDomIndex(currentDomIndex - 1, true))
-    nextBtn.addEventListener('click', () => goToDomIndex(currentDomIndex + 1, true))
+    prevBtn.addEventListener('click', () => goToIndex(currentIndex - 1, true))
+    nextBtn.addEventListener('click', () => goToIndex(currentIndex + 1, true))
 
     track.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); goToDomIndex(currentDomIndex - 1, true) }
-      if (e.key === 'ArrowRight') { e.preventDefault(); goToDomIndex(currentDomIndex + 1, true) }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); goToIndex(currentIndex - 1, true) }
+      if (e.key === 'ArrowRight') { e.preventDefault(); goToIndex(currentIndex + 1, true) }
     })
 
-    items.forEach((btn, domIndex) => {
-      // Index réel = index DOM ramené dans [0, n) en retirant le décalage des clones
-      const realIndex = n > 1 ? (domIndex - 1 + n) % n : 0
-      btn.addEventListener('click', () => lightboxApi.open(photos, realIndex))
+    items.forEach((btn, index) => {
+      btn.addEventListener('click', () => lightboxApi.open(photos, index))
     })
 
     // Repositionne (sans animation) chaque fois que la piste a réellement une
@@ -231,7 +227,7 @@
       relayoutTimer = setTimeout(() => {
         if (!track.clientWidth) return // toujours pas visible : rien à mesurer
         updateSpacer()
-        goToDomIndex(currentDomIndex, false)
+        goToIndex(currentIndex, false)
       }, 100)
     })
     ro.observe(track)
@@ -239,7 +235,7 @@
     function relayoutIfReady() {
       if (!track.clientWidth) return false
       updateSpacer()
-      goToDomIndex(currentDomIndex, false)
+      goToIndex(currentIndex, false)
       return true
     }
 

@@ -75,6 +75,10 @@
 .carousel__nav:focus-visible { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .carousel__nav:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
 
+/* Bout de piste atteint : chevron visible mais clairement inactif */
+.carousel__nav:disabled { cursor: default; opacity: 0.35; }
+.carousel__nav:disabled:hover { backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+
 /* ── Lightbox ─────────────────────────────────────────────────── */
 .lightbox {
   position: fixed; inset: 0; z-index: 1000;
