@@ -1,3 +1,29 @@
 {
-  "carrousels": []
+  "carrousels": [
+    {
+      "titre": "La vie de l'asso",
+      "photos": [
+        {
+          "image": "assets/uploads/noel4.jpg",
+          "legende": "Noel 2023"
+        },
+        {
+          "image": "assets/uploads/noel3.jpg",
+          "legende": "Noel 2023"
+        },
+        {
+          "image": "assets/uploads/noel2.jpg",
+          "legende": "Noel 2023"
+        },
+        {
+          "legende": "Noel 2023",
+          "image": "assets/uploads/noel1.jpg"
+        },
+        {
+          "image": "assets/uploads/noel.jpg",
+          "legende": "Noel 2023"
+        }
+      ]
+    }
+  ]
 }
