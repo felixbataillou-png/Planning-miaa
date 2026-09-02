@@ -77,22 +77,31 @@ collections:
               - { label: "Description", name: description, widget: string, required: false }
               - { label: "Logo", name: logo, widget: image, required: false }
 
-  # Newsletters
-  - name: newsletters
-    label: "Newsletters"
+  # Galerie photo — plusieurs carrousels, chacun avec un titre et ses
+  # propres photos. Ajouter/supprimer un carrousel ou une photo se fait
+  # avec les boutons +/- standards de Decap sur chaque liste.
+  - name: galerie
+    label: "Galerie photo"
     files:
-      - name: newsletters
-        label: "Liste des newsletters"
-        file: _content/newsletters.json
+      - name: galerie
+        label: "Carrousels"
+        file: _content/galerie.json
         fields:
-          - label: "Newsletters"
-            name: newsletters
+          - label: "Carrousels"
+            name: carrousels
             widget: list
+            label_singular: "Carrousel"
             summary: "{{fields.titre}}"
             fields:
-              - { label: "Titre", name: titre, widget: string }
-              - { label: "Lien", name: url, widget: string }
-              - { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }
+              - { label: "Titre du carrousel", name: titre, widget: string }
+              - label: "Photos"
+                name: photos
+                widget: list
+                label_singular: "Photo"
+                summary: "{{fields.legende}}"
+                fields:
+                  - { label: "Photo", name: image, widget: image }
+                  - { label: "Légende (texte alternatif)", name: legende, widget: string, required: false }
 
   # Presse et Médias
   - name: presse
@@ -132,6 +141,7 @@ collections:
           - { label: "Équipe", name: equipe, widget: image, required: false }
           - { label: "Partenaires", name: partenaires, widget: image, required: false }
           - { label: "Presse et médias", name: presse_medias, widget: image, required: false }
+          - { label: "Galerie photo", name: galerie, widget: image, required: false }
           - { label: "RGPD", name: rgpd, widget: image, required: false }
           - { label: "Newsletters", name: newsletter, widget: image, required: false }
 

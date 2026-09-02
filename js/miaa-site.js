@@ -31,6 +31,7 @@
         { label: 'Équipe',                 href: 'equipe.html' },
         { label: 'Partenaires',            href: 'partenaires.html' },
         { label: 'Presse et Médias',       href: 'presse-medias.html' },
+        { label: 'Galerie photo',          href: 'galerie-photo.html' },
         { label: 'Newsletters',            href: 'newsletter-liste.html' },
         { label: 'RGPD',                   href: 'rgpd.html' },
       ]

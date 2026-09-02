@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Galerie photo de l'association MIAA">
+  <title>MIAA — Galerie photo</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/colors_and_type.css">
+  <link rel="stylesheet" href="css/miaa-site.css">
+  <link rel="stylesheet" href="css/galerie-photo.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.12.1/css/all.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&display=swap">
+</head>
+<body>
+<miaa-header page="association"></miaa-header>
+<div class="hero" data-hero-key="galerie"><h1>Galerie photo</h1></div>
+<main class="page-wrap" id="main-content">
+  <div class="main-content article-content">
+    <p>Quelques images de la vie de l'association — cliquez sur une photo pour l'agrandir.</p>
+    <div class="carousels" id="carousels">
+      <p>Chargement de la galerie…</p>
+    </div>
+  </div>
+</main>
+<miaa-footer></miaa-footer>
+<script src="js/miaa-site.js"></script>
+<script src="js/galerie-photo.js"></script>
+
+<!-- Lightbox : une seule instance, partagée par tous les carrousels -->
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lightbox__close" aria-label="Fermer la photo">
+    <i class="fas fa-times" aria-hidden="true"></i>
+  </button>
+  <div class="lightbox__stage">
+    <img class="lightbox__peek lightbox__peek--prev" alt="" aria-hidden="true">
+    <button type="button" class="lightbox__nav lightbox__nav--prev" aria-label="Photo précédente">
+      <i class="fas fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <img class="lightbox__current" alt="">
+    <button type="button" class="lightbox__nav lightbox__nav--next" aria-label="Photo suivante">
+      <i class="fas fa-chevron-right" aria-hidden="true"></i>
+    </button>
+    <img class="lightbox__peek lightbox__peek--next" alt="" aria-hidden="true">
+  </div>
+</div>
+
+</body>
+</html>
