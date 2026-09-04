@@ -3,14 +3,122 @@
    Dépend de : colors_and_type.css, miaa-components.css, planning-admin.css
    ============================================================ */
 
-/* Sur cette page, aucun CTA "Ajouter une personne" ne suit jamais la
-   liste — le message "Aucune inscription" se retrouve donc seul dans la
-   card. On lui réserve la même hauteur que celle qu'aurait occupée le
-   bouton sur planning-admin, et on le centre dedans pour garder une
-   card visuellement équilibrée. */
-.miaa-adminslot__list:has(> .miaa-adminslot__empty:only-child) {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 64px;
+/* ── Sélecteur de jour ────────────────────────────────────────────
+   Les 5 jours de la semaine, toujours affichés côte à côte (même sous
+   901px : c'est le contenu en dessous qui repasse en colonne, pas ce
+   sélecteur — voir js/cdm.js renderDaySelector). */
+/* Reste visible en haut de l'écran pendant le défilement du contenu du jour
+   (beaucoup d'inscriptions = panneau plus haut que l'écran) — juste sous le
+   bandeau topbar+header (lui-même sticky), hauteur réelle mesurée en JS,
+   voir watchStickyHeaderHeight() dans cdm-site.js. Fond opaque (couleur de
+   page) pour masquer le contenu qui défile derrière, y compris dans les
+   interstices de la grille. */
+.cdm-days {
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px; max-width: 1200px; margin: 0 auto 16px;
+  position: sticky; top: var(--sticky-header-height, 122px); z-index: 10;
+  background: #f5f6f8; padding: 10px 0;
+}
+.cdm-days .miaa-day {
+  min-width: 0; width: 100%;
+  border: none; font: inherit; cursor: pointer;
+  transition: outline-color 0.15s, transform 0.1s;
+}
+.cdm-days .miaa-day:hover { transform: translateY(-1px); }
+.cdm-days .miaa-day:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.cdm-days .miaa-day--selected {
+  outline: 3px solid var(--miaa-teal-dark, #0f7a99); outline-offset: 2px;
+}
+
+/* ── Panneau du jour actif ─────────────────────────────────────────── */
+.cdm-day-panel {
+  background: #fff; border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 20px 22px; max-width: 1200px; margin: 0 auto;
+}
+.cdm-panel-title {
+  font-size: 16px; font-weight: 700; color: var(--color-text, #333);
+  margin-bottom: 16px;
+}
+.cdm-panel-title__past { font-weight: 400; color: #888; font-size: 13px; }
+
+.cdm-day-content { display: flex; flex-direction: column; gap: 18px; }
+/* Jour passé : cohérent avec .miaa-adminslot--past sur planning-admin
+   (lecture seule, atténué), appliqué ici à l'ensemble des lignes du jour. */
+.cdm-day-content--past { opacity: 0.5; pointer-events: none; }
+
+.cdm-row { display: flex; align-items: stretch; gap: 16px; }
+
+/* Ligne CDM : la card CDM garde une largeur fixe, les champs "nombre de
+   repas"/"menu" se partagent le reste de la ligne. */
+.cdm-row--cdm { align-items: flex-start; }
+.cdm-row--cdm .cdm-role-block { flex: 0 0 260px; max-width: 260px; }
+
+.cdm-role-block {
+  background: var(--miaa-bg-light, #f8f9fa);
+  border-radius: 6px; padding: 12px 14px;
+  flex: 1; min-width: 0;
+}
+/* En-tête sur une seule ligne : titre + horaire d'un côté, carrés de places
+   + comptage ("1/5") de l'autre — contrairement à .miaa-adminslot__header
+   (planning-admin), empilé en colonne faute de place sur une card étroite. */
+.cdm-role-block__header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.cdm-role-block__title-group { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.cdm-role-block__count-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+/* Repositionnés en ligne à côté du comptage : pas le padding pensé pour une
+   rangée seule sous l'en-tête (voir .miaa-adminslot__dots, miaa-components.css). */
+.cdm-role-block__count-group .miaa-adminslot__dots { padding: 0; }
+
+.cdm-role-block__list { display: flex; flex-wrap: wrap; gap: 10px; }
+/* Cards bénévole affichées en ligne plutôt qu'empilées : pas de liseré de
+   séparation, bordure de card à la place. Contenu empilé en colonne (infos
+   du bénévole, puis statut + CTA "Voir" en dessous, voir .miaa-volunteer__actions
+   ci-dessous) plutôt qu'à côté, comme sur planning-admin. */
+.cdm-role-block__list > .miaa-volunteer {
+  border-top: none; border: 1px solid #e6e6e6; border-radius: 6px;
+  background: #fff; flex: 1 1 240px; max-width: 320px;
+  flex-direction: column; align-items: stretch; gap: 10px;
+}
+.cdm-role-block__list > .miaa-volunteer .miaa-volunteer__actions {
+  flex-direction: row; align-items: center; justify-content: space-between;
+  width: 100%;
+}
+
+.cdm-field { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.cdm-field label {
+  font-size: 12px; font-weight: 700; color: var(--miaa-ink-soft, #414141);
+}
+.cdm-field input, .cdm-field textarea {
+  width: 100%; border: 1px solid var(--miaa-gray-sq, #ddd); border-radius: 4px;
+  padding: 8px 10px; font-family: var(--miaa-font, 'Raleway', sans-serif);
+  font-size: 13px; color: var(--miaa-ink, #333); box-sizing: border-box;
+}
+.cdm-field input:focus, .cdm-field textarea:focus { outline: none; border-color: var(--miaa-teal, #18809D); }
+.cdm-field textarea { overflow: hidden; resize: none; min-height: 36px; }
+.cdm-row--cdm .cdm-field--nombre { flex: 0 0 130px; }
+.cdm-row--cdm .cdm-field--menu   { flex: 1; }
+
+/* Sur cette page, aucun CTA "Ajouter une personne" ne suit jamais la liste —
+   le message "Aucune inscription" se retrouve donc seul dans le bloc rôle. */
+.cdm-role-block .miaa-adminslot__empty { border-top: none; }
+
+/* ── Responsive : tout repasse en colonne sous 901px ──────────────── */
+@media (max-width: 900px) {
+  .cdm-day-panel { padding: 16px; }
+  .cdm-row { flex-direction: column; gap: 12px; }
+  .cdm-row--cdm .cdm-role-block { flex: 1 1 auto; max-width: none; }
+  .cdm-row--cdm .cdm-field--nombre { flex: 1 1 auto; }
+  .cdm-role-block__list > .miaa-volunteer { max-width: none; flex: 1 1 100%; }
+
+  /* 5 colonnes égales n'ont plus la place de rester lisibles : le
+     sélecteur devient une bande défilable horizontalement, chaque jour
+     gardant sa taille naturelle (voir .miaa-day dans miaa-components.css). */
+  .cdm-days {
+    display: flex; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity; padding-bottom: 4px;
+  }
+  .cdm-days .miaa-day { width: auto; flex: 0 0 auto; scroll-snap-align: start; }
 }

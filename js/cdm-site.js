@@ -94,6 +94,27 @@
       wrapper.innerHTML = buildCdmHeader()
       headerEl.replaceWith(...wrapper.childNodes)
     }
+
+    watchStickyHeaderHeight()
+  }
+
+  /** Expose la hauteur réelle du bandeau fixe (topbar + header, tous deux en
+   * position:sticky) dans --sticky-header-height, pour que le sélecteur de
+   * jour (.cdm-days) puisse se coller juste en dessous plutôt que sous une
+   * valeur codée en dur — la hauteur du header est en mode "hug" (dépend du
+   * logo), pas fixe. ResizeObserver plutôt qu'un seul calcul : réagit aussi
+   * au chargement asynchrone du logo ou à un changement de breakpoint.
+   * Identique à admin-site.js (dupliqué volontairement, voir en-tête de
+   * fichier — les deux espaces restent indépendants). */
+  function watchStickyHeaderHeight () {
+    const header = document.querySelector('.site-header')
+    if (!header || !window.ResizeObserver) return
+    const update = () => {
+      const h = header.getBoundingClientRect().bottom
+      document.documentElement.style.setProperty('--sticky-header-height', h + 'px')
+    }
+    new ResizeObserver(update).observe(header)
+    update()
   }
 
   async function grantAccessOrReject () {

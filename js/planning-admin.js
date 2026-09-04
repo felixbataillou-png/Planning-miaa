@@ -54,8 +54,9 @@ const ROLES = [
 // le HTML est généré depuis cette config (voir dayInfoFieldHTML), aucune
 // modification à faire ailleurs dans le fichier. `key` doit correspondre à
 // la fois à la colonne day_info et au paramètre attendu par la fonction RPC
-// upsert_day_info (voir saveDayInfoField). Repris à l'identique dans
-// js/cdm.js — les deux pages partagent le même dropdown.
+// upsert_day_info (voir saveDayInfoField). js/cdm.js écrit dans les mêmes
+// colonnes via la même RPC, mais affiche ces champs en ligne plutôt que
+// dans un dropdown (mise en page propre à cette page, voir renderDayPanel).
 const DAY_INFO_FIELDS = [
   { key: 'nombre',    label: 'Nombre',       type: 'number'   },
   { key: 'repas',     label: 'Repas',        type: 'textarea' },
@@ -247,16 +248,22 @@ async function renderPage() {
     const monthFull   = MONTHS_FULL[day.getMonth()]
     const dateLabel   = `${dayFullName} ${day.getDate()} ${monthFull}`
 
-    html += `<div class="day-col">`
-    html += `<div class="miaa-day miaa-day--${dayVariant}">
+    // <details> : repliable nativement (clavier/lecteur d'écran inclus,
+    // sans JS ni ARIA custom) — uniquement actif sous 901px, voir
+    // css/planning-admin.css. Ouvert par défaut, sauf les jours passés
+    // (repliés par défaut) — l'utilisateur peut toujours re-déplier.
+    html += `<details class="day-col"${isPast ? '' : ' open'}>`
+    html += `<summary class="miaa-day miaa-day--${dayVariant}">
       <h2 class="day-heading">
         <span class="miaa-day__name" aria-hidden="true">${DAYS_FR[i]}</span>
         <span class="sr-only">${dayFullName}</span>
         <span class="miaa-day__num">${day.getDate()}</span>
         <span class="miaa-day__month" aria-hidden="true">${MONTHS_FR[day.getMonth()]}</span>
         <span class="sr-only">${monthFull}</span>
+        <i class="fas fa-chevron-down day-col__chevron" aria-hidden="true"></i>
       </h2>
-    </div>`
+    </summary>
+    <div class="day-col__body">`
 
     ROLES.forEach(role => {
       const regs      = regsData.filter(r => r.date === ds && r.role === role.id)
@@ -317,13 +324,21 @@ async function renderPage() {
             ? `<span class="miaa-volunteer__note">${escHtml(reg.note)}</span>`
             : ''
           const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
-          const identityLabel = escAttr(`Modifier l'inscription de ${volNom}, ${role.label.toLowerCase()}, ${dateLabel}`)
-          const deleteLabel   = escAttr(`Supprimer l'inscription de ${volNom}`)
+          // Commence par "Voir" : reprend le texte du CTA visuel (.miaa-volunteer__view,
+          // décoratif/aria-hidden) pour que le nom accessible le contienne — sans ça, un
+          // outil de commande vocale ("clique sur Voir") ne retrouverait pas la card.
+          const identityLabel = escAttr(`Voir et modifier l'inscription de ${volNom}, ${role.label.toLowerCase()}, ${dateLabel}`)
 
-          html += `<div class="miaa-volunteer${volMod}">
-            <button type="button" class="miaa-volunteer__identity-btn"
-              onclick="openEdit('${ds}','${role.id}','${reg.id}',event)"
-              aria-label="${identityLabel}">
+          // Toute la card ouvre la modale d'édition (comportement unique,
+          // pas d'action de suppression au survol de la card — celle-ci
+          // reste disponible depuis la modale, voir deleteFromEdit()).
+          // Le "CTA voir" n'est qu'un repère visuel (décoratif, hover piloté
+          // par le survol de la card) : un seul élément interactif par card.
+          html += `<div class="miaa-volunteer${volMod}" role="button" tabindex="0"
+            onclick="openEdit('${ds}','${role.id}','${reg.id}',event)"
+            onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openEdit('${ds}','${role.id}','${reg.id}',event)}"
+            aria-label="${identityLabel}">
+            <span class="miaa-volunteer__identity">
               <span class="miaa-volunteer__avatar" aria-hidden="true">${initials(volNom || '?')}</span>
               <span class="miaa-volunteer__info">
                 <span class="miaa-volunteer__name">${escHtml(volNom)}</span>
@@ -332,15 +347,11 @@ async function renderPage() {
                 ${firstTimeBadge}
                 ${noteDisplay}
               </span>
-            </button>
-            <div class="miaa-volunteer__actions">
+            </span>
+            <span class="miaa-volunteer__actions">
               <span class="miaa-volunteer__status">${stTxt}</span>
-              <button type="button" class="miaa-volunteer__delete"
-                aria-label="${deleteLabel}"
-                onclick="openDelete('${ds}','${role.id}','${reg.id}',event)">
-                <i class="fas fa-trash" aria-hidden="true"></i>
-              </button>
-            </div>
+              <span class="miaa-volunteer__view" aria-hidden="true">Voir</span>
+            </span>
           </div>`
         })
       }
@@ -380,7 +391,8 @@ async function renderPage() {
       }
       html += `</div>`
     })
-    html += `</div>`
+    html += `</div>` // .day-col__body
+    html += `</details>`
   })
 
   document.getElementById('planning-grid').innerHTML = html

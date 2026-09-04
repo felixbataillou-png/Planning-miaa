@@ -286,10 +286,21 @@
    ===================================================================== */
 .miaa-volunteer {
   display: flex; align-items: flex-start; gap: 7px;
-  padding: 8px 10px; border-top: 1px solid #f5f5f5;
+  /* Séparateur entre cards bénévole empilées (planning-admin) — assez épais
+     et contrasté avec le fond blanc pour rester visible, sans devenir une
+     vraie bordure de card (voir aussi .cdm-role-block__list, qui le retire
+     au profit d'une bordure complète par card). */
+  padding: 8px 10px; border-top: 2px solid #d7d7d7;
   font-family: var(--miaa-font);
   --miaa-v-accent: var(--miaa-teal);
 }
+/* Toute la card est cliquable (voir js/planning-admin.js et js/cdm.js) */
+.miaa-volunteer[role="button"] {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.miaa-volunteer[role="button"]:hover { background: #fafbfc; }
+.miaa-volunteer[role="button"]:focus-visible { outline: 2px solid var(--miaa-teal); outline-offset: -2px; }
 .miaa-volunteer--confirmed { --miaa-v-accent: var(--miaa-green); }
 .miaa-volunteer--pending   { --miaa-v-accent: var(--miaa-orange); }
 
@@ -314,13 +325,19 @@
 .miaa-volunteer--confirmed .miaa-volunteer__status { background: var(--miaa-green-tint); color: var(--miaa-green-ink); }
 .miaa-volunteer--pending   .miaa-volunteer__status { background: #fde9c8; color: #7a4d00; }
 
-.miaa-volunteer__delete {
-  width: 22px; height: 22px; border-radius: var(--miaa-radius); border: none;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 12px; background: var(--miaa-red-tint); color: #a52f23;
-  transition: filter 0.15s;
+/* CTA "Voir" — repère visuel uniquement, décoratif : c'est la card entière
+ * (.miaa-volunteer[role="button"]) qui est cliquable/interactive (une seule
+ * cible au clavier), son survol/focus pilote donc le hover state ici plutôt
+ * qu'un :hover/:focus propre à cet élément. Texte plutôt qu'icône seule,
+ * pour rester lisible sans dépendre de la reconnaissance d'un pictogramme. */
+.miaa-volunteer__view {
+  padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--miaa-teal-tint); color: var(--miaa-teal-dark);
+  transition: filter 0.15s, background 0.15s;
 }
-.miaa-volunteer__delete:hover { filter: brightness(0.9); }
+.miaa-volunteer[role="button"]:hover .miaa-volunteer__view,
+.miaa-volunteer[role="button"]:focus-visible .miaa-volunteer__view { filter: brightness(0.92); }
 
 /* =====================================================================
    8. CTA « + AJOUTER UNE PERSONNE »  — .miaa-add
@@ -378,17 +395,14 @@
   border-top: 1px solid #f5f5f5; text-align: center;
 }
 
-/* Bouton identité (avatar + nom + téléphone) à l'intérieur d'une card bénévole */
-.miaa-volunteer__identity-btn {
+/* Bloc identité (avatar + nom + téléphone) à l'intérieur d'une card
+ * bénévole — non-interactif : c'est la card entière qui est cliquable, voir
+ * .miaa-volunteer[role="button"] (planning-admin.js ET cdm.js, même
+ * composant/comportement sur les deux pages). */
+.miaa-volunteer__identity {
   flex: 1; min-width: 0;
   display: flex; align-items: flex-start; gap: 7px;
-  background: transparent; border: none; padding: 0; margin: 0;
-  font: inherit; color: inherit; text-align: left;
-  cursor: pointer; border-radius: var(--miaa-radius);
-  transition: background 0.15s;
 }
-.miaa-volunteer__identity-btn:hover { background: #fafbfc; }
-.miaa-volunteer__identity-btn:focus-visible { outline: 2px solid var(--miaa-teal); outline-offset: 2px; }
 
 /* Badge permis à l'intérieur de l'info bénévole */
 .miaa-volunteer__permis {
@@ -406,7 +420,7 @@
 
 /* Requête de conteneur — carte étroite : masquer l'avatar, laisser le nom s'enrouler */
 @container adminslot (max-width: 200px) {
-  .miaa-volunteer__identity-btn > .miaa-volunteer__avatar { display: none; }
+  .miaa-volunteer__identity > .miaa-volunteer__avatar { display: none; }
   .miaa-volunteer__name { white-space: normal; overflow-wrap: anywhere; }
 }
 

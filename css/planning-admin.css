@@ -27,31 +27,37 @@ h3.miaa-adminslot__role { margin: 0; }
 .page-wrap { max-width: 1230px; margin: 0 auto; padding: 32px 15px 80px; }
 
 /* ── Topbar ───────────────────────────────────────────────────── */
+/* Fixe (sticky) en haut de l'écran, au-dessus du header — voir .site-header
+   ci-dessous, qui se colle juste en dessous plutôt que sous top:0. */
 .topbar {
   background: var(--color-primary, #18809D);
   height: var(--topbar-height, 40px);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 max(15px, calc(50% - 600px));
+  position: sticky; top: 0; z-index: 101;
 }
 .topbar a { color: #fff; font-size: 16px; padding: 0 10px; text-decoration: none; }
+/* Simple texte, pas un badge/CTA — juste l'icône + le libellé de l'espace */
 .topbar-admin-badge {
-  display: flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.18); border-radius: var(--radius-card, 4px);
-  padding: 3px 12px; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12px; font-weight: 700;
   color: #fff; letter-spacing: 0.06em; text-transform: uppercase;
 }
 .topbar-admin-badge i { font-size: 10px; }
 
 /* ── Header ───────────────────────────────────────────────────── */
+/* Mode "hug" : pas de hauteur imposée, elle dépend du contenu (logo 50px +
+   padding vertical) — voir aussi .site-header .logo plus bas. */
 .site-header {
   background: var(--color-white, #fff);
   box-shadow: var(--shadow-header, 0 2px 4px rgba(0,0,0,.075));
-  height: var(--header-height, 130px);
-  padding: 15px max(15px, calc(50% - 600px));
+  padding: 12px max(15px, calc(50% - 600px));
   display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100;
+  position: sticky; top: var(--topbar-height, 40px); z-index: 100;
 }
-.site-header .logo { height: 99px; width: auto; }
+/* Même taille qu'en responsive (<901px) — cohérent sur les 3 pages admin/CDM,
+   voir aussi le double-emploi (désormais sans effet) dans admin-site.css */
+.site-header .logo { height: 50px; width: auto; }
 .header-right { display: flex; flex-direction: row; align-items: center; gap: 10px; }
 .admin-label {
   font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -80,16 +86,22 @@ h3.miaa-adminslot__role { margin: 0; }
 }
 
 /* ── Hero ─────────────────────────────────────────────────────── */
+/* Plus de photo de fond : bandeau bas, texte foncé (voir aussi le double-emploi
+   -sans effet- de .hero dans admin-site.css). */
 .hero {
-  position: relative; height: 160px;
-  background: url('../assets/hero-banner.jpg') center/cover no-repeat;
+  /* min-height plutôt que height : le sous-titre passe sur 2 lignes sur les
+     écrans étroits (ex : "Vue réservée au·à la CDM — consultation des
+     inscriptions et notes de service." sur 375px) — une hauteur fixe
+     tronquait/débordait le texte dans ce cas. */
+  position: relative; min-height: 72px;
+  background: var(--color-white, #fff);
+  border-bottom: 1px solid #eee;
   display: flex; align-items: center;
-  padding: 0 max(15px, calc(50% - 600px));
+  padding: 10px max(15px, calc(50% - 600px));
 }
-.hero::after { content: ''; position: absolute; inset: 0; background: rgba(18,139,173,0.6); }
 .hero-text { position: relative; z-index: 1; }
-.hero h1 { font-size: 36px; font-weight: 300; color: #fff; line-height: 1.1; }
-.hero p  { color: rgba(255,255,255,0.88); font-size: 14px; margin-top: 6px; }
+.hero h1 { font-size: 22px; font-weight: 700; color: var(--color-text, #333); line-height: 1.1; }
+.hero p  { color: #666; font-size: 13px; margin-top: 4px; }
 
 
 /* ── Week nav ─────────────────────────────────────────────────── */
@@ -132,12 +144,44 @@ h3.miaa-adminslot__role { margin: 0; }
 .stat-val   { font-size: 22px; font-weight: 700; color: var(--color-text, #333); line-height: 1.1; }
 
 /* ── Planning grid ────────────────────────────────────────────── */
-.planning-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+/* Pas de overflow-x: auto ici (retiré) : la grille passe en 1 colonne dès
+   901px (voir plus bas) et n'a donc plus jamais besoin de défiler
+   horizontalement au-dessus de ce seuil — et le garder aurait cassé
+   position:sticky sur les jours à l'intérieur (voir .day-col > summary) :
+   dès qu'un axe overflow n'est pas "visible", le spec CSS force l'autre
+   axe à "auto" aussi, ce qui fait de .planning-wrap son propre conteneur
+   de scroll et décale le calcul de sticky loin du défilement réel de la
+   page (aucun overflow-y:visible explicite ne peut contourner cette règle). */
+.planning-wrap { padding-bottom: 8px; }
 .planning-grid {
   display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px; min-width: 620px; max-width: 1200px; margin: 0 auto;
 }
 .day-col { display: flex; flex-direction: column; gap: 10px; }
+.day-col__body { display: flex; flex-direction: column; gap: 10px; }
+
+/* Jour = <details> : repli natif, actif uniquement sous 901px (voir la
+   media query plus bas qui force le contenu visible au-dessus). */
+.day-col > summary {
+  list-style: none; /* neutre par défaut (desktop) : pas de triangle, pas de curseur pointeur */
+  cursor: default;
+  /* Reste visible en haut de l'écran pendant le défilement des cards du
+     jour, juste sous le bandeau topbar+header (lui-même sticky) — hauteur
+     réelle (mode "hug") mesurée en JS, voir watchStickyHeaderHeight()
+     dans admin-site.js. */
+  position: sticky;
+  top: var(--sticky-header-height, 122px);
+  z-index: 10;
+}
+.day-col > summary::-webkit-details-marker { display: none; }
+/* Sélecteur qualifié par le tag (i.day-col__chevron) plutôt que la seule
+   classe : Font Awesome déclare .fas { display: inline-block } avec la même
+   spécificité, chargé après cette feuille — sans le tag, l'ordre de
+   chargement déciderait et pourrait afficher le chevron sur desktop. */
+i.day-col__chevron {
+  display: none; /* révélé uniquement sous 901px, voir plus bas */
+  color: #fff; font-size: 13px;
+}
 
 /* Override component fixed widths for grid context */
 .planning-grid .miaa-day       { min-width: 0; width: 100%; }
@@ -365,13 +409,9 @@ h3.miaa-adminslot__role { margin: 0; }
 
 /* ── Responsive ───────────────────────────────────────────────── */
 
-@media (max-width: 810px) {
-  .site-header { padding: 15px 20px; }
-  .header-right { flex-direction: column; align-items: flex-end; }
-  .topbar      { padding-left: 20px; padding-right: 20px; }
-  .hero        { padding: 0 20px; }
-
-  .planning-wrap { overflow-x: visible; }
+/* Header/topbar/hero en mobile : voir admin-site.css (même seuil, 900px) —
+   pas dupliqué ici. */
+@media (max-width: 900px) {
   .planning-grid { grid-template-columns: 1fr; min-width: 0; gap: 18px; }
 
   .stats-bar { flex-direction: column; gap: 8px; }
@@ -383,4 +423,24 @@ h3.miaa-adminslot__role { margin: 0; }
   .week-nav .btn-chevron { display: inline; }
   .week-label .week-prefix { display: none; }
   .week-label { font-size: 14px; }
+
+  /* Jour = dropdown : repli natif actif, chevron visible et cliquable. */
+  /* position déjà non-static (sticky, voir plus haut) : sert aussi de repère
+     pour le chevron en position:absolute ci-dessous. */
+  .day-col > summary { cursor: pointer; }
+  i.day-col__chevron {
+    display: block; position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%); transition: transform 0.15s;
+  }
+  .day-col[open] > summary .day-col__chevron { transform: translateY(-50%) rotate(180deg); }
+}
+
+/* Desktop (5 jours côte à côte) : le contenu reste toujours visible, quel
+   que soit l'état ouvert/fermé du <details> — le repli ne concerne que le
+   mobile ci-dessus. */
+@media (min-width: 901px) {
+  .day-col > summary { pointer-events: none; } /* pas de dropdown au clic souris ici */
+  /* Reste en display:flex (voir .day-col__body plus haut) — sinon le gap
+     entre les cards CDM/Cuisiniers/Maraudeurs disparaît et elles se touchent. */
+  .day-col > .day-col__body { display: flex !important; }
 }

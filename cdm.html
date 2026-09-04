@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIAA — Espace CDM</title>
+  <link rel="icon" href="assets/logo.png" type="image/png">
   <link rel="stylesheet" href="css/colors_and_type.css">
   <link rel="stylesheet" href="css/miaa-components.css">
   <link rel="stylesheet" href="css/planning-admin.css">
@@ -40,9 +41,18 @@
     </button>
   </nav>
 
-  <div class="planning-wrap">
-    <div class="planning-grid" id="planning-grid"></div>
-  </div>
+  <!-- Sélecteur de jour : les 5 jours de la semaine, cliquables (navigation
+       entre jours) — le contenu ci-dessous affiche toujours un seul jour.
+       role="group" : sans rôle, aria-label sur un simple <div> n'est pas
+       exposé de façon fiable aux lecteurs d'écran. -->
+  <div class="cdm-days" id="cdm-days" role="group" aria-label="Choisir un jour"></div>
+
+  <!-- Annonce courte du jour affiché, à part du panneau lui-même : mettre
+       aria-live directement sur #cdm-day-panel ferait relire l'intégralité
+       du contenu reconstruit (tous les champs, toutes les cards bénévole) à
+       chaque changement de jour — beaucoup trop verbeux. -->
+  <p class="sr-only" id="cdm-day-announce" aria-live="polite" aria-atomic="true"></p>
+  <div class="cdm-day-panel" id="cdm-day-panel"></div>
 
 </main>
 
