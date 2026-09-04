@@ -704,8 +704,8 @@ async function openDelete(dateStr, roleId, regId, event) {
   document.getElementById('del-modal-sub').textContent    = role.time ? `${role.label} · ${role.time}` : role.label
   document.getElementById('del-person-info').innerHTML    = personInfoHTML(reg, role.isMaraude)
   document.getElementById('del-warning-text').textContent = reg.status === 'pending'
-    ? "Cette personne sera supprimée et notifiée que sa demande n'a pas été retenue."
-    : "Cette action est irréversible. La personne sera notifiée par email de l'annulation."
+    ? "Cette personne sera supprimée. N'oubliez pas de la notifier que sa demande n'a pas été retenue."
+    : "Cette action est irréversible. N'oubliez pas de notifier la personne par email de l'annulation."
   openModalEl('modal-delete')
 }
 

@@ -254,7 +254,7 @@
   overflow: hidden;
   font-family: var(--miaa-font);
   width: 248px;
-  min-height: 127px;
+  min-height: 145px;
   display: flex; flex-direction: column;
 }
 .miaa-adminslot__header {
