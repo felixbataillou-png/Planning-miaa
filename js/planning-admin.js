@@ -22,7 +22,7 @@ window.onAdminReady = async function () {
   if (confirmDate) {
     const target = new Date(confirmDate + 'T00:00:00')
     const diff = Math.round((target - TODAY) / (7 * 86400000))
-    currentWeekOffset = Math.max(0, Math.min(4, Math.round(diff)))
+    currentWeekOffset = clampWeekOffset(Math.round(diff))
   }
   await renderPage()
 
@@ -94,14 +94,16 @@ function escAttr(s) {
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
-    .select(`id, status, Confirm_token, first_time, note, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, status, Confirm_token, first_time, note, note_cdm, volunteers ( id, nom, prenom, email, tel, permis )`)
     .eq('date', ds)
     .eq('role', roleId)
   return data || []
 }
 
-/** Sauvegarde la note (par inscription) via la fonction RPC dédiée — seule
- * voie d'écriture pour cette colonne (aussi utilisée par l'espace CDM). */
+/** Sauvegarde la note du planneur (par inscription) via la fonction RPC
+ * dédiée — seule voie d'écriture pour cette colonne. Distincte de note_cdm
+ * (note du CDM, lecture seule ici, modifiable uniquement depuis l'espace
+ * CDM via update_registration_note_cdm — voir js/cdm.js). */
 async function updateRegistrationNote(regId, note) {
   return db.rpc('update_registration_note', { p_registration_id: regId, p_note: note })
 }
@@ -159,8 +161,16 @@ async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
 }
 
 // ── État ──────────────────────────────────────────────────────────
-let currentWeekOffset = parseInt(localStorage.getItem('miaa-admin-week') || '0')
-if (isNaN(currentWeekOffset) || currentWeekOffset < 0 || currentWeekOffset > 4) currentWeekOffset = 0
+// Plage navigable : ~2 mois avant et ~2 mois après la semaine courante
+// (9 semaines ≈ 63 jours de chaque côté).
+const WEEK_OFFSET_MIN = -9
+const WEEK_OFFSET_MAX = 9
+function clampWeekOffset(offset) {
+  return Math.max(WEEK_OFFSET_MIN, Math.min(WEEK_OFFSET_MAX, offset))
+}
+
+let currentWeekOffset = clampWeekOffset(parseInt(localStorage.getItem('miaa-admin-week') || '0'))
+if (isNaN(currentWeekOffset)) currentWeekOffset = 0
 
 let pendingAction     = null
 let addTarget         = null
@@ -177,7 +187,13 @@ function getWeekDays(offset) {
 }
 
 async function changeWeek(dir) {
-  currentWeekOffset = Math.max(0, Math.min(4, currentWeekOffset + dir))
+  currentWeekOffset = clampWeekOffset(currentWeekOffset + dir)
+  localStorage.setItem('miaa-admin-week', currentWeekOffset)
+  await renderPage()
+}
+
+async function goToToday() {
+  currentWeekOffset = 0
   localStorage.setItem('miaa-admin-week', currentWeekOffset)
   await renderPage()
 }
@@ -186,8 +202,9 @@ async function changeWeek(dir) {
 async function renderPage() {
   const days = getWeekDays(currentWeekOffset)
 
-  document.getElementById('btn-prev').disabled = currentWeekOffset === 0
-  document.getElementById('btn-next').disabled = currentWeekOffset === 4
+  document.getElementById('btn-prev').disabled  = currentWeekOffset === WEEK_OFFSET_MIN
+  document.getElementById('btn-next').disabled  = currentWeekOffset === WEEK_OFFSET_MAX
+  document.getElementById('btn-today').disabled = currentWeekOffset === 0
 
   const mon = days[0], ven = days[4]
   const sameMonth = mon.getMonth() === ven.getMonth()
@@ -201,7 +218,7 @@ async function renderPage() {
   const dateKeys = days.map(d => localDateKey(d))
   const { data: allRegs } = await db
     .from('registrations')
-    .select(`id, date, role, status, Confirm_token, first_time, note, volunteers ( id, nom, prenom, email, tel, permis )`)
+    .select(`id, date, role, status, Confirm_token, first_time, note, note_cdm, volunteers ( id, nom, prenom, email, tel, permis )`)
     .in('date', dateKeys)
 
   const regsData = allRegs || []
@@ -320,8 +337,20 @@ async function renderPage() {
           const firstTimeBadge = reg.first_time
             ? `<span class="miaa-volunteer__firsttime"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i>1ere fois</span>`
             : ''
+          // Deux notes distinctes par inscription, chacune éditable seulement
+          // depuis sa propre page : la note de l'équipe planning (modifiable
+          // ici) et celle du CDM (lecture seule ici, modifiable uniquement
+          // depuis l'espace CDM). La note CDM doit rester très visible ici
+          // (avant même d'ouvrir la modale) : même composant "dossier/onglet"
+          // que dans la modale (.miaa-note-folder), pas un simple badge.
           const noteDisplay = reg.note
             ? `<span class="miaa-volunteer__note">${escHtml(reg.note)}</span>`
+            : ''
+          const cdmNoteDisplay = reg.note_cdm
+            ? `<div class="miaa-note-folder miaa-note-folder--card">
+                 <div class="miaa-note-folder__tab">CDM</div>
+                 <div class="miaa-note-folder__body">${escHtml(reg.note_cdm)}</div>
+               </div>`
             : ''
           const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
           // Commence par "Voir" : reprend le texte du CTA visuel (.miaa-volunteer__view,
@@ -346,6 +375,7 @@ async function renderPage() {
                 ${permisBadge}
                 ${firstTimeBadge}
                 ${noteDisplay}
+                ${cdmNoteDisplay}
               </span>
             </span>
             <span class="miaa-volunteer__actions">
@@ -456,6 +486,14 @@ async function openEdit(dateStr, roleId, regId, event) {
   // globale continue de réserver ce badge à la maraude.
   document.getElementById('edit-permis-display').style.display   = reg.volunteers.permis ? 'flex' : 'none'
 
+  // Note du CDM : lecture seule ici, n'apparaît que si le CDM en a laissé une
+  // (modifiable uniquement depuis l'espace CDM, voir js/cdm.js).
+  const cdmNoteGroup   = document.getElementById('edit-cdm-note-group')
+  const cdmNoteDisplay = document.getElementById('edit-cdm-note-display')
+  const hasCdmNote     = !!reg.note_cdm
+  cdmNoteDisplay.value = reg.note_cdm || ''
+  cdmNoteGroup.style.display = hasCdmNote ? 'block' : 'none'
+
   const saveBtn     = document.getElementById('edit-save-btn')
   const statusGroup = document.getElementById('edit-status-group')
   if (reg.status === 'pending') {
@@ -471,6 +509,9 @@ async function openEdit(dateStr, roleId, regId, event) {
   document.getElementById('edit-status').addEventListener('change', checkEditChanges)
   document.getElementById('edit-note').addEventListener('input', checkEditChanges)
   openModalEl('modal-edit')
+  // Un textarea cachée (display:none, avant l'ouverture de la modale) a un
+  // scrollHeight de 0 : l'ajustement ne peut se faire qu'une fois affichée.
+  if (hasCdmNote) autoResizeTextarea(cdmNoteDisplay)
 }
 
 function checkEditChanges() {

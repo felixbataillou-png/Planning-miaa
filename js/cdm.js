@@ -14,8 +14,9 @@
  *     ni email, ni secu, ni adresse, ni profession, ni urgence_contact,
  *     ni Confirm_token ne sont exposés ici).
  *   - Aucun ajout / suppression / changement de statut.
- *   - Écriture uniquement via la fonction RPC update_registration_extra,
- *     limitée à note / repas / nombre / info_jour.
+ *   - Écriture uniquement via des fonctions RPC dédiées, limitées à
+ *     note_cdm (update_registration_note_cdm) / repas / nombre / info_jour
+ *     (upsert_day_info) — jamais "note" (note du planneur, lecture seule ici).
  *
  * Dépendances :
  *   - @supabase/supabase-js v2 (CDN)
@@ -75,9 +76,12 @@ function escAttr(s) {
 
 // ── Supabase helpers ──────────────────────────────────────────────
 
-/** Sauvegarde la note (par inscription) via la fonction RPC dédiée. */
-async function updateRegistrationNote(regId, note) {
-  return db.rpc('update_registration_note', { p_registration_id: regId, p_note: note })
+/** Sauvegarde la note du CDM (par inscription), dans sa propre colonne
+ * note_cdm — distincte de "note" (note du planneur, lecture seule ici,
+ * modifiable uniquement depuis planning-admin). Fonction RPC dédiée,
+ * séparée de update_registration_note (qui écrit dans "note"). */
+async function updateRegistrationNoteCdm(regId, note) {
+  return db.rpc('update_registration_note_cdm', { p_registration_id: regId, p_note: note })
 }
 
 /** Charge repas/nombre/info_jour pour un lot de dates (indépendant de la
@@ -119,7 +123,7 @@ function autoResizeTextarea(el) {
 async function loadWeekRegs(dateKeys) {
   const { data: regs } = await db
     .from('registrations_for_planning')
-    .select('id, date, role, status, first_time, new_volunteer, note, volunteers_id')
+    .select('id, date, role, status, first_time, new_volunteer, note, note_cdm, volunteers_id')
     .in('date', dateKeys)
 
   const regsData = regs || []
@@ -365,8 +369,14 @@ function volunteerCardHTML(reg, role) {
   const firstTimeBadge = reg.first_time
     ? `<span class="miaa-volunteer__firsttime"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i>1ere fois</span>`
     : ''
-  const noteDisplay = reg.note
-    ? `<span class="miaa-volunteer__note">${escHtml(reg.note)}</span>`
+  // Note du CDM (celle de CE rôle, modifiable ici) et note de l'équipe
+  // planning (lecture seule ici, modifiable uniquement depuis planning-admin)
+  // — deux colonnes distinctes, voir js/planning-admin.js pour le symétrique.
+  const noteDisplay = reg.note_cdm
+    ? `<span class="miaa-volunteer__note">${escHtml(reg.note_cdm)}</span>`
+    : ''
+  const plannerNoteDisplay = reg.note
+    ? `<span class="miaa-volunteer__note miaa-volunteer__note--other"><strong>Équipe planning :</strong> ${escHtml(reg.note)}</span>`
     : ''
   const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
   const identityLabel = escAttr(`Voir les informations de ${volNom}, ${role.label.toLowerCase()}`)
@@ -387,6 +397,7 @@ function volunteerCardHTML(reg, role) {
         ${permisBadge}
         ${firstTimeBadge}
         ${noteDisplay}
+        ${plannerNoteDisplay}
       </span>
     </span>
     <span class="miaa-volunteer__actions">
@@ -405,7 +416,7 @@ function openCdmView(regId, event) {
   const role = ROLES.find(r => r.id === reg.role)
 
   viewRegId = regId
-  viewOriginalNote = reg.note || ''
+  viewOriginalNote = reg.note_cdm || ''
 
   document.getElementById('cdm-view-sub').textContent    = role ? role.label : ''
   document.getElementById('cdm-view-nom').value          = reg.volunteers.nom    || '—'
@@ -415,10 +426,21 @@ function openCdmView(regId, event) {
   document.getElementById('cdm-view-note').value         = viewOriginalNote
   document.getElementById('cdm-view-save-btn').disabled  = true
 
+  // Note de l'équipe planning : lecture seule ici, n'apparaît que si elle en
+  // a laissé une (modifiable uniquement depuis planning-admin.js).
+  const plannerNoteGroup   = document.getElementById('cdm-view-planner-note-group')
+  const plannerNoteDisplay = document.getElementById('cdm-view-planner-note-display')
+  const hasPlannerNote     = !!reg.note
+  plannerNoteDisplay.value = reg.note || ''
+  plannerNoteGroup.style.display = hasPlannerNote ? 'block' : 'none'
+
   document.getElementById('cdm-view-note').removeEventListener('input', checkCdmViewChanges)
   document.getElementById('cdm-view-note').addEventListener('input', checkCdmViewChanges)
 
   openModalEl('modal-cdm-view')
+  // Un textarea cachée (display:none, avant l'ouverture de la modale) a un
+  // scrollHeight de 0 : l'ajustement ne peut se faire qu'une fois affichée.
+  if (hasPlannerNote) autoResizeTextarea(plannerNoteDisplay)
 }
 
 function checkCdmViewChanges() {
@@ -431,7 +453,7 @@ async function saveCdmNote() {
   const btn  = document.getElementById('cdm-view-save-btn')
   btn.disabled = true; const original = btn.innerHTML; btn.innerHTML = 'Enregistrement…'
   try {
-    await updateRegistrationNote(viewRegId, note)
+    await updateRegistrationNoteCdm(viewRegId, note)
     closeModal('modal-cdm-view')
     await renderPage()
     showToast('green', 'Note enregistrée.')

@@ -91,9 +91,17 @@
           <span>Possède le permis de conduire</span>
         </div>
       </div>
+      <!-- Note laissée par l'équipe planning sur ce bénévole — même visuel
+           que les champs Nom/Prénom/… ci-dessus (lecture seule) : modifiable
+           uniquement depuis planning-admin (js/planning-admin.js). N'apparaît
+           que si l'équipe planning a effectivement laissé une note. -->
+      <div class="form-group" id="cdm-view-planner-note-group" style="display:none">
+        <label for="cdm-view-planner-note-display">Note Équipe planning</label>
+        <textarea id="cdm-view-planner-note-display" class="miaa-field-display" readonly rows="2"></textarea>
+      </div>
       <div class="form-group">
-        <label for="cdm-view-note">Note / commentaire</label>
-        <textarea id="cdm-view-note" rows="3" placeholder="Ajouter une note pour l'équipe planning…"></textarea>
+        <label for="cdm-view-note">Votre note (CDM)</label>
+        <textarea id="cdm-view-note" rows="3" placeholder="Note modifiable ici — visible en lecture seule par l'équipe planning…"></textarea>
       </div>
     </div>
     <div class="modal-footer">

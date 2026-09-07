@@ -155,3 +155,10 @@ collections:
         fields:
           - { label: "Masquer le planning", name: masquer, widget: boolean, default: false }
           - { label: "Message affiché à la place du planning", name: message, widget: markdown, hint: "Affiché uniquement quand le planning est masqué" }
+          - label: "Jours désactivés"
+            name: jours_desactives
+            widget: list
+            label_singular: "Jour désactivé"
+            required: false
+            hint: "Empêche les nouvelles inscriptions ce jour précis (traité comme un jour passé, grisé) — n'annule pas les inscriptions déjà faites. Ajoutez/retirez autant de jours que nécessaire avec les boutons +/-."
+            field: { label: "Date", name: date, widget: datetime, date_format: "YYYY-MM-DD", time_format: false }

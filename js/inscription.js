@@ -69,6 +69,9 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
   if (res.status === 409) {
     throw new Error('Vous êtes déjà inscrit à ce créneau pour cette activité.')
   }
+  if (res.status === 403) {
+    throw new Error('JOUR_DESACTIVE')
+  }
   if (!res.ok) {
     throw new Error('NOTIFY_FAILED')
   }
@@ -82,14 +85,17 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
  * puis construit le HTML de chaque colonne jour par jour.
  */
 async function renderWeek() {
-  // Vérifie si le planning est masqué depuis le CMS
+  // Vérifie si le planning est masqué depuis le CMS, et récupère la liste
+  // des jours désactivés (jours ponctuels fermés aux nouvelles inscriptions,
+  // gérée depuis le CMS — voir admin/config.yml, collection planning-config).
+  let joursDesactives = new Set()
   try {
     const configRes = await fetch('_content/planning-config.json')
     const config = await configRes.json()
     if (config.masquer) {
       // Cache la navigation de semaine
       document.querySelector('.week-nav').style.display = 'none'
-  
+
       // Remplace le planning-wrap entier par le message
       const planningWrap = document.querySelector('.planning-wrap')
       planningWrap.innerHTML = `
@@ -99,6 +105,7 @@ async function renderWeek() {
         </div>`
       return
     }
+    joursDesactives = new Set((config.jours_desactives || []).map(j => (j.date || j).slice(0, 10)))
   } catch (e) {
     // Si le fichier n'existe pas, on affiche le planning normalement
   }
@@ -143,9 +150,13 @@ async function renderWeek() {
   let html = ''
   days.forEach((day, i) => {
     const ds          = dateKey(day)
-    const urg         = urgency(day)
+    // Jour désactivé depuis le CMS : traité exactement comme un jour passé
+    // (grisé, fermé aux nouvelles inscriptions) — n'affecte pas les
+    // inscriptions déjà faites ce jour-là.
+    const isDisabled  = joursDesactives.has(ds)
+    const urg         = isDisabled ? 'past' : urgency(day)
     const isPast      = urg === 'past'
-    const isToday     = dayDiff(day) === 0
+    const isToday     = !isDisabled && dayDiff(day) === 0
     const dayVariant  = isPast ? 'past' : isToday ? 'today' : 'upcoming'
     const dayFullName = DAYS_FULL[day.getDay()]
     const monthFull   = MONTHS_FULL[day.getMonth()]
@@ -497,6 +508,8 @@ async function submitForm() {
       btnConfirm.textContent = 'Confirmer mon inscription'
       if (err.message === 'NOTIFY_FAILED') {
        alert('Votre inscription a bien été enregistrée, mais nous avons rencontré un problème technique pour vous confirmer par email. Merci de nous contacter directement à miaa@miaa.fr')
+      } else if (err.message === 'JOUR_DESACTIVE') {
+        alert("Ce jour n'est plus disponible aux inscriptions. Merci de recharger la page et de choisir un autre créneau.")
       } else {
         alert(err.message.includes('déjà inscrit')
           ? 'Vous êtes déjà inscrit à ce créneau pour cette activité.'
@@ -629,9 +642,13 @@ async function submitFormExtra() {
     console.error('Message:', err.message)
     btn.disabled    = false
     btn.textContent = 'Confirmer mon inscription'
-    alert(err.message.includes('déjà inscrit')
-      ? 'Vous êtes déjà inscrit à ce créneau pour cette activité.'
-      : 'Une erreur est survenue, merci de réessayer.')
+    if (err.message === 'JOUR_DESACTIVE') {
+      alert("Ce jour n'est plus disponible aux inscriptions. Merci de recharger la page et de choisir un autre créneau.")
+    } else {
+      alert(err.message.includes('déjà inscrit')
+        ? 'Vous êtes déjà inscrit à ce créneau pour cette activité.'
+        : 'Une erreur est survenue, merci de réessayer.')
+    }
   }
 }
 

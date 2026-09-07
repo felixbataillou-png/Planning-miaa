@@ -514,7 +514,60 @@
   overflow: hidden; resize: none; min-height: 34px;
 }
 
-/* Note / commentaire sous le nom du bénévole — même style que le téléphone */
+/* Note / commentaire sous le nom du bénévole — même style que le téléphone.
+ * Deux notes distinctes existent désormais par inscription (équipe
+ * planning/CDM, chacune éditable seulement depuis sa propre page) :
+ * --other identifie visuellement celle écrite par l'AUTRE rôle (lecture
+ * seule sur cette page). Voir aussi .miaa-note-folder plus bas — utilisé à
+ * la place de --other pour la note CDM sur la card bénévole de
+ * planning-admin, qui doit rester très visible sans ouvrir la modale. */
 .miaa-volunteer__note {
   font-size: 12px; font-weight: var(--fw-bold, 700); color: var(--miaa-ink-soft); line-height: 1.4; margin-top: 1px; border-top: 1px dashed var(--miaa-ink-soft); padding: 3px;
+}
+.miaa-volunteer__note--other {
+  border-top-style: solid; border-top-color: var(--miaa-teal, #18809D);
+  color: var(--miaa-teal-dark, #0f7a99);
+}
+
+/* =====================================================================
+   14. NOTE DE L'AUTRE RÔLE (dossier/onglet)  — .miaa-note-folder
+   Affiche, en lecture seule, la note laissée par l'autre rôle sur un
+   bénévole — onglet "CDM". Utilisé sur la card bénévole de planning-admin
+   (variante --card, plus compacte) directement dans le planning ; dans les
+   modales, l'autre note est affichée comme les autres champs en lecture
+   seule (.miaa-field-display), pas avec ce composant. Même logique de
+   visibilité que .miaa-volunteer__note : caché tant qu'aucune note n'a été
+   laissée.
+   Slots : tab (libellé du rôle) · body (texte de la note)
+   ===================================================================== */
+.miaa-note-folder {
+  position: relative;
+  margin-top: 14px;
+  border: 1px solid var(--miaa-gray-sq, #ddd);
+  border-radius: var(--miaa-radius, 4px);
+  background: var(--miaa-bg-light, #f8f9fa);
+}
+.miaa-note-folder__tab {
+  position: absolute; top: -13px; left: 12px;
+  background: var(--miaa-teal, #18809D); color: #fff;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 3px 10px; border-radius: var(--miaa-radius, 4px) var(--miaa-radius, 4px) 0 0;
+}
+.miaa-note-folder__body {
+  padding: 16px 12px 12px;
+  font-size: 13px; color: var(--miaa-ink, #333); line-height: 1.5;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* Variante compacte — imbriquée dans une card bénévole plutôt que seule
+   dans une modale, moins de place disponible. */
+.miaa-note-folder--card {
+  margin-top: 12px;
+  font-size: 12px;
+}
+.miaa-note-folder--card .miaa-note-folder__tab {
+  top: -11px; left: 8px; font-size: 10px; padding: 2px 8px;
+}
+.miaa-note-folder--card .miaa-note-folder__body {
+  padding: 12px 8px 8px; font-size: 12px; line-height: 1.4;
 }

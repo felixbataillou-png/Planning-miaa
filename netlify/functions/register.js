@@ -38,6 +38,27 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Rôle invalide' }) }
     }
 
+    // Jours désactivés depuis le CMS (voir admin/config.yml, planning-config) :
+    // js/inscription.js masque déjà le CTA pour ce jour côté client, mais un
+    // appel direct à cette fonction pourrait contourner ce simple masquage —
+    // on revérifie donc ici. Best-effort : si la lecture du fichier échoue
+    // (site pas encore buildé, etc.), on n'y bloque pas l'inscription.
+    try {
+      const siteUrl = process.env.URL || 'https://miaa.fr'
+      const configRes = await fetch(`${siteUrl}/_content/planning-config.json`)
+      if (configRes.ok) {
+        const config = await configRes.json()
+        const joursDesactives = new Set(
+          (config.jours_desactives || []).map(j => (j.date || j).slice(0, 10))
+        )
+        if (joursDesactives.has(date)) {
+          return { statusCode: 403, body: JSON.stringify({ error: 'JOUR_DESACTIVE' }) }
+        }
+      }
+    } catch (e) {
+      // Config illisible : on n'empêche pas l'inscription pour autant.
+    }
+
     const allowed = await checkRateLimit('register', event, 5, 10)
     if (!allowed) {
       return { statusCode: 429, body: JSON.stringify({ error: 'Trop de tentatives, merci de réessayer plus tard.' }) }

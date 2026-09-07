@@ -30,7 +30,10 @@
   <div class="stats-bar" id="stats-bar" aria-label="Statistiques de la semaine"></div>
 
   <nav class="week-nav" aria-label="Navigation par semaine">
-    <button id="btn-prev" onclick="changeWeek(-1)" disabled aria-label="Semaine précédente">
+    <button id="btn-today" class="btn-today" onclick="goToToday()" disabled aria-label="Revenir à la semaine actuelle">
+      Aujourd'hui
+    </button>
+    <button id="btn-prev" onclick="changeWeek(-1)" aria-label="Semaine précédente">
       <span class="btn-text">‹ Semaine précédente</span>
       <span class="btn-chevron" aria-hidden="true">‹</span>
     </button>
@@ -237,9 +240,18 @@
           <option value="pending">En attente de validation</option>
         </select>
       </div>
+      <!-- Note laissée par le CDM sur ce bénévole — même visuel que les
+           champs Nom/Prénom/… ci-dessus (lecture seule), pas la modale
+           d'édition elle-même : modifiable uniquement depuis l'espace CDM
+           (js/cdm.js). N'apparaît que si le CDM a effectivement laissé une
+           note (voir openEdit). -->
+      <div class="form-group" id="edit-cdm-note-group" style="display:none">
+        <label for="edit-cdm-note-display">Note CDM</label>
+        <textarea id="edit-cdm-note-display" class="miaa-field-display" readonly rows="2"></textarea>
+      </div>
       <div class="form-group">
-        <label for="edit-note">Note / commentaire</label>
-        <textarea id="edit-note" rows="3" placeholder="Note visible uniquement par l'équipe planning…"></textarea>
+        <label for="edit-note">Votre note (Équipe planning)</label>
+        <textarea id="edit-note" rows="3" placeholder="Note modifiable ici — visible en lecture seule par le CDM…"></textarea>
       </div>
     </div>
     <div class="modal-footer">
