@@ -1,4 +1,11 @@
 {
-  "masquer": true,
-  "message": "Le planning sera bientôt accessible\n\nMerci à tou(te)s pour cet année\n\nOn se retrouve en **mi septembre :)**"
+  "masquer": false,
+  "message": "Le planning sera bientôt accessible\n\nMerci à tou(te)s pour cet année\n\nOn se retrouve en **mi septembre :)**",
+  "jours_desactives": [
+    "2026-09-07",
+    "2026-09-08",
+    "2026-09-09",
+    "2026-09-10",
+    "2026-09-11"
+  ]
 }
