@@ -265,22 +265,32 @@ async function renderPage() {
     const monthFull   = MONTHS_FULL[day.getMonth()]
     const dateLabel   = `${dayFullName} ${day.getDate()} ${monthFull}`
 
-    // <details> : repliable nativement (clavier/lecteur d'écran inclus,
-    // sans JS ni ARIA custom) — uniquement actif sous 901px, voir
-    // css/planning-admin.css. Ouvert par défaut, sauf les jours passés
-    // (repliés par défaut) — l'utilisateur peut toujours re-déplier.
-    html += `<details class="day-col"${isPast ? '' : ' open'}>`
-    html += `<summary class="miaa-day miaa-day--${dayVariant}">
-      <h2 class="day-heading">
+    // Bouton + aria-expanded/aria-controls plutôt que <details>/<summary> :
+    // un <details> fermé (pas d'attribut "open") cache son contenu via un
+    // mécanisme interne au navigateur (content-visibility sur son contenu)
+    // qu'aucun display:... !important côté auteur ne peut contourner — la
+    // tentative précédente de forcer le contenu visible au-dessus de 900px
+    // ne fonctionnait donc PAS réellement (vérifié : les jours passés
+    // restaient invisibles à toutes les tailles d'écran, cards y compris).
+    // Ici, la visibilité du contenu est entièrement pilotée par nous (voir
+    // toggleDayCol ci-dessous + css/planning-admin.css), donc fiable à
+    // n'importe quelle largeur. Replié par défaut pour les jours passés
+    // (uniquement visible sous 901px, voir CSS) — l'utilisateur peut
+    // toujours re-déplier.
+    const bodyId = `day-body-${ds}`
+    html += `<div class="day-col">`
+    html += `<button type="button" class="miaa-day miaa-day--${dayVariant}"
+      onclick="toggleDayCol(this)" aria-expanded="${isPast ? 'false' : 'true'}" aria-controls="${bodyId}">
+      <span class="day-heading">
         <span class="miaa-day__name" aria-hidden="true">${DAYS_FR[i]}</span>
         <span class="sr-only">${dayFullName}</span>
         <span class="miaa-day__num">${day.getDate()}</span>
         <span class="miaa-day__month" aria-hidden="true">${MONTHS_FR[day.getMonth()]}</span>
         <span class="sr-only">${monthFull}</span>
         <i class="fas fa-chevron-down day-col__chevron" aria-hidden="true"></i>
-      </h2>
-    </summary>
-    <div class="day-col__body">`
+      </span>
+    </button>
+    <div class="day-col__body" id="${bodyId}"${isPast ? ' data-collapsed' : ''}>`
 
     ROLES.forEach(role => {
       const regs      = regsData.filter(r => r.date === ds && r.role === role.id)
@@ -422,13 +432,31 @@ async function renderPage() {
       html += `</div>`
     })
     html += `</div>` // .day-col__body
-    html += `</details>`
+    html += `</div>` // .day-col
   })
 
   document.getElementById('planning-grid').innerHTML = html
   // Note : le dropdown est fermé par défaut (display:none), donc son
   // scrollHeight est nul tant qu'il n'est pas ouvert — l'ajustement de
   // hauteur initial se fait dans toggleCdmDropdown() à l'ouverture.
+}
+
+// ── Repli d'un jour (mobile uniquement, voir css/planning-admin.css) ──
+// data-collapsed pilote entièrement l'affichage (display:none) sous 901px ;
+// au-dessus, ce même attribut n'a aucun effet visuel (contenu toujours
+// affiché) — voir le commentaire dans renderPage() pour le pourquoi de ce
+// choix plutôt qu'un <details>/<summary> natif.
+function toggleDayCol(btn) {
+  const body = document.getElementById(btn.getAttribute('aria-controls'))
+  if (!body) return
+  const collapsed = body.hasAttribute('data-collapsed')
+  if (collapsed) {
+    body.removeAttribute('data-collapsed')
+    btn.setAttribute('aria-expanded', 'true')
+  } else {
+    body.setAttribute('data-collapsed', '')
+    btn.setAttribute('aria-expanded', 'false')
+  }
 }
 
 // ── handleAdd ─────────────────────────────────────────────────────
