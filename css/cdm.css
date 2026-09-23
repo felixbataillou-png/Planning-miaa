@@ -43,8 +43,12 @@
 .cdm-panel-title__past { font-weight: 400; color: #888; font-size: 13px; }
 
 .cdm-day-content { display: flex; flex-direction: column; gap: 18px; }
-/* Jour passé : cohérent avec .miaa-adminslot--past sur planning-admin
-   (lecture seule, atténué), appliqué ici à l'ensemble des lignes du jour. */
+/* Jour passé sur l'espace CDM : grisé et en lecture seule (l'espace CDM ne
+   permet de toute façon aucune écriture depuis planning-admin sur un jour
+   passé, voir js/cdm.js) — appliqué ici à l'ensemble des lignes du jour.
+   Traitement différent de planning-admin, où les cards restent normales
+   pour un jour passé et seul le bandeau date (.miaa-day--past) reste
+   grisé. */
 .cdm-day-content--past { opacity: 0.5; pointer-events: none; }
 
 .cdm-row { display: flex; align-items: stretch; gap: 16px; }

@@ -300,7 +300,7 @@ async function renderPage() {
       const countMod  = isFull ? ' miaa-adminslot__count--full' : remaining <= 1 ? ' miaa-adminslot__count--warn' : ''
       const countTxt  = isFull ? 'Complet' : `${filled}/${role.quota}`
 
-      html += `<div class="miaa-adminslot${isPast ? ' miaa-adminslot--past' : ''}">`
+      html += `<div class="miaa-adminslot">`
       if (role.isCdm) {
         // CDM : card réduite au strict nécessaire (pas d'horaire, pas de
         // badge de quota, pas de rangée de points).
@@ -534,6 +534,14 @@ async function openEdit(dateStr, roleId, regId, event) {
     statusGroup.style.display = 'block'
   }
 
+  // Suppression toujours bloquée pour un jour passé — seule action encore
+  // interdite là où tout le reste (voir/commenter un bénévole, statut,
+  // infos du jour) reste possible.
+  const isPastReg = dayDiff(new Date(dateStr + 'T00:00:00')) < 0
+  const deleteBtn = document.getElementById('edit-delete-btn')
+  deleteBtn.disabled = isPastReg
+  deleteBtn.title = isPastReg ? "Impossible de supprimer une inscription d'un jour passé" : ''
+
   document.getElementById('edit-status').addEventListener('change', checkEditChanges)
   document.getElementById('edit-note').addEventListener('input', checkEditChanges)
   openModalEl('modal-edit')
@@ -763,6 +771,9 @@ function handleOverlayClickAddExtra(e) {
 // ── Supprimer une inscription ─────────────────────────────────────
 async function openDelete(dateStr, roleId, regId, event) {
   if (event) event.stopPropagation()
+  // Garde-fou en plus du bouton désactivé dans la modale d'édition (voir
+  // openEdit) : un jour passé ne peut jamais perdre un bénévole.
+  if (dayDiff(new Date(dateStr + 'T00:00:00')) < 0) return
   const regs = await getSlotRegs(dateStr, roleId)
   const reg  = regs.find(r => String(r.id) === String(regId))
   if (!reg) return

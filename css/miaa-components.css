@@ -380,8 +380,17 @@
   container-name: adminslot;
 }
 
-/* Variante jour passé */
-.miaa-adminslot--past { opacity: 0.5; pointer-events: none; }
+/* Pas de variante "jour passé" ici (planning-admin) : les cards restent
+ * visuellement identiques à un jour présent/futur — seul .miaa-day--past
+ * (le bandeau date en haut de colonne) reste grisé pour signaler le jour
+ * passé. Presque toutes les actions restent possibles sur une card d'un
+ * jour passé (voir, commenter, changer le statut, éditer les infos du
+ * jour) ; seuls l'ajout et la suppression d'un bénévole restent bloqués —
+ * le CTA "Ajouter une personne" n'est simplement pas généré pour un jour
+ * passé (voir js/planning-admin.js), et le bouton "Supprimer" de la modale
+ * d'édition est désactivé pour une inscription passée (voir openEdit()).
+ * Contrairement à .cdm-day-content--past (css/cdm.css), qui reste grisée
+ * ET en lecture seule sur l'espace CDM. */
 
 /* Wrapper role + time dans l'en-tête */
 .miaa-adminslot__info { display: flex; flex-direction: column; gap: 1px; }
