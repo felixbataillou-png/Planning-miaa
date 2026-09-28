@@ -132,6 +132,14 @@
           </span>
         </label>
       </div>
+
+      <!-- Même champ que "Votre note (Équipe planning)" dans la modale
+           d'édition (modal-edit) — modifiable uniquement depuis planning-admin,
+           visible en lecture seule par le CDM (voir js/cdm.js). -->
+      <div class="form-group">
+        <label for="add-note">Votre note (Équipe planning)</label>
+        <textarea id="add-note" rows="3" placeholder="Note modifiable ici — visible en lecture seule par le CDM…"></textarea>
+      </div>
     </div>
 
     <div class="modal-footer">
@@ -360,6 +368,8 @@
   <span id="toast-msg"></span>
 </div>
 
+<script src="js/dom-utils.js"></script>
+<script src="js/admin-date-utils.js"></script>
 <script src="js/admin-site.js"></script>
 <script src="js/planning-admin.js"></script>
 </body>

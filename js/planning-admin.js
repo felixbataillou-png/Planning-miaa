@@ -6,6 +6,8 @@
  *   - @supabase/supabase-js v2 (CDN)
  *   - js/supabase-config.js → db
  *   - js/admin-site.js → AdminSite, auth partagée
+ *   - js/dom-utils.js → escHtml/escAttr/initials/autoResizeTextarea
+ *   - js/admin-date-utils.js → TODAY/DAYS_FR/…/getMonday/addDays/localDateKey/dayDiff/getWeekDays
  *
  * window.ADMIN_PAGE et window.onAdminReady sont définis ici
  * et utilisés par admin-site.js.
@@ -35,11 +37,7 @@ window.onAdminReady = async function () {
 }
 
 // ── Constantes ────────────────────────────────────────────────────
-const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
-const DAYS_FR     = ['Lun','Mar','Mer','Jeu','Ven']
-const MONTHS_FR   = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc']
-const MONTHS_FULL = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
-const DAYS_FULL   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
+// TODAY/DAYS_FR/MONTHS_FR/MONTHS_FULL/DAYS_FULL → js/admin-date-utils.js
 
 const ROLES = [
   // CDM : ajouté uniquement depuis planning-admin (pas de card publique sur
@@ -64,30 +62,20 @@ const DAY_INFO_FIELDS = [
 ]
 
 // ── Helpers ───────────────────────────────────────────────────────
-function getMonday(d) {
-  const date = new Date(d), day = date.getDay() || 7
-  date.setDate(date.getDate() - day + 1); return date
+// getMonday/addDays/localDateKey/dayDiff → js/admin-date-utils.js
+// initials/escHtml/escAttr/autoResizeTextarea → js/dom-utils.js
+
+// Nom de famille toujours affiché/enregistré en majuscules, quelle que soit
+// la casse saisie (le prénom n'est pas concerné par cette règle).
+function formatNom(nom) {
+  return String(nom || '').toUpperCase()
 }
-function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r }
-function localDateKey(d) {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-function dayDiff(d) {
-  return Math.round((new Date(localDateKey(d)) - new Date(localDateKey(TODAY))) / 86400000)
-}
-function initials(name) {
-  const parts = name.trim().split(' ')
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-  return name.slice(0, 2).toUpperCase()
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-}
-function escAttr(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+// Numéro de téléphone toujours affiché/enregistré groupé par 2 chiffres
+// séparés d'un espace ("06 12 34 56 78") — y compris en direct pendant la
+// saisie, voir les listeners sur #add-tel / #add-extra-urgence-tel plus bas.
+function formatTel(tel) {
+  const digits = String(tel || '').replace(/\D/g, '')
+  return digits ? digits.match(/.{1,2}/g).join(' ') : String(tel || '')
 }
 
 // ── Supabase helpers ──────────────────────────────────────────────
@@ -137,7 +125,7 @@ async function deleteReg(regId) {
 
 async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
                       secu = '', profession = '', adresse = '', codepostal = '', ville = '',
-                      urgenceContact = '', firstTime = false) {
+                      urgenceContact = '', firstTime = false, note = '') {
   const { data: existing } = await db
     .from('volunteers').select('id').eq('email', email).maybeSingle()
 
@@ -156,7 +144,8 @@ async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
   const token = crypto.randomUUID()
   await db.from('registrations').insert({
     volunteers_id: volunteerId, date: ds, role: roleId,
-    status: status, Confirm_token: token, first_time: !!firstTime
+    status: status, Confirm_token: token, first_time: !!firstTime,
+    note: note || null
   })
 }
 
@@ -181,10 +170,7 @@ let editOriginalNote   = null
 let lastFocusedTrigger = null
 
 // ── Week helpers ──────────────────────────────────────────────────
-function getWeekDays(offset) {
-  const monday = getMonday(addDays(TODAY, offset * 7))
-  return Array.from({ length: 5 }, (_, i) => addDays(monday, i))
-}
+// getWeekDays → js/admin-date-utils.js
 
 async function changeWeek(dir) {
   currentWeekOffset = clampWeekOffset(currentWeekOffset + dir)
@@ -362,7 +348,7 @@ async function renderPage() {
                  <div class="miaa-note-folder__body">${escHtml(reg.note_cdm)}</div>
                </div>`
             : ''
-          const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+          const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
           // Commence par "Voir" : reprend le texte du CTA visuel (.miaa-volunteer__view,
           // décoratif/aria-hidden) pour que le nom accessible le contienne — sans ça, un
           // outil de commande vocale ("clique sur Voir") ne retrouverait pas la card.
@@ -381,7 +367,7 @@ async function renderPage() {
               <span class="miaa-volunteer__avatar" aria-hidden="true">${initials(volNom || '?')}</span>
               <span class="miaa-volunteer__info">
                 <span class="miaa-volunteer__name">${escHtml(volNom)}</span>
-                <span class="miaa-volunteer__meta">${escHtml(reg.volunteers.tel)}</span>
+                <span class="miaa-volunteer__meta">${escHtml(formatTel(reg.volunteers.tel))}</span>
                 ${permisBadge}
                 ${firstTimeBadge}
                 ${noteDisplay}
@@ -502,11 +488,11 @@ async function openEdit(dateStr, roleId, regId, event) {
   editOriginalNote   = reg.note || ''
 
   const role = ROLES.find(r => r.id === roleId)
-  const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+  const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
   document.getElementById('edit-modal-sub').textContent          = role.time ? `${role.label} · ${role.time}` : role.label
-  document.getElementById('edit-nom').value                      = reg.volunteers.nom || '—'
+  document.getElementById('edit-nom').value                      = formatNom(reg.volunteers.nom) || '—'
   document.getElementById('edit-prenom').value                   = reg.volunteers.prenom || '—'
-  document.getElementById('edit-tel').value                      = reg.volunteers.tel    || '—'
+  document.getElementById('edit-tel').value                      = formatTel(reg.volunteers.tel) || '—'
   document.getElementById('edit-email').value                    = reg.volunteers.email  || '—'
   document.getElementById('edit-status').value                   = reg.status
   document.getElementById('edit-note').value                     = editOriginalNote
@@ -576,7 +562,7 @@ async function saveEdit() {
   document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
   closeModal('modal-edit')
   await renderPage()
-  const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+  const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
   showToast('green', editOriginalStatus === 'pending' ? `${volNom} confirmé(e).` : 'Informations mises à jour.')
 }
 
@@ -595,7 +581,7 @@ function openAdd(dateStr, roleId, roleLabel, roleTime, isMaraude) {
   document.getElementById('add-modal-sub').textContent      = roleTime ? `${roleLabel} · ${roleTime}` : roleLabel
   document.getElementById('add-permis-group').style.display = isMaraude ? 'block' : 'none'
 
-  ;['add-nom', 'add-prenom', 'add-tel', 'add-email'].forEach(id => {
+  ;['add-nom', 'add-prenom', 'add-tel', 'add-email', 'add-note'].forEach(id => {
     const el = document.getElementById(id)
     el.value = ''
     el.classList.remove('autocompleted')
@@ -636,9 +622,9 @@ function initAddEmailAutocomplete () {
     document.getElementById('add-email-loading').style.display = 'none'
 
     if (vol) {
-      document.getElementById('add-nom').value    = vol.nom    || ''
+      document.getElementById('add-nom').value    = formatNom(vol.nom)
       document.getElementById('add-prenom').value = vol.prenom || ''
-      document.getElementById('add-tel').value    = vol.tel    || ''
+      document.getElementById('add-tel').value    = formatTel(vol.tel)
       if (addIsMaraude) document.getElementById('add-permis').checked = vol.permis || false
       ;['add-nom','add-prenom','add-tel'].forEach(id => {
         document.getElementById(id).classList.add('autocompleted')
@@ -648,13 +634,14 @@ function initAddEmailAutocomplete () {
 }
 
 async function submitAdd() {
-  const nom       = document.getElementById('add-nom').value.trim()
+  const nom       = formatNom(document.getElementById('add-nom').value.trim())
   const prenom    = document.getElementById('add-prenom').value.trim()
   const tel       = document.getElementById('add-tel').value.trim()
   const email     = document.getElementById('add-email').value.trim()
   const status    = document.getElementById('add-status').value
   const permis    = document.getElementById('add-permis').checked
   const firstTime = document.getElementById('add-firsttime').checked
+  const note      = document.getElementById('add-note').value.trim()
 
   let valid = true, firstInvalid = null
   const checks = [
@@ -679,7 +666,7 @@ async function submitAdd() {
   if (existing) {
     try {
       await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status,
-        '', '', '', '', '', '', firstTime)
+        '', '', '', '', '', '', firstTime, note)
       closeModal('modal-add')
       await renderPage()
       showToast('green', `${nom} ajouté(e) au créneau.`)
@@ -689,12 +676,12 @@ async function submitAdd() {
     }
   } else {
     closeModal('modal-add')
-    openAddExtra(nom, prenom, email, tel, permis, status, firstTime)
+    openAddExtra(nom, prenom, email, tel, permis, status, firstTime, note)
   }
 }
 
-function openAddExtra(nom, prenom, email, tel, permis, status, firstTime) {
-  addExtraData = { nom, prenom, email, tel, permis, status, firstTime }
+function openAddExtra(nom, prenom, email, tel, permis, status, firstTime, note) {
+  addExtraData = { nom, prenom, email, tel, permis, status, firstTime, note }
   document.getElementById('add-extra-tag-date').textContent = document.getElementById('add-modal-sub').textContent
   ;['add-extra-secu','add-extra-profession','add-extra-adresse','add-extra-codepostal','add-extra-ville',
     'add-extra-urgence-nom','add-extra-urgence-tel'].forEach(id => {
@@ -753,7 +740,7 @@ async function submitAddExtra() {
   try {
     await addReg(addTarget.dateStr, addTarget.roleId,
       addExtraData.nom, addExtraData.prenom, addExtraData.email, addExtraData.tel, permis, addExtraData.status,
-      secu, profession, adresse, codepostal, ville, urgenceContact, addExtraData.firstTime)
+      secu, profession, adresse, codepostal, ville, urgenceContact, addExtraData.firstTime, addExtraData.note)
     closeAddExtra()
     await renderPage()
     showToast('green', `${addExtraData.nom} ajouté(e) au créneau.`)
@@ -800,7 +787,7 @@ async function confirmDelete() {
 
   // Affiche la modale de confirmation au lieu d'ouvrir Gmail
   if (reg && reg.volunteers) {
-    const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+    const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
     document.getElementById('delete-confirm-name').textContent = volNom
     document.getElementById('delete-confirm-email').textContent = reg.volunteers.email || ''
     document.getElementById('modal-delete-confirm').classList.add('open')
@@ -809,10 +796,10 @@ async function confirmDelete() {
 }
 
 function personInfoHTML(reg, isMaraude) {
-  const volNom = `${reg.volunteers.prenom || ''} ${reg.volunteers.nom || ''}`.trim()
+  const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
   return `
     <div class="pib-row"><i class="fas fa-user" aria-hidden="true"></i><strong>${escHtml(volNom)}</strong></div>
-    <div class="pib-row"><i class="fas fa-phone" aria-hidden="true"></i>${escHtml(reg.volunteers.tel)}</div>
+    <div class="pib-row"><i class="fas fa-phone" aria-hidden="true"></i>${escHtml(formatTel(reg.volunteers.tel))}</div>
     <div class="pib-row"><i class="fas fa-envelope" aria-hidden="true"></i>${escHtml(reg.volunteers.email)}</div>
     ${isMaraude && reg.volunteers.permis ? '<div class="pib-row"><i class="fas fa-car" aria-hidden="true"></i>Possède le permis</div>' : ''}
     <div class="pib-row"><i class="fas fa-circle" aria-hidden="true"
@@ -874,11 +861,7 @@ function toggleCdmDropdown(date) {
   if (nowOpen) dropdown.querySelectorAll('textarea').forEach(autoResizeTextarea)
 }
 
-/** Fait grandir/rétrécir un textarea pour s'ajuster à son contenu. */
-function autoResizeTextarea(el) {
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
-}
+// autoResizeTextarea → js/dom-utils.js
 
 async function saveDayInfoFieldFromInput(el, date, field) {
   try {
@@ -900,6 +883,18 @@ function showToast(type, msg) {
   if (toastTimer) clearTimeout(toastTimer)
   toastTimer = setTimeout(() => { el.classList.remove('show') }, 3000)
 }
+
+// ── Formatage en direct (nom en majuscules, téléphone espacé) ──────
+document.getElementById('add-nom').addEventListener('input', e => {
+  const el = e.target, pos = el.selectionStart
+  el.value = formatNom(el.value)
+  el.setSelectionRange(pos, pos)
+})
+;['add-tel', 'add-extra-urgence-tel'].forEach(id => {
+  document.getElementById(id).addEventListener('input', e => {
+    e.target.value = formatTel(e.target.value)
+  })
+})
 
 // ── Clavier ───────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {

@@ -38,6 +38,10 @@ exports.handler = async (event) => {
     }
     return { statusCode: 200, body: JSON.stringify({ exists: false }) }
   } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ error: e.message }) }
+    // Le détail de l'erreur reste côté serveur (logs Netlify) — un message
+    // précis renvoyé au client pourrait exposer des informations exploitables
+    // (structure interne, requête en cause, etc.).
+    console.error('lookup-volunteer.js:', e)
+    return { statusCode: 500, body: JSON.stringify({ error: 'Une erreur est survenue, merci de réessayer.' }) }
   }
 }

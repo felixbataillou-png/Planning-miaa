@@ -22,6 +22,8 @@
  *   - @supabase/supabase-js v2 (CDN)
  *   - js/supabase-config.js → db
  *   - js/cdm-site.js        → CdmSite, auth partagée
+ *   - js/dom-utils.js       → escHtml/escAttr/initials/autoResizeTextarea
+ *   - js/admin-date-utils.js → TODAY/DAYS_FR/…/getMonday/addDays/localDateKey/dayDiff/getWeekDays
  */
 
 // ── Point d'entrée appelé par cdm-site.js ──────────────────────────
@@ -31,11 +33,7 @@ window.onCdmReady = async function () {
 }
 
 // ── Constantes ────────────────────────────────────────────────────
-const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })()
-const DAYS_FR     = ['Lun','Mar','Mer','Jeu','Ven']
-const MONTHS_FR   = ['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc']
-const MONTHS_FULL = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
-const DAYS_FULL   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi']
+// TODAY/DAYS_FR/MONTHS_FR/MONTHS_FULL/DAYS_FULL → js/admin-date-utils.js
 
 const ROLES = [
   { id: 'cdm',       label: 'CDM',       quota: 1, time: '',                       isMaraude: false, isCdm: true },
@@ -48,31 +46,8 @@ const ROLES = [
 // affiche lui via un dropdown replié (voir DAY_INFO_FIELDS là-bas).
 
 // ── Helpers ───────────────────────────────────────────────────────
-function getMonday(d) {
-  const date = new Date(d), day = date.getDay() || 7
-  date.setDate(date.getDate() - day + 1); return date
-}
-function addDays(d, n) { const r = new Date(d); r.setDate(r.getDate() + n); return r }
-function localDateKey(d) {
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-function dayDiff(d) {
-  return Math.round((new Date(localDateKey(d)) - new Date(localDateKey(TODAY))) / 86400000)
-}
-function initials(name) {
-  const parts = name.trim().split(' ')
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-  return name.slice(0, 2).toUpperCase()
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-}
-function escAttr(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')
-}
+// getMonday/addDays/localDateKey/dayDiff → js/admin-date-utils.js
+// initials/escHtml/escAttr/autoResizeTextarea → js/dom-utils.js
 
 // ── Supabase helpers ──────────────────────────────────────────────
 
@@ -111,11 +86,7 @@ async function saveDayInfoFieldFromInput(el, date, field) {
   }
 }
 
-/** Fait grandir/rétrécir un textarea pour s'ajuster à son contenu. */
-function autoResizeTextarea(el) {
-  el.style.height = 'auto'
-  el.style.height = el.scrollHeight + 'px'
-}
+// autoResizeTextarea → js/dom-utils.js
 
 /** Charge les inscriptions de la semaine (vue restreinte) + les infos de
  * base des bénévoles concernés (vue volunteers_basic), puis les assemble
@@ -153,10 +124,7 @@ let lastRegsData   = [] // dernier jeu de données chargé par renderPage (évit
 let lastDayInfoMap = {}
 
 // ── Week helpers ──────────────────────────────────────────────────
-function getWeekDays(offset) {
-  const monday = getMonday(addDays(TODAY, offset * 7))
-  return Array.from({ length: 5 }, (_, i) => addDays(monday, i))
-}
+// getWeekDays → js/admin-date-utils.js
 
 /** Jour actif par défaut à l'arrivée sur une semaine : aujourd'hui s'il en
  * fait partie, sinon le premier jour à venir (le lundi pour une semaine
