@@ -79,6 +79,18 @@ function formatTel(tel) {
 }
 
 // ── Supabase helpers ──────────────────────────────────────────────
+/** Supabase-js ne lance jamais d'exception sur une erreur de requête
+ * (insert/update/delete/rpc) : elle est seulement renvoyée dans `error`,
+ * silencieusement ignorée par un simple `await` sans vérification — c'est
+ * ce qui causait des "succès" affichés à l'admin alors que l'écriture avait
+ * échoué en base. Ce helper transforme `error` en exception (message lisible
+ * de Postgres/PostgREST), pour que les catch() de ce fichier la détectent
+ * réellement et informent l'admin de la cause précise. */
+function unwrap({ data, error }) {
+  if (error) throw new Error(error.message || 'Erreur inconnue')
+  return data
+}
+
 async function getSlotRegs(ds, roleId) {
   const { data } = await db
     .from('registrations')
@@ -93,7 +105,7 @@ async function getSlotRegs(ds, roleId) {
  * (note du CDM, lecture seule ici, modifiable uniquement depuis l'espace
  * CDM via update_registration_note_cdm — voir js/cdm.js). */
 async function updateRegistrationNote(regId, note) {
-  return db.rpc('update_registration_note', { p_registration_id: regId, p_note: note })
+  return unwrap(await db.rpc('update_registration_note', { p_registration_id: regId, p_note: note }))
 }
 
 /** Charge repas/nombre/info_jour pour un lot de dates (indépendant de la
@@ -112,41 +124,46 @@ async function loadDayInfo(dateKeys) {
 async function saveDayInfoField(date, field, value) {
   const args = { p_date: date, p_repas: null, p_nombre: null, p_info_jour: null }
   args[`p_${field}`] = value
-  return db.rpc('upsert_day_info', args)
+  return unwrap(await db.rpc('upsert_day_info', args))
 }
 
 async function setSlotStatus(regId, newStatus) {
-  await db.from('registrations').update({ status: newStatus }).eq('id', regId)
+  unwrap(await db.from('registrations').update({ status: newStatus }).eq('id', regId))
 }
 
 async function deleteReg(regId) {
-  await db.from('registrations').delete().eq('id', regId)
+  unwrap(await db.from('registrations').delete().eq('id', regId))
 }
 
 async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
                       secu = '', profession = '', adresse = '', codepostal = '', ville = '',
                       urgenceContact = '', firstTime = false, note = '') {
-  const { data: existing } = await db
-    .from('volunteers').select('id').eq('email', email).maybeSingle()
+  const existing = unwrap(await db
+    .from('volunteers').select('id').eq('email', email).maybeSingle())
 
   let volunteerId
   if (existing) {
     volunteerId = existing.id
   } else {
-    const { data: newVol } = await db
+    const newVol = unwrap(await db
       .from('volunteers')
       .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
                 urgence_contact: urgenceContact, rgpd: true })
-      .select('id').single()
+      .select('id').single())
     volunteerId = newVol.id
   }
 
   const token = crypto.randomUUID()
-  await db.from('registrations').insert({
+  const newReg = unwrap(await db.from('registrations').insert({
     volunteers_id: volunteerId, date: ds, role: roleId,
-    status: status, Confirm_token: token, first_time: !!firstTime,
-    note: note || null
-  })
+    status: status, Confirm_token: token, first_time: !!firstTime
+  }).select('id').single())
+
+  // La note du planneur passe par la même RPC dédiée que depuis modal-edit
+  // (voir updateRegistrationNote) plutôt que par une écriture directe dans
+  // l'insert ci-dessus : "note" n'est a priori autorisée en écriture que par
+  // cette fonction (politique RLS), pas à l'insertion de la ligne elle-même.
+  if (note) await updateRegistrationNote(newReg.id, note)
 }
 
 // ── État ──────────────────────────────────────────────────────────
@@ -555,8 +572,14 @@ async function saveEdit() {
     : document.getElementById('edit-status').value
   const newNote = document.getElementById('edit-note').value
 
-  await setSlotStatus(regId, newStatus)
-  if (newNote !== editOriginalNote) await updateRegistrationNote(regId, newNote)
+  try {
+    await setSlotStatus(regId, newStatus)
+    if (newNote !== editOriginalNote) await updateRegistrationNote(regId, newNote)
+  } catch (err) {
+    console.error(err)
+    showToast('red', `Échec de l'enregistrement : ${err.message || 'erreur inconnue'}`)
+    return
+  }
 
   document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
   document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
@@ -672,7 +695,7 @@ async function submitAdd() {
       showToast('green', `${nom} ajouté(e) au créneau.`)
     } catch (err) {
       console.error(err)
-      showToast('red', 'Une erreur est survenue, merci de réessayer.')
+      showToast('red', `Échec de l'ajout : ${err.message || 'erreur inconnue'}`)
     }
   } else {
     closeModal('modal-add')
@@ -747,7 +770,7 @@ async function submitAddExtra() {
   } catch(err) {
     console.error(err)
     btn.disabled = false; btn.textContent = 'Confirmer'
-    showToast('red', 'Une erreur est survenue, merci de réessayer.')
+    showToast('red', `Échec de l'ajout : ${err.message || 'erreur inconnue'}`)
   }
 }
 
@@ -781,7 +804,14 @@ async function confirmDelete() {
   const regs = await getSlotRegs(dateStr, roleId)
   const reg  = regs.find(r => String(r.id) === String(regId))
 
-  await deleteReg(regId)
+  try {
+    await deleteReg(regId)
+  } catch (err) {
+    console.error(err)
+    closeModal('modal-delete')
+    showToast('red', `Échec de la suppression : ${err.message || 'erreur inconnue'}`)
+    return
+  }
   closeModal('modal-delete')
   await renderPage()
 
@@ -868,7 +898,7 @@ async function saveDayInfoFieldFromInput(el, date, field) {
     await saveDayInfoField(date, field, el.value.trim())
   } catch (err) {
     console.error(err)
-    showToast('red', "Une erreur est survenue lors de l'enregistrement.")
+    showToast('red', `Échec de l'enregistrement : ${err.message || 'erreur inconnue'}`)
   }
 }
 
