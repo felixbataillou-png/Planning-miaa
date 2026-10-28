@@ -35,6 +35,14 @@ window.onCdmReady = async function () {
 // ── Constantes ────────────────────────────────────────────────────
 // TODAY/DAYS_FR/MONTHS_FR/MONTHS_FULL/DAYS_FULL → js/admin-date-utils.js
 
+// À partir du 9 novembre 2026, la cuisine passe à 4 places (aligné sur
+// planning-admin et le côté public) ; un 5ème inscrit ajouté ponctuellement
+// par un admin s'affiche simplement "5/4".
+const CUISINE_QUOTA_REDUIT_DES = '2026-11-09'
+function displayQuota(role, ds) {
+  return role.id === 'cuisinier' && ds >= CUISINE_QUOTA_REDUIT_DES ? 4 : role.quota
+}
+
 const ROLES = [
   { id: 'cdm',       label: 'CDM',       quota: 1, time: '',                       isMaraude: false, isCdm: true },
   { id: 'cuisinier', label: 'Cuisiniers', quota: 5, time: '8h – 12h',             isMaraude: false },
@@ -258,8 +266,8 @@ function renderDayPanel() {
   </div>`
 
   // Ligne 3 : cuisiniers · Ligne 4 : maraudeurs
-  html += `<div class="cdm-row cdm-row--role">${roleRowHTML(cuisinierRole, regsFor('cuisinier'))}</div>`
-  html += `<div class="cdm-row cdm-row--role">${roleRowHTML(maraudeurRole, regsFor('maraudeur'))}</div>`
+  html += `<div class="cdm-row cdm-row--role">${roleRowHTML(cuisinierRole, regsFor('cuisinier'), ds)}</div>`
+  html += `<div class="cdm-row cdm-row--role">${roleRowHTML(maraudeurRole, regsFor('maraudeur'), ds)}</div>`
 
   html += `</div>`
 
@@ -289,15 +297,16 @@ function cdmSlotHTML(role, regs) {
 /** Bloc cuisiniers/maraudeurs : en-tête sur une seule ligne (rôle + horaire
  * d'un côté, carrés de places + comptage de l'autre) + cards bénévoles en
  * ligne (voir css/cdm.css). */
-function roleRowHTML(role, regs) {
+function roleRowHTML(role, regs, ds) {
+  const quota     = displayQuota(role, ds)
   const filled    = regs.length
-  const remaining = role.quota - filled
+  const remaining = quota - filled
   const isFull    = remaining <= 0
   const countMod  = isFull ? ' miaa-adminslot__count--full' : remaining <= 1 ? ' miaa-adminslot__count--warn' : ''
-  const countTxt  = isFull ? 'Complet' : `${filled}/${role.quota}`
+  const countTxt  = isFull && quota === role.quota ? 'Complet' : `${filled}/${quota}`
 
   let dotsHtml = ''
-  for (let s = 0; s < role.quota; s++) {
+  for (let s = 0; s < quota; s++) {
     if (s < filled) {
       const dotMod = regs[s].status === 'pending' ? ' miaa-dot--pending' : ' miaa-dot--taken'
       dotsHtml += `<div class="miaa-dot${dotMod}"></div>`

@@ -150,6 +150,28 @@
   </div>
 </div>
 
+<!-- Modal : Bénévole déjà inscrit sur ce créneau (confirmation d'une 2ème inscription) -->
+<div class="modal-overlay" id="modal-dup">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dup-modal-title">
+    <div class="modal-header">
+      <div>
+        <h3 id="dup-modal-title">Bénévole déjà inscrit</h3>
+        <div class="mh-sub" id="dup-modal-sub">—</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="confirm-warning">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true" style="margin-right:6px"></i>
+        <span id="dup-warning-text">—</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-tertiary" onclick="cancelAddDuplicate()" style="flex:0 0 auto;padding:12px 18px">Annuler</button>
+      <button class="btn-primary" id="dup-confirm-btn" onclick="confirmAddDuplicate()">Oui, l'inscrire à nouveau</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal : Confirmer la suppression -->
 <div class="modal-overlay" id="modal-delete" onclick="handleOverlayClick(event,'modal-delete')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="del-modal-title">
@@ -247,6 +269,19 @@
           <option value="confirmed">Confirmé</option>
           <option value="pending">En attente de validation</option>
         </select>
+      </div>
+      <!-- Première fois à ce poste — même design que #add-firsttime-group
+           (modale d'ajout). Modifiable par l'admin quelle que soit la valeur
+           d'origine (saisie par le bénévole ou renseignée automatiquement). -->
+      <div id="edit-firsttime-group">
+        <label for="edit-firsttime" class="toggle-row">
+          <span class="tl-main">Il s'agit de sa première fois à ce poste</span>
+          <span class="toggle-switch">
+            <input type="checkbox" id="edit-firsttime">
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="toggle-thumb" aria-hidden="true"></span>
+          </span>
+        </label>
       </div>
       <!-- Note laissée par le CDM sur ce bénévole — même visuel que les
            champs Nom/Prénom/… ci-dessus (lecture seule), pas la modale

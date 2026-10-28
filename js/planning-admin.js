@@ -39,6 +39,15 @@ window.onAdminReady = async function () {
 // ── Constantes ────────────────────────────────────────────────────
 // TODAY/DAYS_FR/MONTHS_FR/MONTHS_FULL/DAYS_FULL → js/admin-date-utils.js
 
+// Quota "affiché" d'un créneau : à partir du 9 novembre 2026, la cuisine passe
+// à 4 places (comme côté public, voir cuisineQuota() dans js/inscription.js).
+// role.quota reste le maximum réel : un admin peut toujours ajouter un 5ème
+// cuisinier ponctuellement, ce qui s'affiche simplement "5/4".
+const CUISINE_QUOTA_REDUIT_DES = '2026-11-09'
+function displayQuota(role, ds) {
+  return role.id === 'cuisinier' && ds >= CUISINE_QUOTA_REDUIT_DES ? 4 : role.quota
+}
+
 const ROLES = [
   // CDM : ajouté uniquement depuis planning-admin (pas de card publique sur
   // inscription.html, register.js rejette d'ailleurs ce rôle côté serveur).
@@ -79,6 +88,12 @@ function formatTel(tel) {
 }
 
 // ── Supabase helpers ──────────────────────────────────────────────
+/** Motif ilike pour comparer un email sans tenir compte de la casse
+ * ("Marie@x.fr" = "marie@x.fr") : \, % et _ sont échappés (jokers de ilike). */
+function emailLike(email) {
+  return email.replace(/[\\%_]/g, '\\$&')
+}
+
 /** Supabase-js ne lance jamais d'exception sur une erreur de requête
  * (insert/update/delete/rpc) : elle est seulement renvoyée dans `error`,
  * silencieusement ignorée par un simple `await` sans vérification — c'est
@@ -127,8 +142,8 @@ async function saveDayInfoField(date, field, value) {
   return unwrap(await db.rpc('upsert_day_info', args))
 }
 
-async function setSlotStatus(regId, newStatus) {
-  unwrap(await db.from('registrations').update({ status: newStatus }).eq('id', regId))
+async function setSlotStatus(regId, newStatus, firstTime) {
+  unwrap(await db.from('registrations').update({ status: newStatus, first_time: !!firstTime }).eq('id', regId))
 }
 
 async function deleteReg(regId) {
@@ -139,7 +154,7 @@ async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
                       secu = '', profession = '', adresse = '', codepostal = '', ville = '',
                       urgenceContact = '', firstTime = false, note = '') {
   const existing = unwrap(await db
-    .from('volunteers').select('id').eq('email', email).maybeSingle())
+    .from('volunteers').select('id').ilike('email', emailLike(email)).limit(1).maybeSingle())
 
   let volunteerId
   if (existing) {
@@ -147,7 +162,7 @@ async function addReg(ds, roleId, nom, prenom, email, tel, permis, status,
   } else {
     const newVol = unwrap(await db
       .from('volunteers')
-      .insert({ nom, prenom, email, tel, permis, secu, profession, adresse, codepostal, ville,
+      .insert({ nom, prenom, email: email.toLowerCase(), tel, permis, secu, profession, adresse, codepostal, ville,
                 urgence_contact: urgenceContact, rgpd: true })
       .select('id').single())
     volunteerId = newVol.id
@@ -182,8 +197,10 @@ let pendingAction     = null
 let addTarget         = null
 let addIsMaraude      = false
 let addExtraData      = null
+let pendingDupAdd     = null
 let editOriginalStatus = null
 let editOriginalNote   = null
+let editOriginalFirstTime = false
 let lastFocusedTrigger = null
 
 // ── Week helpers ──────────────────────────────────────────────────
@@ -234,7 +251,7 @@ async function renderPage() {
       total     += slotRegs.length
       confirmed += slotRegs.filter(r => r.status === 'confirmed').length
       pending   += slotRegs.filter(r => r.status === 'pending').length
-      spots     += Math.max(0, role.quota - slotRegs.length)
+      spots     += Math.max(0, displayQuota(role, ds) - slotRegs.length)
     })
   })
 
@@ -298,10 +315,13 @@ async function renderPage() {
     ROLES.forEach(role => {
       const regs      = regsData.filter(r => r.date === ds && r.role === role.id)
       const filled    = regs.length
-      const remaining = role.quota - filled
+      const quota     = displayQuota(role, ds)
+      const remaining = quota - filled
       const isFull    = remaining <= 0
+      // Plein au sens du maximum réel (role.quota) : seul cas où l'ajout est bloqué.
+      const isMaxed   = filled >= role.quota
       const countMod  = isFull ? ' miaa-adminslot__count--full' : remaining <= 1 ? ' miaa-adminslot__count--warn' : ''
-      const countTxt  = isFull ? 'Complet' : `${filled}/${role.quota}`
+      const countTxt  = isFull && quota === role.quota ? 'Complet' : `${filled}/${quota}`
 
       html += `<div class="miaa-adminslot">`
       if (role.isCdm) {
@@ -322,7 +342,7 @@ async function renderPage() {
         </div>`
 
         html += `<div class="miaa-adminslot__dots" aria-hidden="true">`
-        for (let s = 0; s < role.quota; s++) {
+        for (let s = 0; s < quota; s++) {
           if (s < filled) {
             const dotMod = regs[s].status === 'pending' ? ' miaa-dot--pending' : ' miaa-dot--taken'
             html += `<div class="miaa-dot${dotMod}"></div>`
@@ -405,7 +425,7 @@ async function renderPage() {
         // CTA "Ajouter une personne" (visible/éditable qu'un CDM soit
         // inscrit ou non — rattaché à la date, pas à une inscription précise).
         if (regs.length > 0) html += `<hr class="miaa-adminslot__divider">`
-        if (!isPast && !isFull) {
+        if (!isPast && !isMaxed) {
           const addLabel = escAttr(`Ajouter au créneau ${role.label.toLowerCase()}, ${dateLabel}`)
           html += `<button class="miaa-add"
             data-date="${ds}" data-role="${role.id}"
@@ -420,7 +440,7 @@ async function renderPage() {
       } else if (!isPast) {
         const addLabel = escAttr(`Ajouter au créneau ${role.label.toLowerCase()}, ${dateLabel}`)
         if (regs.length > 0) html += `<hr class="miaa-adminslot__divider">`
-        if (!isFull) {
+        if (!isMaxed) {
           html += `<button class="miaa-add"
             data-date="${ds}" data-role="${role.id}"
             data-label="${escAttr(role.label)}" data-time="${escAttr(role.time)}"
@@ -503,6 +523,7 @@ async function openEdit(dateStr, roleId, regId, event) {
   pendingAction      = { type: 'edit', dateStr, roleId, regId }
   editOriginalStatus = reg.status
   editOriginalNote   = reg.note || ''
+  editOriginalFirstTime = !!reg.first_time
 
   const role = ROLES.find(r => r.id === roleId)
   const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
@@ -513,6 +534,7 @@ async function openEdit(dateStr, roleId, regId, event) {
   document.getElementById('edit-email').value                    = reg.volunteers.email  || '—'
   document.getElementById('edit-status').value                   = reg.status
   document.getElementById('edit-note').value                     = editOriginalNote
+  document.getElementById('edit-firsttime').checked              = editOriginalFirstTime
   // Affiché quel que soit le rôle (cuisine incluse) — seule la vue planning
   // globale continue de réserver ce badge à la maraude.
   document.getElementById('edit-permis-display').style.display   = reg.volunteers.permis ? 'flex' : 'none'
@@ -547,6 +569,7 @@ async function openEdit(dateStr, roleId, regId, event) {
 
   document.getElementById('edit-status').addEventListener('change', checkEditChanges)
   document.getElementById('edit-note').addEventListener('input', checkEditChanges)
+  document.getElementById('edit-firsttime').addEventListener('change', checkEditChanges)
   openModalEl('modal-edit')
   // Un textarea cachée (display:none, avant l'ouverture de la modale) a un
   // scrollHeight de 0 : l'ajustement ne peut se faire qu'une fois affichée.
@@ -557,8 +580,9 @@ function checkEditChanges() {
   const newStatus = document.getElementById('edit-status').value
   const newNote   = document.getElementById('edit-note').value
   const noteChanged = newNote !== editOriginalNote
+  const firstTimeChanged = document.getElementById('edit-firsttime').checked !== editOriginalFirstTime
   document.getElementById('edit-save-btn').disabled =
-    editOriginalStatus !== 'pending' && newStatus === editOriginalStatus && !noteChanged
+    editOriginalStatus !== 'pending' && newStatus === editOriginalStatus && !noteChanged && !firstTimeChanged
 }
 
 async function saveEdit() {
@@ -573,7 +597,7 @@ async function saveEdit() {
   const newNote = document.getElementById('edit-note').value
 
   try {
-    await setSlotStatus(regId, newStatus)
+    await setSlotStatus(regId, newStatus, document.getElementById('edit-firsttime').checked)
     if (newNote !== editOriginalNote) await updateRegistrationNote(regId, newNote)
   } catch (err) {
     console.error(err)
@@ -583,6 +607,7 @@ async function saveEdit() {
 
   document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
   document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
+  document.getElementById('edit-firsttime').removeEventListener('change', checkEditChanges)
   closeModal('modal-edit')
   await renderPage()
   const volNom = `${reg.volunteers.prenom || ''} ${formatNom(reg.volunteers.nom)}`.trim()
@@ -592,6 +617,7 @@ async function saveEdit() {
 function deleteFromEdit() {
   document.getElementById('edit-status').removeEventListener('change', checkEditChanges)
   document.getElementById('edit-note').removeEventListener('input', checkEditChanges)
+  document.getElementById('edit-firsttime').removeEventListener('change', checkEditChanges)
   closeModal('modal-edit')
   const { dateStr, roleId, regId } = pendingAction
   openDelete(dateStr, roleId, regId)
@@ -639,7 +665,8 @@ function initAddEmailAutocomplete () {
     const { data: vol } = await db
       .from('volunteers')
       .select('nom, prenom, tel, permis')
-      .eq('email', email)
+      .ilike('email', emailLike(email))
+      .limit(1)
       .maybeSingle()
 
     document.getElementById('add-email-loading').style.display = 'none'
@@ -684,23 +711,69 @@ async function submitAdd() {
   if (!valid) { if (firstInvalid) firstInvalid.focus(); return }
 
   const { data: existing } = await db
-    .from('volunteers').select('id').eq('email', email).maybeSingle()
+    .from('volunteers').select('id').ilike('email', emailLike(email)).limit(1).maybeSingle()
 
   if (existing) {
+    // Même bénévole déjà inscrit sur ce créneau (date + rôle) : on demande
+    // confirmation avant de l'inscrire une 2ème fois.
+    let dupReg = null
     try {
-      await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status,
-        '', '', '', '', '', '', firstTime, note)
-      closeModal('modal-add')
-      await renderPage()
-      showToast('green', `${nom} ajouté(e) au créneau.`)
+      dupReg = unwrap(await db.from('registrations').select('id')
+        .eq('volunteers_id', existing.id)
+        .eq('date', addTarget.dateStr).eq('role', addTarget.roleId)
+        .limit(1).maybeSingle())
     } catch (err) {
       console.error(err)
-      showToast('red', `Échec de l'ajout : ${err.message || 'erreur inconnue'}`)
+      showToast('red', `Échec de la vérification : ${err.message || 'erreur inconnue'}`)
+      return
+    }
+    pendingDupAdd = { nom, prenom, email, tel, permis, status, firstTime, note }
+    if (dupReg) {
+      openDupModal()
+    } else {
+      await addExistingVolunteer()
     }
   } else {
     closeModal('modal-add')
     openAddExtra(nom, prenom, email, tel, permis, status, firstTime, note)
   }
+}
+
+async function addExistingVolunteer() {
+  const { nom, prenom, email, tel, permis, status, firstTime, note } = pendingDupAdd
+  try {
+    await addReg(addTarget.dateStr, addTarget.roleId, nom, prenom, email, tel, permis, status,
+      '', '', '', '', '', '', firstTime, note)
+    closeModal('modal-add')
+    await renderPage()
+    showToast('green', `${nom} ajouté(e) au créneau.`)
+  } catch (err) {
+    console.error(err)
+    showToast('red', `Échec de l'ajout : ${err.message || 'erreur inconnue'}`)
+  }
+}
+
+function openDupModal() {
+  const role = ROLES.find(r => r.id === addTarget.roleId)
+  const d = new Date(addTarget.dateStr + 'T00:00:00')
+  const slot = `${role.label}, ${DAYS_FULL[d.getDay()].toLowerCase()} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`
+  document.getElementById('dup-modal-sub').textContent = slot
+  document.getElementById('dup-warning-text').textContent =
+    `Attention, ce bénévole est déjà inscrit à ce créneau (${slot}). Voulez-vous l'inscrire à nouveau ?`
+  document.getElementById('dup-confirm-btn').disabled = false
+  closeModal('modal-add')
+  openModalEl('modal-dup')
+}
+
+function cancelAddDuplicate() {
+  closeModal('modal-dup')
+  openModalEl('modal-add')
+}
+
+async function confirmAddDuplicate() {
+  document.getElementById('dup-confirm-btn').disabled = true
+  closeModal('modal-dup')
+  await addExistingVolunteer()
 }
 
 function openAddExtra(nom, prenom, email, tel, permis, status, firstTime, note) {
@@ -928,7 +1001,7 @@ document.getElementById('add-nom').addEventListener('input', e => {
 
 // ── Clavier ───────────────────────────────────────────────────────
 document.addEventListener('keydown', e => {
-  const openId = ['modal-add','modal-delete','modal-edit','modal-add-extra'].find(id =>
+  const openId = ['modal-dup','modal-add','modal-delete','modal-edit','modal-add-extra'].find(id =>
     document.getElementById(id)?.classList.contains('open')
   )
   if (!openId) return

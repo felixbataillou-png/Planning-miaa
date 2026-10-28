@@ -1,6 +1,17 @@
 const crypto = require('crypto')
 const { checkRateLimit } = require('./_rate-limit')
 
+// Places en cuisine proposées au public : 4 à partir du lundi 9 novembre 2026.
+// Doit rester aligné sur cuisineQuota() de js/inscription.js. planning-admin
+// n'est pas concerné (il continue d'accepter jusqu'à 5 inscrits).
+const CUISINE_QUOTA_REDUIT_DES = '2026-11-09'
+const CUISINE_QUOTA_PUBLIC = 4
+
+// Les emails sont comparés sans tenir compte de la casse (ilike) : "Marie@x.fr"
+// et "marie@x.fr" désignent le même bénévole. \, % et _ sont échappés pour
+// ne pas être interprétés comme des jokers.
+const escapeLike = s => s.replace(/[\\%_]/g, '\\$&')
+
 // Regroupe tout le flux d'inscription publique côté serveur (clé service_role) :
 // find-or-create du bénévole, anti-doublon sur le créneau, insertion de
 // l'inscription, notification admin. Nécessaire depuis le verrouillage RLS :
@@ -72,9 +83,25 @@ exports.handler = async (event) => {
       Authorization: `Bearer ${serviceKey}`
     }
 
+    // Quota public en cuisine (à partir du 9 novembre) : vérifié ici, avant toute
+    // création, pour qu'une page restée ouverte ne permette pas de dépasser 4.
+    if (role === 'cuisinier' && date >= CUISINE_QUOTA_REDUIT_DES) {
+      const countRes  = await fetch(
+        `${supabaseUrl}/rest/v1/registrations?select=id&date=eq.${encodeURIComponent(date)}&role=eq.cuisinier`,
+        { headers }
+      )
+      const countData = await countRes.json()
+      if (!countRes.ok || !Array.isArray(countData)) {
+        throw new Error('Lecture du quota cuisine impossible')
+      }
+      if (countData.length >= CUISINE_QUOTA_PUBLIC) {
+        return { statusCode: 409, body: JSON.stringify({ error: 'CRENEAU_COMPLET' }) }
+      }
+    }
+
     // 1. Recherche ou création du bénévole
     const findRes  = await fetch(
-      `${supabaseUrl}/rest/v1/volunteers?select=id&email=eq.${encodeURIComponent(email)}`,
+      `${supabaseUrl}/rest/v1/volunteers?select=id&limit=1&email=ilike.${encodeURIComponent(escapeLike(email))}`,
       { headers }
     )
     const findData = await findRes.json()
@@ -87,7 +114,7 @@ exports.handler = async (event) => {
         method: 'POST',
         headers: { ...headers, Prefer: 'return=representation' },
         body: JSON.stringify({
-          nom, prenom, email, tel, permis, secu, profession, adresse,
+          nom, prenom, email: email.toLowerCase(), tel, permis, secu, profession, adresse,
           codepostal, ville, urgence_contact: urgenceContact, rgpd: true
         })
       })

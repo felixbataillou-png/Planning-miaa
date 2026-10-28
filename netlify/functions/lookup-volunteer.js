@@ -1,5 +1,8 @@
 const { checkRateLimit } = require('./_rate-limit')
 
+// Comparaison d'email insensible à la casse ; \, % et _ échappés (jokers de ilike).
+const escapeLike = s => s.replace(/[\\%_]/g, '\\$&')
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method not allowed' }
@@ -27,7 +30,7 @@ exports.handler = async (event) => {
     const serviceKey  = process.env.SUPABASE_SERVICE_ROLE
 
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/volunteers?select=id,nom,prenom,tel,permis&email=eq.${encodeURIComponent(email)}`,
+      `${supabaseUrl}/rest/v1/volunteers?select=id,nom,prenom,tel,permis&limit=1&email=ilike.${encodeURIComponent(escapeLike(email))}`,
       { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
     )
     const data = await res.json()

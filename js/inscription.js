@@ -67,6 +67,8 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
   })
 
   if (res.status === 409) {
+    const body = await res.json().catch(() => ({}))
+    if (body.error === 'CRENEAU_COMPLET') throw new Error('CRENEAU_COMPLET')
     throw new Error('Vous êtes déjà inscrit à ce créneau pour cette activité.')
   }
   if (res.status === 403) {
@@ -78,6 +80,14 @@ async function storeReg(ds, roleId, nom, prenom, email, tel, permis,
 }
 
 // ── Rendu du planning ─────────────────────────────────────────────
+
+// Places en cuisine proposées au public : 4 à partir du lundi 9 novembre 2026
+// (5 avant). Affichage uniquement — planning-admin garde un quota de 5, et une
+// 5e inscription ajoutée par un admin n'est simplement pas visible ici.
+const CUISINE_QUOTA_REDUIT_DES = '2026-11-09'
+function cuisineQuota(ds) {
+  return ds >= CUISINE_QUOTA_REDUIT_DES ? 4 : 5
+}
 
 /**
  * Affiche le planning de la semaine courante.
@@ -181,11 +191,12 @@ async function renderWeek() {
       </h2>
     </div>`
 
-    html += buildSlot('cuisinier', 'Cuisiniers', '8h – 12h', ds, filledCuis, 5, urg, cuisinierClosed, false)
+    const quotaCuis = cuisineQuota(ds)
+    html += buildSlot('cuisinier', 'Cuisiniers', '8h – 12h', ds, filledCuis, quotaCuis, urg, cuisinierClosed, false)
     html += buildSlotMaraude(ds, filledMar, 4, permisCount, urg, maraudeurClosed)
 
     if (!isPast) {
-      const rCuis     = 5 - filledCuis
+      const rCuis     = quotaCuis - filledCuis
       const rMar      = 4 - filledMar
       const canDouble = !cuisinierClosed && !maraudeurClosed && rCuis > 0 && rMar > 0
       const dateLabel = `${dayFullName} ${day.getDate()} ${MONTHS_FULL[day.getMonth()]}`
@@ -262,7 +273,7 @@ function buildSpots(filled, quota) {
  */
 function buildSlot(roleId, label, time, ds, filled, quota, urg, isClosed, isMaraude) {
   const remaining = quota - filled
-  const isFull    = remaining === 0
+  const isFull    = remaining <= 0
   const varCls    = slotVariantClass(isClosed, isFull, urg)
   const d         = new Date(ds + 'T00:00:00')
   const dateLabel = `${DAYS_FULL[d.getDay()]} ${d.getDate()} ${MONTHS_FULL[d.getMonth()]}`
@@ -294,7 +305,7 @@ function buildSlot(roleId, label, time, ds, filled, quota, urg, isClosed, isMara
  */
 function buildSlotMaraude(ds, filled, quota, permisCount, urg, isClosed) {
   const remaining = quota - filled
-  const isFull    = remaining === 0
+  const isFull    = remaining <= 0
   const varCls    = slotVariantClass(isClosed, isFull, urg)
   const time      = "11h – début d'après-midi"
   const d         = new Date(ds + 'T00:00:00')
@@ -508,6 +519,8 @@ async function submitForm() {
       btnConfirm.textContent = 'Confirmer mon inscription'
       if (err.message === 'NOTIFY_FAILED') {
        alert('Votre inscription a bien été enregistrée, mais nous avons rencontré un problème technique pour vous confirmer par email. Merci de nous contacter directement à miaa@miaa.fr')
+      } else if (err.message === 'CRENEAU_COMPLET') {
+        alert("Ce créneau vient d'être complété. Merci de recharger la page et de choisir un autre créneau.")
       } else if (err.message === 'JOUR_DESACTIVE') {
         alert("Ce jour n'est plus disponible aux inscriptions. Merci de recharger la page et de choisir un autre créneau.")
       } else {
@@ -642,7 +655,9 @@ async function submitFormExtra() {
     console.error('Message:', err.message)
     btn.disabled    = false
     btn.textContent = 'Confirmer mon inscription'
-    if (err.message === 'JOUR_DESACTIVE') {
+    if (err.message === 'CRENEAU_COMPLET') {
+      alert("Ce créneau vient d'être complété. Merci de recharger la page et de choisir un autre créneau.")
+    } else if (err.message === 'JOUR_DESACTIVE') {
       alert("Ce jour n'est plus disponible aux inscriptions. Merci de recharger la page et de choisir un autre créneau.")
     } else {
       alert(err.message.includes('déjà inscrit')
