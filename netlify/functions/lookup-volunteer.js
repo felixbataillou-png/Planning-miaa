@@ -13,7 +13,8 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Body manquant' }) }
     }
 
-    const { email } = JSON.parse(event.body)
+    const { email: rawEmail } = JSON.parse(event.body)
+    const email = String(rawEmail || '').trim()
     if (!email) {
       return { statusCode: 400, body: JSON.stringify({ error: 'email manquant' }) }
     }

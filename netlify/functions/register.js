@@ -28,10 +28,12 @@ exports.handler = async (event) => {
     }
 
     const {
-      date, role, nom, prenom, email, tel, permis,
+      date, role, nom, prenom, email: rawEmail, tel, permis,
       secu = '', profession = '', adresse = '', codepostal = '',
       ville = '', urgenceContact = '', firstTime = false, website = ''
     } = JSON.parse(event.body)
+
+    const email = String(rawEmail || '').trim()
 
     // Piège à bots : un champ censé rester vide, invisible pour un humain.
     // On répond succès sans rien écrire, pour ne pas révéler le mécanisme.
